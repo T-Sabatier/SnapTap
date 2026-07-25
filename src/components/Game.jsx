@@ -167,6 +167,65 @@ function SpecialBanner({ special }) {
   );
 }
 
+// Annonce PLEIN ECRAN du JACKPOT (x2 sort + manche double = x4), au moment de
+// la revelation. Meme "slam" que les manches speciales : ca claque ~2.5 s puis
+// se fond. Remontee a chaque manche (key=round).
+function JackpotAnnounce({ apero, winnerName }) {
+  const [phase, setPhase] = useState('in'); // 'in' → 'out' → hidden
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase('out'), 2100);
+    const t2 = setTimeout(() => setPhase('hidden'), 2500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
+  if (phase === 'hidden') return null;
+  return (
+    <div
+      className={`fixed inset-0 z-[55] flex items-center justify-center p-6 ${phase === 'out' ? 'special-fade' : ''}`}
+      style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
+    >
+      <div className="special-slam text-center flex flex-col items-center">
+        <div className="text-6xl leading-none mb-3" aria-hidden>
+          🎆🎇🎆
+        </div>
+        <div
+          style={{ fontFamily: '"Space Mono", monospace', color: YELLOW }}
+          className="text-sm uppercase tracking-[0.4em] mb-3"
+        >
+          Jackpot
+        </div>
+        <div
+          style={{
+            fontFamily: '"Anton", sans-serif',
+            color: '#fff',
+            WebkitTextStroke: '3px #000',
+            paintOrder: 'stroke fill',
+          }}
+          className="text-7xl uppercase leading-none mb-5"
+        >
+          x4 !
+        </div>
+        <div
+          style={{
+            fontFamily: '"Anton", sans-serif',
+            backgroundColor: YELLOW,
+            color: '#000',
+            boxShadow: '6px 6px 0 #000',
+            transform: 'rotate(1.5deg)',
+          }}
+          className="inline-block border-4 border-black px-5 py-3 text-xl uppercase max-w-xs"
+        >
+          {apero
+            ? `Tout le monde boit 1 à la santé de ${winnerName || '?'} !`
+            : `Félicitations ${winnerName || ''} !`}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Couche d'affichage des reactions : chaque reaction recente (< 3.5 s) monte
 // et s'estompe. Position horizontale deterministe (hash de la cle) → placee
 // pareil sur tous les ecrans. reactions = objet Firebase { key: {e, t} }.
@@ -1757,6 +1816,13 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
         <TopBar />
         <Scoreboard />
+        {jackpot && (
+          <JackpotAnnounce
+            key={room.round}
+            apero={partyMode}
+            winnerName={winnerP?.name}
+          />
+        )}
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center py-6 max-w-xl mx-auto w-full">
           {partyMode ? (
             <>
