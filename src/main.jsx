@@ -5,7 +5,12 @@ import { App as CapacitorApp } from '@capacitor/app';
 import App from './App.jsx';
 import { authReady } from './firebase';
 import { initPurchases } from './purchases';
+import { applyAperoTestUnlock } from './utils';
 import './index.css';
+
+// TEST TEMPORAIRE : un lien .../?apero=<TOKEN> debloque l'apero sur le web de
+// prod (test entre amis). A retirer apres le test — voir utils.js.
+applyAperoTestUnlock();
 
 // App native Android : le bouton retour systeme minimise l'app au lieu de la
 // tuer — on ne perd jamais une partie en cours (l'etat vit dans Firebase de
