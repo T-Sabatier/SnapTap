@@ -363,7 +363,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                 }
               }}
               placeholder="Prénom…"
-              maxLength={20}
+              maxLength={14}
               autoFocus={!myName}
               className="flex-1 min-w-0 border-4 border-black bg-white px-3 py-3 outline-none placeholder-black/30 text-lg"
               style={{ boxShadow: '4px 4px 0 #000' }}

@@ -406,7 +406,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Prénom…"
-            maxLength={20}
+            maxLength={14}
             className="w-full border-4 border-black bg-white px-3 py-3 outline-none placeholder-black/30 text-lg"
             style={{ boxShadow: '4px 4px 0 #000' }}
           />
@@ -633,7 +633,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && joinRoom()}
               placeholder="Prénom…"
-              maxLength={20}
+              maxLength={14}
               autoFocus
               className="w-full border-4 border-black bg-white px-3 py-3 outline-none placeholder-black/30 text-lg mb-4"
               style={{ boxShadow: '4px 4px 0 #000' }}
