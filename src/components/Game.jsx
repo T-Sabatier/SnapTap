@@ -641,9 +641,10 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       const updates = {};
       const winnerId = room.winnerInfo.playerId;
       const winnerCurrentScore = playerById[winnerId]?.score || 0;
-      // Gain = 1, +1 si Va-tout (sort), +1 si Manche Double (special).
+      // Gain = 1, DOUBLE si Va-tout (sort x2) et DOUBLE si Manche Double : les
+      // deux x2 se MULTIPLIENT → 1, 2, 2 ou 4 (jackpot les deux cumules).
       const gain =
-        1 + (room.vatout?.[winnerId] ? 1 : 0) + (room.special === 'double' ? 1 : 0);
+        1 * (room.vatout?.[winnerId] ? 2 : 1) * (room.special === 'double' ? 2 : 1);
       const winnerNewScore = winnerCurrentScore + gain;
       updates[`players/${winnerId}/score`] = winnerNewScore;
       // Le va-tout est valable un seul tour → on le remet a zero.
@@ -1662,10 +1663,12 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
   if (room.phase === 'result' && room.winnerInfo) {
     const winnerP = playerById[room.winnerInfo.playerId];
     const winnerCard = pool[room.winnerInfo.cardId];
-    const winnerGain =
-      1 +
-      (room.vatout?.[room.winnerInfo.playerId] ? 1 : 0) +
-      (room.special === 'double' ? 1 : 0);
+    const winnerUsedVatout = !!room.vatout?.[room.winnerInfo.playerId];
+    const winnerDoubleRound = room.special === 'double';
+    // x2 (sort) et manche "double" se MULTIPLIENT : 1 → x2 → x2 = jusqu'a x4.
+    const winnerGain = 1 * (winnerUsedVatout ? 2 : 1) * (winnerDoubleRound ? 2 : 1);
+    // Jackpot : les DEUX x2 cumules (sort + manche double) → x4.
+    const jackpot = winnerUsedVatout && winnerDoubleRound;
     const winnerNewScore = (winnerP?.score || 0) + winnerGain;
     const willWinGame = winnerNewScore >= (room.settings?.winningScore ?? WINNING_SCORE);
     const iAmWinner = room.winnerInfo.playerId === playerId;
@@ -1729,6 +1732,26 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   +{winnerGain} PT{winnerGain > 1 ? 'S' : ''} {iAmWinner && '🎉'}
                 </span>
               </div>
+
+              {/* Jackpot (x2 + manche double = x4) : bonus a boire collectif. */}
+              {jackpot && (
+                <div
+                  style={{
+                    fontFamily: '"Anton", sans-serif',
+                    backgroundColor: '#000',
+                    color: YELLOW,
+                    boxShadow: '5px 5px 0 #000',
+                    transform: 'rotate(-1deg)',
+                    lineHeight: 1.1,
+                  }}
+                  className="inline-block border-4 border-black px-5 py-3 text-xl uppercase mb-8 gage-pop"
+                >
+                  🎆 Jackpot x4 ! 🎆
+                  <div className="text-base mt-1">
+                    Tout le monde boit 1 à la santé de {winnerP?.name || '?'}
+                  </div>
+                </div>
+              )}
 
               {/* ---- ZONE 2 : la regle a boire, LA VEDETTE ---- */}
               <div className="w-full border-t-4 border-black/15 pt-8 flex flex-col items-center gap-2">
@@ -1896,7 +1919,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               >
                 +{winnerGain} point{winnerGain > 1 ? 's' : ''}
               </div>
-              {winnerGain > 1 && (
+              {winnerGain > 1 && !jackpot && (
                 <div
                   style={{
                     fontFamily: '"Anton", sans-serif',
@@ -1908,6 +1931,32 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   className="inline-block border-4 border-black px-3 py-1 text-lg uppercase mt-3 ml-2"
                 >
                   🔥 x2 réussi
+                </div>
+              )}
+              {/* Jackpot (x2 + manche double = x4) : feu d'artifice + felicitations. */}
+              {jackpot && (
+                <div className="mt-5 flex flex-col items-center gage-pop">
+                  <div className="text-5xl leading-none" aria-hidden>
+                    🎆🎇🎆
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: '"Anton", sans-serif',
+                      color: '#000',
+                      WebkitTextStroke: '2px #000',
+                      paintOrder: 'stroke fill',
+                      letterSpacing: '0.04em',
+                    }}
+                    className="text-3xl uppercase mt-2"
+                  >
+                    Félicitations !
+                  </div>
+                  <div
+                    style={{ fontFamily: '"Space Mono", monospace' }}
+                    className="text-sm font-bold uppercase tracking-wide mt-1"
+                  >
+                    x2 × x2 = x4
+                  </div>
                 </div>
               )}
             </>

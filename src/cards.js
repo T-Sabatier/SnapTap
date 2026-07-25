@@ -197,7 +197,7 @@ export const UNLOCK_ALL_ID = 'tout_debloquer';
 // Chaque joueur en a 1 charge par partie pour chaque sort active.
 export const SORTS = [
   { id: 'reroll', label: 'Reroll', emoji: '🎲', desc: 'Rejette ta main et repioche 7 cartes' },
-  { id: 'vatout', label: 'x2', emoji: '🔥', desc: 'Ta carte vaut +2 si le boss la choisit' },
+  { id: 'vatout', label: 'x2', emoji: '🔥', desc: 'Double tes points si le boss choisit ta carte' },
 ];
 
 export const HAND_SIZE = 7;
