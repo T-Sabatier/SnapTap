@@ -189,10 +189,18 @@ function GageRoulette({ players, targetId, onDone }) {
   useEffect(() => {
     const n = players.length;
     if (n <= 1) {
+      // Un seul eligible (parties a 3 : gagnant + boss exclus) → pas de vraie
+      // roulette. On DIFFERE onDone via setTimeout : sinon il s'execute pendant
+      // le montage, AVANT l'effet de reset du parent (les effets enfant passent
+      // avant ceux du parent sur un meme commit), qui remet gageRouletteDone a
+      // false juste apres → le texte du gage restait masque ("QUI S'Y COLLE ?"
+      // + joueur designe, mais pas de regle). Le delai ajoute aussi un beat.
       setActive(targetIdx);
-      setDone(true);
-      onDone && onDone();
-      return;
+      const t = setTimeout(() => {
+        setDone(true);
+        onDone && onDone();
+      }, 600);
+      return () => clearTimeout(t);
     }
     // Sequence : ~4 tours + arrivee sur la cible, deceleration cubique.
     // Plus long (~5-6 s) pour le suspense et pour que tout le monde suive.
