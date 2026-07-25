@@ -602,8 +602,22 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     if (!isBoss || busy) return;
     setBusy(true);
     try {
+      // Mode Apero : on resout le GAGE UNE seule fois ici (cote host) et on le
+      // fige dans winnerInfo. Tous les clients l'AFFICHENT tel quel, sans jamais
+      // le recalculer → meme texte + meme joueur designe pour tout le monde,
+      // immunise contre les differences de version/cache (un bundle perime ne
+      // peut plus afficher un autre gage, ni la roulette sans texte). En mode
+      // normal, winnerInfo.gage est simplement ignore.
+      const wCard = (room.pool || {})[entry.cardId];
+      const excluded = [entry.playerId, room.bossId];
+      const g = gageOf(wCard, entry.cardId, room.round || 1, room.players, excluded);
       await update(ref(db, `rooms/${roomCode}`), {
-        winnerInfo: { playerId: entry.playerId, cardId: entry.cardId },
+        winnerInfo: {
+          playerId: entry.playerId,
+          cardId: entry.cardId,
+          // Firebase ignore les cles null : targetId absent = defi non cible.
+          gage: { text: g.text, targetId: g.targetId ?? null },
+        },
         phase: 'result',
         bossPick: null,
       });
@@ -1713,13 +1727,18 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 {(() => {
                   // Exclus du defi : le gagnant (il ne boit pas) et le boss.
                   const excluded = [room.winnerInfo.playerId, room.bossId];
-                  const gage = gageOf(
-                    winnerCard,
-                    room.winnerInfo.cardId,
-                    room.round || 1,
-                    room.players,
-                    excluded
-                  );
+                  // Gage FIGE par le host (source de verite, identique pour tous).
+                  // Fallback sur le calcul local uniquement pour les parties
+                  // demarrees avant ce correctif (winnerInfo.gage absent).
+                  const gage =
+                    room.winnerInfo.gage ||
+                    gageOf(
+                      winnerCard,
+                      room.winnerInfo.cardId,
+                      room.round || 1,
+                      room.players,
+                      excluded
+                    );
                   const eligible = players.filter(
                     (p) => !excluded.includes(p.id)
                   );

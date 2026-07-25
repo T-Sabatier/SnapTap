@@ -136,6 +136,14 @@ function GameApp() {
           return;
         }
         if (cancelled) return;
+        // On ouvre le lien d'une AUTRE room (B) alors qu'on etait deja dans la
+        // room A : le nouveau lien GAGNE. On lache la room precedente pour
+        // atterrir sur l'accueil, qui lira ?room=B et affichera la modal de
+        // join. Sans ca, roomCode restait sur A et on restait bloque dedans.
+        if (roomCode && roomCode !== code) {
+          setStoredRoom(null);
+          setRoomCode(null);
+        }
         setAutoJoining(false);
       } catch (e) {
         if (!cancelled) {
