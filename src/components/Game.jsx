@@ -1819,8 +1819,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                         {ruleText}
                       </div>
                       <div
-                        style={{ fontFamily: '"Space Mono", monospace' }}
-                        className="text-[10px] uppercase tracking-widest opacity-55 mt-4"
+                        style={{ fontFamily: '"Space Mono", monospace', color: '#000' }}
+                        className="text-base font-bold uppercase tracking-wide mt-5"
                       >
                         Le boss et le gagnant ne boivent pas
                       </div>
