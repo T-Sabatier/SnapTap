@@ -54,6 +54,22 @@ function hashStr(s) {
 // Reactions emoji disponibles pendant la revelation.
 const REACTIONS = ['😂', '😱', '😍', '🔥', '👎', '💀'];
 
+// Sorts a usage unique : contenu du modal de confirmation stylee (reroll / x2).
+const SORT_CONFIRM = {
+  reroll: {
+    emoji: '🎲',
+    title: 'Reroll ?',
+    body: 'Tu jettes ta main et tu repioches 7 nouvelles cartes. Une seule fois dans la partie.',
+    cta: 'Repiocher',
+  },
+  vatout: {
+    emoji: '🔥',
+    title: 'Activer le x2 ?',
+    body: 'Ta carte vaudra le DOUBLE si le boss la choisit. Une seule fois — consommé quand tu joues.',
+    cta: 'Activer',
+  },
+};
+
 // Manches speciales (mode normal comme apero) : twist annonce en debut de
 // manche. Choisi par le host (writer unique) au passage a la manche suivante.
 const SPECIALS = {
@@ -332,6 +348,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
   const [sortsOpen, setSortsOpen] = useState(false);
   // Mode Apero : la roulette de designation d'un defi a-t-elle fini de tourner ?
   const [gageRouletteDone, setGageRouletteDone] = useState(false);
+  // Confirmation stylee avant de consommer un sort a usage unique (reroll / x2).
+  const [confirmSort, setConfirmSort] = useState(null); // null | 'reroll' | 'vatout'
 
   const isHost = room.host === playerId;
   const isBoss = room.bossId === playerId;
@@ -552,7 +570,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
   async function rerollHand() {
     if (isBoss || iHavePlayed || busy) return;
     if (!sorts.reroll || myUsed.reroll) return;
-    if (!confirm('Rejeter ta main et repiocher 7 nouvelles cartes ? (1 seule fois)')) return;
+    // La confirmation passe desormais par le modal stylee (confirmSortAction).
     setBusy(true);
     try {
       await runTransaction(ref(db, `rooms/${roomCode}`), (cur) => {
@@ -584,6 +602,14 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       setBusy(false);
       setSelectedCard(null);
     }
+  }
+
+  // Valide le sort choisi dans le modal de confirmation, puis l'execute/arme.
+  function confirmSortAction() {
+    const type = confirmSort;
+    setConfirmSort(null);
+    if (type === 'reroll') rerollHand();
+    else if (type === 'vatout') setVatoutArmed(true);
   }
 
   // SORT Espion : revele (pour moi seul) qui a pose la carte tapee.
@@ -1272,7 +1298,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 <div className="flex gap-2 mb-2 items-stretch">
                   {sorts.reroll && (
                     <button
-                      onClick={rerollHand}
+                      onClick={() => setConfirmSort('reroll')}
                       disabled={busy || myUsed.reroll}
                       className="flex-1 border-4 border-black bg-white py-2 disabled:opacity-30 active:translate-x-[2px] active:translate-y-[2px] flex items-center justify-center gap-1.5"
                       style={{ boxShadow: '4px 4px 0 #000' }}
@@ -1288,7 +1314,12 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   )}
                   {sorts.vatout && (
                     <button
-                      onClick={() => !myUsed.vatout && setVatoutArmed((v) => !v)}
+                      onClick={() => {
+                        if (myUsed.vatout) return;
+                        // Deja arme → on desarme direct ; sinon → modal de confirm.
+                        if (vatoutArmed) setVatoutArmed(false);
+                        else setConfirmSort('vatout');
+                      }}
                       disabled={busy || myUsed.vatout}
                       className="flex-1 border-4 border-black py-2 disabled:opacity-30 active:translate-x-[2px] active:translate-y-[2px] flex items-center justify-center gap-1.5"
                       style={{
@@ -1360,6 +1391,55 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 {selectedCard && <ChevronRight size={24} />}
               </div>
             </button>
+            {confirmSort && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6"
+                onClick={() => setConfirmSort(null)}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full max-w-sm border-4 border-black bg-white p-6 text-center gage-pop"
+                  style={{ boxShadow: '10px 10px 0 #000' }}
+                >
+                  <div className="text-5xl leading-none mb-3" aria-hidden>
+                    {SORT_CONFIRM[confirmSort].emoji}
+                  </div>
+                  <div
+                    style={{ fontFamily: '"Anton", sans-serif' }}
+                    className="text-3xl uppercase mb-3 text-black"
+                  >
+                    {SORT_CONFIRM[confirmSort].title}
+                  </div>
+                  <p
+                    style={{ fontFamily: '"Space Mono", monospace' }}
+                    className="text-sm text-black/80 mb-6 leading-snug"
+                  >
+                    {SORT_CONFIRM[confirmSort].body}
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setConfirmSort(null)}
+                      style={{ fontFamily: '"Anton", sans-serif', boxShadow: '4px 4px 0 #000' }}
+                      className="flex-1 border-4 border-black bg-white text-black py-3 text-lg uppercase active:translate-x-[2px] active:translate-y-[2px]"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={confirmSortAction}
+                      style={{
+                        fontFamily: '"Anton", sans-serif',
+                        backgroundColor: DISLIKE_RED,
+                        color: '#FFF',
+                        boxShadow: '4px 4px 0 #000',
+                      }}
+                      className="flex-1 border-4 border-black py-3 text-lg uppercase active:translate-x-[2px] active:translate-y-[2px]"
+                    >
+                      {SORT_CONFIRM[confirmSort].cta}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
