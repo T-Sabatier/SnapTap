@@ -1854,26 +1854,35 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   {winnerCard?.t || '?'}
                 </div>
               </div>
-              <div
-                style={{ fontFamily: '"Space Mono", monospace' }}
-                className="text-[11px] uppercase tracking-widest mb-9 flex items-center justify-center gap-2 flex-wrap"
-              >
-                <span className="opacity-70">Posée par</span>
+              <div className="mb-9 flex flex-col items-center gap-1">
                 <span
+                  style={{ fontFamily: '"Space Mono", monospace' }}
+                  className="text-[11px] uppercase tracking-widest opacity-70"
+                >
+                  Posée par
+                </span>
+                <div
                   style={{
                     fontFamily: '"Anton", sans-serif',
                     color: colorHex(winnerP?.color) || '#000',
-                    WebkitTextStroke: '2.5px #000',
+                    WebkitTextStroke: '3px #000',
                     paintOrder: 'stroke fill',
-                    fontSize: '1.5em',
+                    fontSize: fitBig(winnerP?.name || ''),
+                    lineHeight: 1,
                     letterSpacing: '0.04em',
                   }}
+                  className="uppercase break-words"
                 >
                   {winnerP?.name || '?'}
-                </span>
+                </div>
                 <span
-                  style={{ backgroundColor: PINK, color: '#FFF', border: '2px solid #000' }}
-                  className="px-2 py-0.5 text-[11px]"
+                  style={{
+                    backgroundColor: PINK,
+                    color: '#FFF',
+                    border: '2px solid #000',
+                    fontFamily: '"Space Mono", monospace',
+                  }}
+                  className="px-2 py-0.5 text-[11px] uppercase tracking-widest mt-1"
                 >
                   +{winnerGain} PT{winnerGain > 1 ? 'S' : ''} {iAmWinner && '🎉'}
                 </span>
@@ -1893,9 +1902,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   className="inline-block border-4 border-black px-5 py-3 text-xl uppercase mb-8 gage-pop"
                 >
                   🎆 Jackpot x4 ! 🎆
-                  <div className="text-base mt-1">
-                    Tout le monde boit 1 à la santé de {winnerP?.name || '?'}
-                  </div>
+                  <div className="text-base mt-1">Tout le monde boit 1 à sa santé !</div>
                 </div>
               )}
 
@@ -1960,32 +1967,37 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                     : gage.text;
                   return (
                     <>
-                      {isVote && (
+                      {/* Regle de VOTE : le badge "Votez !" passe DERRIERE le gage
+                          (decale + tourne → il depasse en haut, effet empile).
+                          Rose comme le gage, texte jaune. */}
+                      <div className="relative inline-block">
+                        {isVote && (
+                          <div
+                            style={{
+                              fontFamily: '"Anton", sans-serif',
+                              backgroundColor: PINK,
+                              color: YELLOW,
+                              boxShadow: '6px 6px 0 #000',
+                              transform: 'rotate(-5deg)',
+                            }}
+                            className="absolute left-1/2 -top-8 -translate-x-1/2 z-0 border-4 border-black px-10 pt-2 pb-10 text-2xl uppercase tracking-wide whitespace-nowrap"
+                          >
+                            Votez !
+                          </div>
+                        )}
                         <div
                           style={{
                             fontFamily: '"Anton", sans-serif',
-                            backgroundColor: '#000',
-                            color: YELLOW,
-                            boxShadow: '4px 4px 0 #000',
-                            transform: 'rotate(-2deg)',
+                            backgroundColor: PINK,
+                            color: '#FFF',
+                            boxShadow: '6px 6px 0 #000',
+                            transform: 'rotate(1deg)',
+                            lineHeight: 1.1,
                           }}
-                          className="inline-block border-4 border-black px-5 py-1.5 text-2xl uppercase mb-3 tracking-wide"
+                          className="relative z-10 border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm"
                         >
-                          Votez !
+                          {ruleText}
                         </div>
-                      )}
-                      <div
-                        style={{
-                          fontFamily: '"Anton", sans-serif',
-                          backgroundColor: PINK,
-                          color: '#FFF',
-                          boxShadow: '6px 6px 0 #000',
-                          transform: 'rotate(1deg)',
-                          lineHeight: 1.1,
-                        }}
-                        className="inline-block border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm"
-                      >
-                        {ruleText}
                       </div>
                       <div
                         style={{ fontFamily: '"Space Mono", monospace', color: '#000' }}
@@ -2095,7 +2107,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                     }}
                     className="text-3xl uppercase mt-2"
                   >
-                    Félicitations {winnerP?.name || ''} !
+                    Félicitations !
                   </div>
                   <div
                     style={{ fontFamily: '"Space Mono", monospace' }}
