@@ -1888,24 +1888,6 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 </span>
               </div>
 
-              {/* Jackpot (x2 + manche double = x4) : bonus a boire collectif. */}
-              {jackpot && (
-                <div
-                  style={{
-                    fontFamily: '"Anton", sans-serif',
-                    backgroundColor: '#000',
-                    color: YELLOW,
-                    boxShadow: '5px 5px 0 #000',
-                    transform: 'rotate(-1deg)',
-                    lineHeight: 1.1,
-                  }}
-                  className="inline-block border-4 border-black px-5 py-3 text-xl uppercase mb-8 gage-pop"
-                >
-                  🎆 Jackpot x4 ! 🎆
-                  <div className="text-base mt-1">Tout le monde boit 1 à sa santé !</div>
-                </div>
-              )}
-
               {/* ---- ZONE 2 : la regle a boire, LA VEDETTE ---- */}
               <div className="w-full border-t-4 border-black/15 pt-8 flex flex-col items-center gap-2">
                 {(() => {
@@ -1970,7 +1952,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       {/* Regle de VOTE : le badge "Votez !" passe DERRIERE le gage
                           (decale + tourne → il depasse en haut, effet empile).
                           Rose comme le gage, texte jaune. */}
-                      <div className="relative inline-block">
+                      <div className={`relative inline-block ${isVote ? 'mt-11' : ''}`}>
                         {isVote && (
                           <div
                             style={{
@@ -1978,9 +1960,11 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                               backgroundColor: PINK,
                               color: YELLOW,
                               boxShadow: '6px 6px 0 #000',
-                              transform: 'rotate(-5deg)',
+                              // translate + rotate ensemble : sinon le rotate inline
+                              // ecrase le -translate-x-1/2 de Tailwind → decentre.
+                              transform: 'translateX(-50%) rotate(-4deg)',
                             }}
-                            className="absolute left-1/2 -top-8 -translate-x-1/2 z-0 border-4 border-black px-10 pt-2 pb-10 text-2xl uppercase tracking-wide whitespace-nowrap"
+                            className="absolute left-1/2 -top-11 z-0 border-4 border-black px-8 pt-1.5 pb-12 text-2xl uppercase tracking-wide whitespace-nowrap"
                           >
                             Votez !
                           </div>
@@ -2089,32 +2073,6 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   className="inline-block border-4 border-black px-3 py-1 text-lg uppercase mt-3 ml-2"
                 >
                   🔥 x2 réussi
-                </div>
-              )}
-              {/* Jackpot (x2 + manche double = x4) : feu d'artifice + felicitations. */}
-              {jackpot && (
-                <div className="mt-5 flex flex-col items-center gage-pop">
-                  <div className="text-5xl leading-none" aria-hidden>
-                    🎆🎇🎆
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: '"Anton", sans-serif',
-                      color: '#000',
-                      WebkitTextStroke: '2px #000',
-                      paintOrder: 'stroke fill',
-                      letterSpacing: '0.04em',
-                    }}
-                    className="text-3xl uppercase mt-2"
-                  >
-                    Félicitations !
-                  </div>
-                  <div
-                    style={{ fontFamily: '"Space Mono", monospace' }}
-                    className="text-sm font-bold uppercase tracking-wide mt-1"
-                  >
-                    x2 × x2 = x4
-                  </div>
                 </div>
               )}
             </>
