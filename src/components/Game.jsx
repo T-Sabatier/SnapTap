@@ -2095,7 +2095,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                     }}
                     className="text-3xl uppercase mt-2"
                   >
-                    Félicitations !
+                    Félicitations {winnerP?.name || ''} !
                   </div>
                   <div
                     style={{ fontFamily: '"Space Mono", monospace' }}
