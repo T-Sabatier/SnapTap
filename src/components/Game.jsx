@@ -173,8 +173,9 @@ function SpecialBanner({ special }) {
 function JackpotAnnounce({ apero, winnerName }) {
   const [phase, setPhase] = useState('in'); // 'in' → 'out' → hidden
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('out'), 2100);
-    const t2 = setTimeout(() => setPhase('hidden'), 2500);
+    // Reste ~2 s de plus que les manches speciales (moment fort).
+    const t1 = setTimeout(() => setPhase('out'), 4100);
+    const t2 = setTimeout(() => setPhase('hidden'), 4500);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -183,13 +184,18 @@ function JackpotAnnounce({ apero, winnerName }) {
   if (phase === 'hidden') return null;
   return (
     <div
-      className={`fixed inset-0 z-[55] flex items-center justify-center p-6 ${phase === 'out' ? 'special-fade' : ''}`}
-      style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
+      className={`fixed inset-0 z-[55] flex items-center justify-center overflow-hidden p-6 ${phase === 'out' ? 'special-fade' : ''}`}
+      style={{ backgroundColor: 'rgba(0,0,0,0.88)' }}
     >
-      <div className="special-slam text-center flex flex-col items-center">
-        <div className="text-6xl leading-none mb-3" aria-hidden>
-          🎆🎇🎆
-        </div>
+      {/* Vrais feux d'artifice (CSS) derriere le texte. */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <span className="fw" style={{ top: '22%', left: '24%' }} />
+        <span className="fw" style={{ top: '26%', left: '76%', animationDelay: '0.35s' }} />
+        <span className="fw" style={{ top: '70%', left: '30%', animationDelay: '0.7s' }} />
+        <span className="fw" style={{ top: '74%', left: '72%', animationDelay: '1.05s' }} />
+        <span className="fw" style={{ top: '48%', left: '52%', animationDelay: '1.4s' }} />
+      </div>
+      <div className="special-slam relative text-center flex flex-col items-center">
         <div
           style={{ fontFamily: '"Space Mono", monospace', color: YELLOW }}
           className="text-sm uppercase tracking-[0.4em] mb-3"
@@ -215,11 +221,12 @@ function JackpotAnnounce({ apero, winnerName }) {
             boxShadow: '6px 6px 0 #000',
             transform: 'rotate(1.5deg)',
           }}
-          className="inline-block border-4 border-black px-5 py-3 text-xl uppercase max-w-xs"
+          className="inline-block border-4 border-black px-5 py-3 text-lg uppercase max-w-xs leading-tight"
         >
-          {apero
-            ? `Tout le monde boit 1 à la santé de ${winnerName || '?'} !`
-            : `Félicitations ${winnerName || ''} !`}
+          {apero ? 'Tout le monde boit 1 à la santé de' : 'Félicitations'}
+          <div className="text-4xl leading-none mt-1 break-words">
+            {winnerName || '?'} !
+          </div>
         </div>
       </div>
     </div>
@@ -1977,6 +1984,9 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                             boxShadow: '6px 6px 0 #000',
                             transform: 'rotate(1deg)',
                             lineHeight: 1.1,
+                            // Vote : pas de bordure haute → le gage se fond dans la
+                            // carte "Votez !" posee derriere (effet une seule carte).
+                            borderTopWidth: isVote ? 0 : undefined,
                           }}
                           className="relative z-10 border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm"
                         >
