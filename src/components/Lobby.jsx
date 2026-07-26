@@ -829,8 +829,8 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
               <button
                 onClick={startGame}
                 disabled={!canStart}
-                className="w-full border-4 border-black bg-black text-white py-4 disabled:opacity-40 active:translate-x-[2px] active:translate-y-[2px]"
-                style={{ boxShadow: '6px 6px 0 #000' }}
+                className="w-full border-4 border-black py-4 disabled:opacity-40 active:translate-x-[2px] active:translate-y-[2px]"
+                style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
               >
                 <div className="flex items-center justify-center gap-3">
                   <span
