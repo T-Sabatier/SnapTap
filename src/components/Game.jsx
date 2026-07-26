@@ -2040,18 +2040,12 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               <div
                 className="border-4 border-black p-6 mb-6 max-w-sm w-full relative"
                 style={{
-                  backgroundColor: '#000',
-                  color: YELLOW,
+                  backgroundColor: '#FFF',
+                  color: '#000',
                   boxShadow: '8px 8px 0 #000',
                   transform: 'rotate(-2deg)',
                 }}
               >
-                <span
-                  className="absolute top-1.5 right-2 text-lg leading-none opacity-80 select-none"
-                  aria-hidden
-                >
-                  {catEmojiOf(winnerCard)}
-                </span>
                 <div
                   style={{
                     fontFamily: '"Anton", sans-serif',
@@ -2087,8 +2081,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               <div
                 style={{
                   fontFamily: '"Anton", sans-serif',
-                  backgroundColor: '#000',
-                  color: YELLOW,
+                  backgroundColor: LIKE_GREEN,
+                  color: '#000',
                   boxShadow: '4px 4px 0 #000',
                   transform: 'rotate(3deg)',
                 }}
