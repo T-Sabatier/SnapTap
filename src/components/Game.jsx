@@ -1966,12 +1966,15 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                               fontFamily: '"Anton", sans-serif',
                               backgroundColor: PINK,
                               color: YELLOW,
-                              boxShadow: '6px 6px 0 #000',
-                              // translate + rotate ensemble : sinon le rotate inline
-                              // ecrase le -translate-x-1/2 de Tailwind → decentre.
-                              transform: 'translateX(-50%) rotate(-4deg)',
+                              // Pas de bordure basse ni d'ombre : le bas du Votez se
+                              // fond dans le gage (une seule carte) ; il ne recouvre
+                              // que le milieu → les epaules du gage gardent leur
+                              // contour noir. translate + rotate ensemble (sinon le
+                              // rotate inline ecrase le -translate-x-1/2 de Tailwind).
+                              borderBottomWidth: 0,
+                              transform: 'translateX(-50%) rotate(-3deg)',
                             }}
-                            className="absolute left-1/2 -top-11 z-0 border-4 border-black px-8 pt-1.5 pb-12 text-2xl uppercase tracking-wide whitespace-nowrap"
+                            className="absolute left-1/2 -top-11 z-20 border-4 border-black px-8 pt-1.5 pb-4 text-2xl uppercase tracking-wide whitespace-nowrap"
                           >
                             Votez !
                           </div>
@@ -1984,9 +1987,6 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                             boxShadow: '6px 6px 0 #000',
                             transform: 'rotate(1deg)',
                             lineHeight: 1.1,
-                            // Vote : pas de bordure haute → le gage se fond dans la
-                            // carte "Votez !" posee derriere (effet une seule carte).
-                            borderTopWidth: isVote ? 0 : undefined,
                           }}
                           className="relative z-10 border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm"
                         >
