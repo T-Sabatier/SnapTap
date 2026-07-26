@@ -1959,7 +1959,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       {/* Regle de VOTE : le badge "Votez !" passe DERRIERE le gage
                           (decale + tourne → il depasse en haut, effet empile).
                           Rose comme le gage, texte jaune. */}
-                      <div className={`relative inline-block ${isVote ? 'mt-11' : ''}`}>
+                      <div className={`relative inline-block ${isVote ? 'mt-12' : ''}`}>
                         {isVote && (
                           <div
                             style={{
@@ -1967,14 +1967,17 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                               backgroundColor: PINK,
                               color: YELLOW,
                               // Pas de bordure basse ni d'ombre : le bas du Votez se
-                              // fond dans le gage (une seule carte) ; il ne recouvre
-                              // que le milieu → les epaules du gage gardent leur
-                              // contour noir. translate + rotate ensemble (sinon le
+                              // fond dans le gage. MEME rotation que le gage (1deg)
+                              // → bords paralleles, donc les bordures verticales du
+                              // Votez retombent PILE sur la bordure haute du gage des
+                              // deux cotes. top cale le bas du Votez juste sur cette
+                              // bordure (4px). translate + rotate ensemble (sinon le
                               // rotate inline ecrase le -translate-x-1/2 de Tailwind).
                               borderBottomWidth: 0,
-                              transform: 'translateX(-50%) rotate(-3deg)',
+                              top: '-46px',
+                              transform: 'translateX(-50%) rotate(1deg)',
                             }}
-                            className="absolute left-1/2 -top-11 z-20 border-4 border-black px-8 pt-1.5 pb-4 text-2xl uppercase tracking-wide whitespace-nowrap"
+                            className="absolute left-1/2 z-20 border-4 border-black px-8 pt-1.5 pb-2 text-2xl uppercase tracking-wide whitespace-nowrap"
                           >
                             Votez !
                           </div>
