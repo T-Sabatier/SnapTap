@@ -2128,8 +2128,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             <button
               onClick={continueAfterResult}
               disabled={busy}
-              className="w-full border-4 border-black bg-black text-white py-4 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-              style={{ boxShadow: '6px 6px 0 #000' }}
+              className="w-full border-4 border-black py-4 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+              style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
             >
               <div className="flex items-center justify-center gap-3">
                 <span
