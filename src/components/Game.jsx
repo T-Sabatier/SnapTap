@@ -428,7 +428,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
   // les accents jaunes sur noir et le rose. La couleur sert de SECOURS derriere
   // la texture biere (classe .apero-bg) appliquee sur la racine des ecrans.
   const baseColor = partyMode ? AMBER : YELLOW;
-  const baseClass = partyMode ? 'apero-bg' : '';
+  const baseClass = `${partyMode ? 'apero-bg ' : ''}screen-in`;
 
   const players = Object.entries(room.players || {}).map(([id, p]) => ({
     id,
@@ -936,6 +936,63 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     </div>
   );
 
+  // Ecrans d'attente : barre de progression (combien ont pose) + pseudos,
+  // grises tant que le joueur n'a pas encore pose sa carte.
+  const WaitingProgress = () => {
+    const others = players.filter((p) => p.id !== room.bossId);
+    const total = others.length || 1;
+    const done = others.filter((p) => playedObj[p.id]).length;
+    const pct = Math.round((done / total) * 100);
+    return (
+      <div className="w-full max-w-sm mx-auto">
+        <div
+          className="relative border-4 border-black overflow-hidden"
+          style={{ backgroundColor: '#FFF', height: 34, boxShadow: '4px 4px 0 #000' }}
+        >
+          <div
+            className="h-full"
+            style={{
+              width: `${pct}%`,
+              backgroundColor: LIKE_GREEN,
+              transition: 'width 350ms ease-out',
+            }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span
+              style={{ fontFamily: '"Anton", sans-serif', ...NAME_STYLE }}
+              className="text-lg uppercase leading-none"
+            >
+              {done} / {others.length} ont posé
+            </span>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2 justify-center">
+          {others.map((p) => {
+            const hasPlayed = !!playedObj[p.id];
+            const pColor = colorHex(p.color);
+            const bg = pColor || (hasPlayed ? '#000' : '#FFF');
+            return (
+              <div
+                key={p.id}
+                style={{
+                  backgroundColor: bg,
+                  opacity: hasPlayed ? 1 : 0.4,
+                  fontFamily: '"Anton", sans-serif',
+                  boxShadow: '3px 3px 0 #000',
+                  ...NAME_STYLE,
+                }}
+                className="border-2 border-black px-3 py-1.5 uppercase text-lg leading-none"
+              >
+                {hasPlayed ? '✓ ' : '… '}
+                {p.name}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const baseWrap = {
     minHeight: '100vh',
     backgroundColor: baseColor,
@@ -945,7 +1002,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
   if (room.phase === 'boss_choose') {
     if (isBoss) {
       return (
-        <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+        <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
           <SpecialAnnounce key={room.round} special={room.special} />
           <TopBar right={`TOUR ${room.round || 1}`} />
           <Scoreboard />
@@ -1066,7 +1123,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     }
     // Non-boss waiting
     return (
-      <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+      <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
         <SpecialAnnounce key={room.round} special={room.special} />
         <TopBar right={`TOUR ${room.round || 1}`} />
         <Scoreboard />
@@ -1109,7 +1166,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     if (isBoss) {
       // Boss waits while others play
       return (
-        <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+        <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
           <TopBar right={`${playedCount}/${nonBossCount}`} />
           <Scoreboard />
           <div className="flex-1 flex flex-col items-center justify-center px-4 text-center max-w-xl mx-auto w-full">
@@ -1144,40 +1201,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             >
               Les joueurs<br />posent leur carte
             </div>
-            <div
-              style={{
-                fontFamily: '"Anton", sans-serif',
-                backgroundColor: '#000',
-                color: YELLOW,
-              }}
-              className="border-4 border-black px-4 py-2 text-2xl"
-            >
-              {playedCount} / {nonBossCount}
-            </div>
-            <div className="mt-6 flex flex-wrap gap-3 justify-center">
-              {players
-                .filter((p) => p.id !== room.bossId)
-                .map((p) => {
-                  const hasPlayed = !!playedObj[p.id];
-                  const pColor = colorHex(p.color);
-                  const bg = pColor || (hasPlayed ? '#000' : '#FFF');
-                  return (
-                    <div
-                      key={p.id}
-                      style={{
-                        backgroundColor: bg,
-                        opacity: hasPlayed ? 1 : 0.5,
-                        fontFamily: '"Anton", sans-serif',
-                        boxShadow: '3px 3px 0 #000',
-                        ...NAME_STYLE,
-                      }}
-                      className="border-2 border-black px-4 py-2 uppercase text-xl leading-none"
-                    >
-                      {hasPlayed ? '✓ ' : '… '}
-                      {p.name}
-                    </div>
-                  );
-                })}
+            <div className="w-full mt-2">
+              <WaitingProgress />
             </div>
           </div>
         </div>
@@ -1189,7 +1214,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       const myPlayedCardId = playedObj[playerId];
       const myCard = pool[myPlayedCardId];
       return (
-        <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+        <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
           <TopBar right={`${playedCount}/${nonBossCount}`} />
           <Scoreboard />
           <div className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-xl mx-auto w-full">
@@ -1231,16 +1256,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             >
               En attente<br />des autres
             </div>
-            <div
-              style={{
-                fontFamily: '"Anton", sans-serif',
-                backgroundColor: '#000',
-                color: YELLOW,
-                boxShadow: '4px 4px 0 #000',
-              }}
-              className="inline-block border-4 border-black px-4 py-2 text-2xl uppercase"
-            >
-              {playedCount} / {nonBossCount} ont posé
+            <div className="w-full mt-2">
+              <WaitingProgress />
             </div>
           </div>
         </div>
@@ -1250,7 +1267,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     // Non-boss player : main directement, banniere mode en haut
     const isLike = room.mode === 'like';
     return (
-      <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+      <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
         <TopBar right={`${playedCount}/${nonBossCount}`} />
         <Scoreboard />
         <SpecialBanner special={room.special} />
@@ -1532,7 +1549,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
   if (room.phase === 'reveal') {
     if (isBoss) {
       return (
-        <div style={baseWrap} className={`relative text-black flex flex-col ${baseClass}`}>
+        <div key={room.phase} style={baseWrap} className={`relative text-black flex flex-col ${baseClass}`}>
           <ReactionsLayer reactions={room.reactions} />
           <TopBar right={`${playedEntries.length} CARTES`} />
           <Scoreboard />
@@ -1836,7 +1853,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     const iAmWinner = room.winnerInfo.playerId === playerId;
 
     return (
-      <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+      <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
         <TopBar />
         <Scoreboard />
         {jackpot && (
@@ -2162,7 +2179,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     const ranked = [...players].sort((a, b) => (b.score || 0) - (a.score || 0));
     const champ = ranked[0];
     return (
-      <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+      <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
         <TopBar />
         {/* Feux d'artifice : c'est le climax de la partie, on celebre le champion. */}
         <div className="pointer-events-none fixed inset-0 z-40" aria-hidden>
