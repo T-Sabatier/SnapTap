@@ -6,9 +6,10 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { getDatabase, ref, get, update } from 'firebase/database';
 
-const root = 'c:/Users/Valky/Desktop/Fast and curious/fastandecurious';
+// Racine projet deduite du chemin du script -> insensible au renommage du dossier.
+const projectRoot = new URL('../', import.meta.url);
 const env = {};
-for (const line of readFileSync(`${root}/.env`, 'utf8').split(/\r?\n/)) {
+for (const line of readFileSync(new URL('.env', projectRoot), 'utf8').split(/\r?\n/)) {
   const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
   if (m) env[m[1]] = m[2].trim();
 }
@@ -18,7 +19,7 @@ const app = initializeApp({
   databaseURL: env.VITE_FIREBASE_DATABASE_URL,
   projectId: env.VITE_FIREBASE_PROJECT_ID,
 });
-const creds = JSON.parse(readFileSync(`${root}/scripts/.admin-credentials.json`, 'utf8'));
+const creds = JSON.parse(readFileSync(new URL('scripts/.admin-credentials.json', projectRoot), 'utf8'));
 await signInWithEmailAndPassword(getAuth(app), creds.email, creds.password);
 const db = getDatabase(app);
 
