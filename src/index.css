@@ -90,12 +90,18 @@ input {
   animation: fw-burst 1.5s ease-out infinite;
   will-change: transform, opacity;
   box-shadow:
-    0 -70px 0 0 #ffe600, 49px -49px 0 0 #ff2d6f, 70px 0 0 0 #00e5ff,
-    49px 49px 0 0 #ff6d00, 0 70px 0 0 #39ff14, -49px 49px 0 0 #ffe600,
-    -70px 0 0 0 #ff2d6f, -49px -49px 0 0 #00e5ff,
-    0 -45px 0 0 #fff, 32px -32px 0 0 #ffe600, 45px 0 0 0 #ff2d6f,
-    32px 32px 0 0 #00e5ff, 0 45px 0 0 #ff6d00, -32px 32px 0 0 #39ff14,
-    -45px 0 0 0 #fff, -32px -32px 0 0 #ffe600;
+    /* anneau externe (R78) */
+    0 -78px 0 0 #ffe600, 55px -55px 0 0 #ff2d6f, 78px 0 0 0 #00e5ff,
+    55px 55px 0 0 #ff6d00, 0 78px 0 0 #39ff14, -55px 55px 0 0 #b026ff,
+    -78px 0 0 0 #ff1744, -55px -55px 0 0 #2979ff,
+    /* anneau median (R52) */
+    0 -52px 0 0 #fff, 37px -37px 0 0 #ffe600, 52px 0 0 0 #ff2d6f,
+    37px 37px 0 0 #00e5ff, 0 52px 0 0 #ff6d00, -37px 37px 0 0 #39ff14,
+    -52px 0 0 0 #b026ff, -37px -37px 0 0 #ff1744,
+    /* anneau interne (R28) */
+    0 -28px 0 0 #2979ff, 20px -20px 0 0 #fff, 28px 0 0 0 #ffe600,
+    20px 20px 0 0 #ff2d6f, 0 28px 0 0 #00e5ff, -20px 20px 0 0 #ff6d00,
+    -28px 0 0 0 #39ff14, -20px -20px 0 0 #b026ff;
 }
 
 /* Reactions emoji qui montent et s'estompent (moment reveal). */

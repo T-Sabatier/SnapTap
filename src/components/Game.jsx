@@ -1849,10 +1849,12 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             deja son gros slam). Places en peripherie pour ne pas cacher le nom. */}
         {iAmWinner && !jackpot && (
           <div className="pointer-events-none fixed inset-0 z-40" aria-hidden>
-            <span className="fw" style={{ top: '18%', left: '16%' }} />
-            <span className="fw" style={{ top: '22%', left: '84%', animationDelay: '0.4s' }} />
-            <span className="fw" style={{ top: '66%', left: '20%', animationDelay: '0.8s' }} />
-            <span className="fw" style={{ top: '70%', left: '82%', animationDelay: '1.2s' }} />
+            <span className="fw" style={{ top: '16%', left: '15%' }} />
+            <span className="fw" style={{ top: '20%', left: '85%', animationDelay: '0.3s' }} />
+            <span className="fw" style={{ top: '40%', left: '10%', animationDelay: '0.6s' }} />
+            <span className="fw" style={{ top: '44%', left: '90%', animationDelay: '0.9s' }} />
+            <span className="fw" style={{ top: '68%', left: '20%', animationDelay: '1.2s' }} />
+            <span className="fw" style={{ top: '72%', left: '80%', animationDelay: '1.5s' }} />
           </div>
         )}
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center py-6 max-w-xl mx-auto w-full">
