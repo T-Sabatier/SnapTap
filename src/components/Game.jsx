@@ -1293,7 +1293,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-lg uppercase leading-tight"
           >
-            🎯 Pose la carte qui va{' '}
+            Pose la carte qui va{' '}
             <span style={{ color: PINK }}>
               {isLike ? 'lui plaire' : 'lui déplaire'}
             </span>{' '}
