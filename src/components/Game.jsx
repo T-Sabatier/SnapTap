@@ -1570,8 +1570,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               </span>
             </div>
           </div>
-          <div className="flex-1 px-4 pb-32 overflow-y-auto">
-            <div className="grid grid-cols-2 gap-3 mt-3 max-w-xl mx-auto">
+          <div className="flex-1 px-4 pt-6 pb-32 overflow-y-auto">
+            <div className="grid grid-cols-2 gap-6 mt-1 max-w-xl mx-auto">
               {playedEntries.map((entry, i) => {
                 const card = pool[entry.cardId];
                 if (!card) return null;
