@@ -371,8 +371,8 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             <button
               onClick={saveName}
               disabled={!nameInput.trim()}
-              className="border-4 border-black bg-black text-white px-4 disabled:opacity-30 active:translate-x-[2px] active:translate-y-[2px] flex items-center"
-              style={{ boxShadow: '4px 4px 0 #000' }}
+              className="border-4 border-black px-4 disabled:opacity-30 active:translate-x-[2px] active:translate-y-[2px] flex items-center"
+              style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
             >
               <span
                 style={{ fontFamily: '"Anton", sans-serif' }}
@@ -937,8 +937,8 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                 <button
                   onClick={() => buyPackFromTeaser(teaserPackId)}
                   disabled={shopBusy}
-                  className="mt-5 w-full border-4 border-black bg-black text-white py-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-                  style={{ boxShadow: '4px 4px 0 #000' }}
+                  className="mt-5 w-full border-4 border-black py-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+                  style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
                 >
                   <span
                     style={{ fontFamily: '"Anton", sans-serif' }}

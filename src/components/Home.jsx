@@ -426,8 +426,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
         <button
           onClick={createRoom}
           disabled={busy}
-          className="w-full border-4 border-black bg-black text-white py-2 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-          style={{ boxShadow: '4px 4px 0 #000' }}
+          className="w-full border-4 border-black py-2 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+          style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
         >
           <div
             style={{ fontFamily: '"Anton", sans-serif' }}
@@ -469,8 +469,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
           <button
             onClick={joinRoom}
             disabled={busy || joinCode.trim().length !== 4}
-            className="border-4 border-black bg-black text-white px-4 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-30 flex items-center justify-center gap-1"
-            style={{ boxShadow: '4px 4px 0 #000' }}
+            className="border-4 border-black px-4 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-30 flex items-center justify-center gap-1"
+            style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
           >
             <span
               style={{ fontFamily: '"Anton", sans-serif' }}
@@ -721,8 +721,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   setAperoTeaser(false);
                 }}
                 disabled={shopBusy}
-                className="mt-5 w-full border-4 border-black bg-black text-white py-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-                style={{ boxShadow: '4px 4px 0 #000' }}
+                className="mt-5 w-full border-4 border-black py-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+                style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
               >
                 <span
                   style={{ fontFamily: '"Anton", sans-serif' }}
