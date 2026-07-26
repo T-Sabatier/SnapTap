@@ -78,7 +78,8 @@ input {
    (box-shadow) projetees vers l'exterieur via transform:scale, puis s'estompe.
    Plusieurs .fw a des positions/delais differents = plusieurs explosions. */
 @keyframes fw-burst {
-  0%   { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
+  0%   { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
+  12%  { opacity: 1; }
   55%  { opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
 }
@@ -87,7 +88,7 @@ input {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  animation: fw-burst 1.5s ease-out infinite;
+  animation: fw-burst 1.5s ease-out infinite backwards;
   will-change: transform, opacity;
   box-shadow:
     /* anneau externe (R78) */
