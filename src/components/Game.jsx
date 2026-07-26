@@ -417,6 +417,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
   const [gageRouletteDone, setGageRouletteDone] = useState(false);
   // Confirmation stylee avant de consommer un sort a usage unique (reroll / x2).
   const [confirmSort, setConfirmSort] = useState(null); // null | 'reroll' | 'vatout'
+  // Legende emoji -> categorie (bouton "?" toujours dispo dans la TopBar).
+  const [showHelp, setShowHelp] = useState(false);
 
   const isHost = room.host === playerId;
   const isBoss = room.bossId === playerId;
@@ -864,31 +866,96 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
   const TopBar = ({ right }) => (
     // text-black explicite : la barre reste jaune sur TOUS les ecrans, y
     // compris le mode projecteur (fond noir + text-white herite sinon).
-    <div className="px-4 py-3 border-b-4 border-black bg-yellow-300 text-black" style={{ backgroundColor: baseColor }}>
-      <div className="flex items-center justify-between max-w-xl mx-auto">
-        <button onClick={leaveGame} className="flex items-center gap-1.5">
-          <LogOut size={16} />
-          <span
+    <>
+      <div className="px-4 py-3 border-b-4 border-black bg-yellow-300 text-black" style={{ backgroundColor: baseColor }}>
+        <div className="flex items-center justify-between max-w-xl mx-auto">
+          <button onClick={leaveGame} className="flex items-center gap-1.5">
+            <LogOut size={16} />
+            <span
+              style={{ fontFamily: '"Space Mono", monospace' }}
+              className="text-[10px] uppercase tracking-widest"
+            >
+              Quitter
+            </span>
+          </button>
+          <div className="flex items-center gap-2">
+            <div
+              style={{ fontFamily: '"Anton", sans-serif' }}
+              className="text-lg uppercase tracking-tight"
+            >
+              Room {roomCode}
+            </div>
+            <button
+              onClick={() => setShowHelp(true)}
+              aria-label="Aide : les catégories"
+              className="w-6 h-6 flex items-center justify-center border-2 border-black rounded-full active:translate-y-[1px]"
+              style={{ fontFamily: '"Anton", sans-serif', backgroundColor: '#FFF', color: '#000', lineHeight: 1 }}
+            >
+              ?
+            </button>
+          </div>
+          <div
             style={{ fontFamily: '"Space Mono", monospace' }}
-            className="text-[10px] uppercase tracking-widest"
+            className="text-[10px] uppercase tracking-widest text-right min-w-[60px]"
           >
-            Quitter
-          </span>
-        </button>
-        <div
-          style={{ fontFamily: '"Anton", sans-serif' }}
-          className="text-lg uppercase tracking-tight"
-        >
-          Room {roomCode}
-        </div>
-        <div
-          style={{ fontFamily: '"Space Mono", monospace' }}
-          className="text-[10px] uppercase tracking-widest text-right min-w-[60px]"
-        >
-          {right || (partyMode ? '🍻 Apéro' : '')}
+            {right || (partyMode ? '🍻 Apéro' : '')}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Legende emoji -> categorie, ouverte depuis le "?" de la TopBar. */}
+      {showHelp && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 px-5"
+          onClick={() => setShowHelp(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm border-4 border-black bg-white p-5 max-h-[82vh] overflow-y-auto"
+            style={{ boxShadow: '10px 10px 0 #000' }}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <div
+                style={{ fontFamily: '"Anton", sans-serif' }}
+                className="text-2xl uppercase text-black"
+              >
+                Les catégories
+              </div>
+              <button
+                onClick={() => setShowHelp(false)}
+                aria-label="Fermer"
+                className="border-2 border-black bg-white p-1 active:translate-y-[1px]"
+              >
+                <X size={18} color="#000" />
+              </button>
+            </div>
+            <div
+              style={{ fontFamily: '"Space Mono", monospace' }}
+              className="text-[10px] uppercase tracking-widest text-black/60 mb-4"
+            >
+              L'emoji en haut de chaque carte = sa catégorie
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {CATEGORIES.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center gap-2 border-2 border-black px-2 py-1.5"
+                  style={{ backgroundColor: c.spicy ? '#FFE4E9' : '#FFF' }}
+                >
+                  <span className="text-lg leading-none">{c.emoji}</span>
+                  <span
+                    style={{ fontFamily: '"Anton", sans-serif' }}
+                    className="text-sm uppercase leading-none text-black"
+                  >
+                    {c.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 
   const Scoreboard = () => (
