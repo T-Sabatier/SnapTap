@@ -1954,10 +1954,18 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   const ruleText = isVote
                     ? gage.text.replace(/^vote\s*:\s*/i, '')
                     : gage.text;
+                  // Pour un vote, on detache la consequence (« boit 2 » /
+                  // « distribue 2 ») du sujet -> petite pastille, pas de pronom
+                  // (jamais faux) et pas de bloc « sujet + verbe » colle.
+                  const voteMatch = isVote
+                    ? ruleText.match(/^(.*?)\s+((?:boit|distribue)\s+\d+)\s*$/i)
+                    : null;
+                  const voteSubject = voteMatch ? voteMatch[1] : ruleText;
+                  const voteConseq = voteMatch ? voteMatch[2] : null;
                   return (
                     <>
-                      {/* Regle de VOTE : "VOTEZ :" (jaune) directement dans la
-                          meme carte que le gage. */}
+                      {/* Regle de VOTE : « VOTEZ POUR : » (jaune) au-dessus du
+                          sujet, et la consequence (« boit 2 ») en pastille. */}
                       <div
                         style={{
                           fontFamily: '"Anton", sans-serif',
@@ -1969,8 +1977,31 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                         }}
                         className="inline-block border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm"
                       >
-                        {isVote && <span style={{ color: YELLOW }}>Votez : </span>}
-                        {ruleText}
+                        {isVote ? (
+                          <>
+                            <span
+                              style={{ color: YELLOW }}
+                              className="block text-lg mb-1"
+                            >
+                              Votez pour :
+                            </span>
+                            {voteSubject}
+                            {voteConseq && (
+                              <span
+                                style={{
+                                  backgroundColor: YELLOW,
+                                  color: '#000',
+                                  boxShadow: '3px 3px 0 #000',
+                                }}
+                                className="inline-block border-2 border-black px-3 py-1 text-lg ml-2 align-middle whitespace-nowrap"
+                              >
+                                {voteConseq}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          ruleText
+                        )}
                       </div>
                       <div
                         style={{ fontFamily: '"Space Mono", monospace', color: '#000' }}
