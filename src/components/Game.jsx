@@ -2174,19 +2174,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
           <span className="fw" style={{ top: '74%', left: '82%', animationDelay: '1.5s' }} />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center py-8 max-w-xl mx-auto w-full">
-          {/* Trophee "medaille" : coupe doree cerclee de noir, effet centre. */}
-          <div
-            className="inline-flex items-center justify-center border-4 border-black rounded-full mb-1"
-            style={{
-              width: 118,
-              height: 118,
-              backgroundColor: '#FFF',
-              boxShadow: '6px 6px 0 #000',
-              transform: 'rotate(-3deg)',
-            }}
-          >
-            <Trophy size={64} fill="#F5A623" color="#000" strokeWidth={2} />
-          </div>
+          <Trophy size={80} strokeWidth={2.5} />
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest opacity-60 mt-4 mb-2"
