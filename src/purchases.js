@@ -85,9 +85,7 @@ export function useBilling() {
       // cote serveur uniquement). Le flag localStorage apero ne compte QU'EN DEV
       // (bouton "activer pour tester") : en prod web, un simple
       // localStorage.fc_apero_unlocked='1' en console debloquait le mode. ---
-      // NB: normalement gate par import.meta.env.DEV. Ouvert en prod
-      // TEMPORAIREMENT pour le test apero via lien secret (voir utils.js).
-      let devUnlock = getStoredAperoUnlock();
+      let devUnlock = import.meta.env.DEV && getStoredAperoUnlock();
       let packs = {};
       const apply = () =>
         setEnt({
@@ -100,7 +98,7 @@ export function useBilling() {
         apply();
       });
       const onFocus = () => {
-        devUnlock = getStoredAperoUnlock(); // TEMP test apero prod (voir utils.js)
+        devUnlock = import.meta.env.DEV && getStoredAperoUnlock();
         apply();
       };
       window.addEventListener('focus', onFocus);

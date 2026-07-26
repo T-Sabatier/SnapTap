@@ -144,23 +144,6 @@ export function setStoredAperoUnlock(on) {
   localStorage.setItem('fc_apero_unlocked', on ? '1' : '0');
 }
 
-// --- TEST TEMPORAIRE (a retirer apres) : deblocage du Mode Apero sur le web de
-// prod pour une session de test entre amis. L'apero n'est normalement achetable
-// que sur mobile ; ici un lien secret .../?apero=<TOKEN> pose le flag local.
-// Seul l'HOTE en a besoin (l'apero est un reglage de la room, les invites en
-// heritent). Pour retirer : supprimer APERO_TEST_TOKEN + applyAperoTestUnlock,
-// l'appel dans main.jsx, et restaurer le garde import.meta.env.DEV dans
-// purchases.js. Voir [[snap-tap-projet]].
-export const APERO_TEST_TOKEN = 'snaptap-apero-2026';
-export function applyAperoTestUnlock() {
-  try {
-    const t = new URLSearchParams(window.location.search).get('apero');
-    if (t && t === APERO_TEST_TOKEN) setStoredAperoUnlock(true);
-  } catch {
-    /* pas de window / URL invalide : on ignore */
-  }
-}
-
 export function getStoredRoom() {
   return localStorage.getItem('fc_currentRoom') || null;
 }
