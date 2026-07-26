@@ -1956,45 +1956,21 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                     : gage.text;
                   return (
                     <>
-                      {/* Regle de VOTE : le badge "Votez !" passe DERRIERE le gage
-                          (decale + tourne → il depasse en haut, effet empile).
-                          Rose comme le gage, texte jaune. */}
-                      <div className={`relative inline-block ${isVote ? 'mt-12' : ''}`}>
-                        {isVote && (
-                          <div
-                            style={{
-                              fontFamily: '"Anton", sans-serif',
-                              backgroundColor: PINK,
-                              color: YELLOW,
-                              // Pas de bordure basse ni d'ombre : le bas du Votez se
-                              // fond dans le gage. MEME rotation que le gage (1deg)
-                              // → bords paralleles, donc les bordures verticales du
-                              // Votez retombent PILE sur la bordure haute du gage des
-                              // deux cotes. top cale le bas du Votez juste sur cette
-                              // bordure (4px). translate + rotate ensemble (sinon le
-                              // rotate inline ecrase le -translate-x-1/2 de Tailwind).
-                              borderBottomWidth: 0,
-                              top: '-46px',
-                              transform: 'translateX(-50%) rotate(1deg)',
-                            }}
-                            className="absolute left-1/2 z-20 border-4 border-black px-8 pt-1.5 pb-2 text-2xl uppercase tracking-wide whitespace-nowrap"
-                          >
-                            Votez !
-                          </div>
-                        )}
-                        <div
-                          style={{
-                            fontFamily: '"Anton", sans-serif',
-                            backgroundColor: PINK,
-                            color: '#FFF',
-                            boxShadow: '6px 6px 0 #000',
-                            transform: 'rotate(1deg)',
-                            lineHeight: 1.1,
-                          }}
-                          className="relative z-10 border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm"
-                        >
-                          {ruleText}
-                        </div>
+                      {/* Regle de VOTE : "VOTEZ :" (jaune) directement dans la
+                          meme carte que le gage. */}
+                      <div
+                        style={{
+                          fontFamily: '"Anton", sans-serif',
+                          backgroundColor: PINK,
+                          color: '#FFF',
+                          boxShadow: '6px 6px 0 #000',
+                          transform: 'rotate(1deg)',
+                          lineHeight: 1.15,
+                        }}
+                        className="inline-block border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm"
+                      >
+                        {isVote && <span style={{ color: YELLOW }}>Votez : </span>}
+                        {ruleText}
                       </div>
                       <div
                         style={{ fontFamily: '"Space Mono", monospace', color: '#000' }}
