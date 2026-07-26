@@ -1748,7 +1748,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               }}
               aria-hidden
             />
-            <div className="grid grid-cols-2 gap-3 mt-1">
+            <div className="grid grid-cols-2 gap-6 mt-1">
               {playedEntries.map((entry, i) => {
                 const card = pool[entry.cardId];
                 if (!card) return null;
