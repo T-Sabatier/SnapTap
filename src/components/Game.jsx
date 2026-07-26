@@ -2076,7 +2076,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 }}
                 className="uppercase mb-6 break-words"
               >
-                {winnerP?.name || '?'} {iAmWinner && '🎉'}
+                {winnerP?.name || '?'}
               </div>
               <div
                 style={{
