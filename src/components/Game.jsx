@@ -395,6 +395,7 @@ import {
   HeartCrack,
   ChevronRight,
   Trophy,
+  Crown,
   LogOut,
   Clock,
   Eye,
@@ -2163,6 +2164,15 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     return (
       <div style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
         <TopBar />
+        {/* Feux d'artifice : c'est le climax de la partie, on celebre le champion. */}
+        <div className="pointer-events-none fixed inset-0 z-40" aria-hidden>
+          <span className="fw" style={{ top: '14%', left: '14%' }} />
+          <span className="fw" style={{ top: '18%', left: '86%', animationDelay: '0.3s' }} />
+          <span className="fw" style={{ top: '40%', left: '8%', animationDelay: '0.6s' }} />
+          <span className="fw" style={{ top: '44%', left: '92%', animationDelay: '0.9s' }} />
+          <span className="fw" style={{ top: '70%', left: '18%', animationDelay: '1.2s' }} />
+          <span className="fw" style={{ top: '74%', left: '82%', animationDelay: '1.5s' }} />
+        </div>
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center py-8 max-w-xl mx-auto w-full">
           <Trophy size={80} strokeWidth={2.5} />
           <div
@@ -2199,31 +2209,44 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   style={{
                     backgroundColor: bg,
                     color: fg,
-                    boxShadow: '4px 4px 0 #000',
+                    boxShadow: i === 0 ? '6px 6px 0 #000' : '4px 4px 0 #000',
                   }}
-                  className="border-4 border-black px-4 py-3 flex items-center justify-between"
+                  className={`border-4 border-black px-4 flex items-center justify-between ${
+                    i === 0 ? 'py-5' : 'py-3'
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span
-                      style={{ fontFamily: '"Space Mono", monospace' }}
-                      className="text-xs opacity-70"
-                    >
-                      #{i + 1}
-                    </span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {i === 0 ? (
+                      <Crown
+                        size={26}
+                        fill="currentColor"
+                        strokeWidth={1.5}
+                        className="shrink-0"
+                      />
+                    ) : (
+                      <span
+                        style={{ fontFamily: '"Space Mono", monospace' }}
+                        className="text-xs opacity-70 shrink-0"
+                      >
+                        #{i + 1}
+                      </span>
+                    )}
                     <span
                       style={{
                         fontFamily: '"Anton", sans-serif',
                         letterSpacing: '0.05em',
                         ...NAME_STYLE,
                       }}
-                      className="text-xl uppercase leading-none"
+                      className={`uppercase leading-none truncate ${
+                        i === 0 ? 'text-3xl' : 'text-xl'
+                      }`}
                     >
                       {p.name}
                     </span>
                     {(room.wins?.[p.id] || 0) > 0 && (
                       <span
                         style={{ fontFamily: '"Space Mono", monospace' }}
-                        className="text-xs whitespace-nowrap"
+                        className="text-xs whitespace-nowrap shrink-0"
                         title="Victoires dans cette room"
                       >
                         🏆×{room.wins[p.id]}
@@ -2232,7 +2255,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   </div>
                   <span
                     style={{ fontFamily: '"Anton", sans-serif' }}
-                    className="text-2xl"
+                    className={`shrink-0 pl-2 ${i === 0 ? 'text-4xl' : 'text-2xl'}`}
                   >
                     {p.score || 0}
                   </span>
@@ -2245,8 +2268,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             <button
               onClick={backToLobby}
               disabled={busy}
-              className="border-4 border-black bg-black text-white py-3 px-6 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-              style={{ boxShadow: '4px 4px 0 #000' }}
+              className="border-4 border-black py-3 px-6 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+              style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
             >
               <span
                 style={{ fontFamily: '"Anton", sans-serif' }}
