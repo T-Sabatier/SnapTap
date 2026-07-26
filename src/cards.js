@@ -70,7 +70,7 @@ export const DEFAULT_CARDS = [
   ['Dîner aux chandelles', 'relations'], ['Pizza-Netflix', 'relations'],
   ["Lettre d'amour", 'relations'], ['Memes mignons', 'relations'],
   ['Rencontre IRL', 'relations'], ['Match sur appli', 'relations'],
-  ['Couple cocon', 'relations'], ['Couple aventurier', 'relations'],
+  ['Couple cocon', 'relations'], ['Couple baroudeur', 'relations'],
 
   // SPORT
   ['Foot', 'sport'], ['Basket', 'sport'],
