@@ -1286,6 +1286,21 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
           </div>
         </div>
 
+        {/* Consigne d'action explicite : sans ca, un nouveau joueur ne sait pas
+            quoi poser (retour recurrent des testeurs). */}
+        <div className="px-4 -mt-2 pb-2 max-w-xl mx-auto w-full text-center">
+          <span
+            style={{ fontFamily: '"Anton", sans-serif' }}
+            className="text-lg uppercase leading-tight"
+          >
+            🎯 Pose la carte qui va{' '}
+            <span style={{ color: PINK }}>
+              {isLike ? 'lui plaire' : 'lui déplaire'}
+            </span>{' '}
+            le plus
+          </span>
+        </div>
+
         <div className="flex-1 px-4 overflow-y-auto pb-32">
           <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto">
             {myHandCardIds.map((cid) => {
