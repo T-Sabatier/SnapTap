@@ -1981,7 +1981,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                           <>
                             <span
                               style={{ color: YELLOW }}
-                              className="block text-lg mb-1"
+                              className="block mb-1"
                             >
                               Votez pour :
                             </span>
