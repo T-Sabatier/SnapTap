@@ -1735,8 +1735,10 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
           </div>
         </div>
 
-        {/* Cartes sombres "sur scene" + faisceau de projecteur qui balaie */}
-        <div className="flex-1 px-4 pb-8 overflow-y-auto">
+        {/* Cartes sombres "sur scene" + faisceau de projecteur qui balaie.
+            pt-6 : marge en haut pour que la carte selectionnee (scale + halo)
+            ne soit pas rognee par le bord du conteneur qui scrolle. */}
+        <div className="flex-1 px-4 pt-6 pb-8 overflow-y-auto">
           <div className="relative max-w-xl mx-auto">
             <div
               className="pointer-events-none absolute inset-y-0 left-0 w-1/2 spotlight-sweep z-10"
