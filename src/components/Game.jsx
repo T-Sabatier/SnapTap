@@ -21,6 +21,7 @@ import {
   colorHex,
   colorFg,
 } from '../cards';
+import { useT } from '../i18n.jsx';
 
 const CAT_EMOJI = Object.fromEntries(
   CATEGORIES.map((c) => [c.id, c.emoji])
@@ -55,28 +56,16 @@ function hashStr(s) {
 const REACTIONS = ['😂', '😱', '😍', '🔥', '👎', '💀'];
 
 // Sorts a usage unique : contenu du modal de confirmation stylee (reroll / x2).
+// Textes dans les carnets (game.sortConfirm.<id>) ; ici juste l'emoji.
 const SORT_CONFIRM = {
-  reroll: {
-    emoji: '🎲',
-    title: 'Reroll ?',
-    body: 'Tu jettes ta main et tu repioches 7 nouvelles cartes. Une seule fois dans la partie.',
-    cta: 'Repiocher',
-  },
-  vatout: {
-    emoji: '🔥',
-    title: 'Activer le x2 ?',
-    body: 'Ta carte vaudra le DOUBLE si le boss la choisit. Une seule fois — consommé quand tu joues.',
-    cta: 'Activer',
-  },
+  reroll: { emoji: '🎲' },
+  vatout: { emoji: '🔥' },
 };
 
 // Manches speciales (mode normal comme apero) : twist annonce en debut de
 // manche. Choisi par le host (writer unique) au passage a la manche suivante.
-const SPECIALS = {
-  double: { label: 'Manche double', desc: 'Le gagnant marque 2 points !' },
-  chrono: { label: 'Manche chrono', desc: '10 s pour poser, sinon carte au hasard !' },
-  swap: { label: 'Manche échange', desc: 'Tu joues avec la main de ton voisin !' },
-};
+// Les libellés/descriptions vivent dans les carnets (game.specials.<id>).
+const SPECIALS = { double: true, chrono: true, swap: true };
 const SPECIAL_KEYS = Object.keys(SPECIALS);
 // ~30% de chance qu'une manche soit speciale.
 function rollSpecial() {
@@ -88,6 +77,7 @@ function rollSpecial() {
 // Annonce PLEIN ECRAN d'une manche speciale, au debut de la manche : ca claque
 // pendant ~2.5 s puis se fond. Se remonte a chaque nouvelle manche (key=round).
 function SpecialAnnounce({ special }) {
+  const t = useT();
   const s = SPECIALS[special];
   const [phase, setPhase] = useState('in'); // 'in' → 'out' → hidden
   useEffect(() => {
@@ -110,7 +100,7 @@ function SpecialAnnounce({ special }) {
           style={{ fontFamily: '"Space Mono", monospace', color: YELLOW }}
           className="text-sm uppercase tracking-[0.4em] mb-4"
         >
-          Manche spéciale
+          {t('game.specialRound')}
         </div>
         <div
           style={{
@@ -121,7 +111,7 @@ function SpecialAnnounce({ special }) {
           }}
           className="text-6xl uppercase leading-none mb-5"
         >
-          {s.label}
+          {t(`game.specials.${special}.label`)}
         </div>
         <div
           style={{
@@ -133,7 +123,7 @@ function SpecialAnnounce({ special }) {
           }}
           className="inline-block border-4 border-black px-5 py-3 text-xl uppercase"
         >
-          {s.desc}
+          {t(`game.specials.${special}.desc`)}
         </div>
       </div>
     </div>
@@ -142,6 +132,7 @@ function SpecialAnnounce({ special }) {
 
 // Banniere d'annonce d'une manche speciale (affichee en haut des ecrans de jeu).
 function SpecialBanner({ special }) {
+  const t = useT();
   const s = SPECIALS[special];
   if (!s) return null;
   return (
@@ -154,13 +145,13 @@ function SpecialBanner({ special }) {
           style={{ fontFamily: '"Anton", sans-serif' }}
           className="text-xl uppercase leading-none"
         >
-          {s.label}
+          {t(`game.specials.${special}.label`)}
         </div>
         <div
           style={{ fontFamily: '"Space Mono", monospace' }}
           className="text-[10px] uppercase tracking-widest mt-1 opacity-80"
         >
-          {s.desc}
+          {t(`game.specials.${special}.desc`)}
         </div>
       </div>
     </div>
@@ -171,6 +162,7 @@ function SpecialBanner({ special }) {
 // la revelation. Meme "slam" que les manches speciales : ca claque ~2.5 s puis
 // se fond. Remontee a chaque manche (key=round).
 function JackpotAnnounce({ apero, winnerName }) {
+  const t = useT();
   const [phase, setPhase] = useState('in'); // 'in' → 'out' → hidden
   useEffect(() => {
     // Reste ~2 s de plus que les manches speciales (moment fort).
@@ -200,7 +192,7 @@ function JackpotAnnounce({ apero, winnerName }) {
           style={{ fontFamily: '"Space Mono", monospace', color: YELLOW }}
           className="text-sm uppercase tracking-[0.4em] mb-3"
         >
-          Jackpot
+          {t('game.jackpot')}
         </div>
         <div
           style={{
@@ -223,7 +215,7 @@ function JackpotAnnounce({ apero, winnerName }) {
           }}
           className="inline-block border-4 border-black px-5 py-3 text-lg uppercase max-w-xs leading-tight"
         >
-          {apero ? 'Tout le monde boit 1 à la santé de' : 'Félicitations'}
+          {apero ? t('game.jackpotApero') : t('game.jackpotNormal')}
           <div className="text-4xl leading-none mt-1 break-words">
             {winnerName || '?'} !
           </div>
@@ -404,6 +396,7 @@ import {
 } from 'lucide-react';
 
 export default function Game({ room, roomCode, playerId, onLeave }) {
+  const t = useT();
   const [selectedCard, setSelectedCard] = useState(null);
   const [busy, setBusy] = useState(false);
   const [vatoutArmed, setVatoutArmed] = useState(false);
@@ -1574,13 +1567,13 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                     style={{ fontFamily: '"Anton", sans-serif' }}
                     className="text-3xl uppercase mb-3 text-black"
                   >
-                    {SORT_CONFIRM[confirmSort].title}
+                    {t(`game.sortConfirm.${confirmSort}.title`)}
                   </div>
                   <p
                     style={{ fontFamily: '"Space Mono", monospace' }}
                     className="text-sm text-black/80 mb-6 leading-snug"
                   >
-                    {SORT_CONFIRM[confirmSort].body}
+                    {t(`game.sortConfirm.${confirmSort}.body`)}
                   </p>
                   <div className="flex gap-3">
                     <button
@@ -1600,7 +1593,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       }}
                       className="flex-1 border-4 border-black py-3 text-lg uppercase active:translate-x-[2px] active:translate-y-[2px]"
                     >
-                      {SORT_CONFIRM[confirmSort].cta}
+                      {t(`game.sortConfirm.${confirmSort}.cta`)}
                     </button>
                   </div>
                 </div>

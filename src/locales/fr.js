@@ -71,6 +71,29 @@ export const fr = {
     ultraDesc:
       '7 catégories premium : Coquin (+18), Jeux vidéo, Dessins animés, Tech, Culture FR, Mode, Politique.',
   },
+  game: {
+    specialRound: 'Manche spéciale',
+    jackpot: 'Jackpot',
+    jackpotApero: 'Tout le monde boit 1 à la santé de',
+    jackpotNormal: 'Félicitations',
+    specials: {
+      double: { label: 'Manche double', desc: 'Le gagnant marque 2 points !' },
+      chrono: { label: 'Manche chrono', desc: '10 s pour poser, sinon carte au hasard !' },
+      swap: { label: 'Manche échange', desc: 'Tu joues avec la main de ton voisin !' },
+    },
+    sortConfirm: {
+      reroll: {
+        title: 'Reroll ?',
+        body: 'Tu jettes ta main et tu repioches 7 nouvelles cartes. Une seule fois dans la partie.',
+        cta: 'Repiocher',
+      },
+      vatout: {
+        title: 'Activer le x2 ?',
+        body: 'Ta carte vaudra le DOUBLE si le boss la choisit. Une seule fois — consommé quand tu joues.',
+        cta: 'Activer',
+      },
+    },
+  },
   lobby: {
     title: 'Salon',
     roomCode: 'Code de la room',

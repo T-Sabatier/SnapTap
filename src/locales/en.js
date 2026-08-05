@@ -71,6 +71,29 @@ export const en = {
     ultraDesc:
       '7 premium categories: Spicy (18+), Video Games, Cartoons, Tech, Pop Culture, Fashion, Politics.',
   },
+  game: {
+    specialRound: 'Special round',
+    jackpot: 'Jackpot',
+    jackpotApero: 'Everyone drinks to',
+    jackpotNormal: 'Congrats',
+    specials: {
+      double: { label: 'Double round', desc: 'The winner scores 2 points!' },
+      chrono: { label: 'Timed round', desc: '10s to play, otherwise a random card!' },
+      swap: { label: 'Swap round', desc: "You play with your neighbor's hand!" },
+    },
+    sortConfirm: {
+      reroll: {
+        title: 'Reroll?',
+        body: 'You discard your hand and draw 7 new cards. Once per game.',
+        cta: 'Redraw',
+      },
+      vatout: {
+        title: 'Activate x2?',
+        body: 'Your card will be worth DOUBLE if the boss picks it. Once only — used when you play.',
+        cta: 'Activate',
+      },
+    },
+  },
   lobby: {
     title: 'Lobby',
     roomCode: 'Room code',
