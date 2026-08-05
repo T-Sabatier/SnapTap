@@ -15,6 +15,7 @@ import Game from './components/Game.jsx';
 import Announcement from './components/Announcement.jsx';
 import Admin from './components/Admin.jsx';
 import Debug from './components/Debug.jsx';
+import { useT, useLang } from './i18n.jsx';
 
 // Routeur SANS hooks : les early-returns avant les hooks de jeu violaient les
 // Rules of Hooks (ça marchait car les flags sont constants, mais c'est fragile).
@@ -43,12 +44,21 @@ export default function App() {
 }
 
 function GameApp() {
+  const t = useT();
+  const { setRoomLocale } = useLang();
   const [playerId] = useState(getOrCreatePlayerId);
   const [roomCode, setRoomCode] = useState(getStoredRoom);
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(false);
   const [autoJoining, setAutoJoining] = useState(false);
   const [joinError, setJoinError] = useState('');
+
+  // Une partie = la langue de l'hôte : dès qu'on est dans une room qui porte
+  // une langue (room.settings.lang), toute l'app l'adopte (menus + jeu) ; en
+  // dehors d'une room, on revient à la préférence perso.
+  useEffect(() => {
+    setRoomLocale(room?.settings?.lang || null);
+  }, [room?.settings?.lang, setRoomLocale]);
 
   useEffect(() => {
     if (!roomCode) {
@@ -124,7 +134,7 @@ function GameApp() {
         // sans prenom). On valide la room, puis l'accueil affiche la modal de
         // join (prenom + Rejoindre) qui l'ajoutera au bon moment.
         if (r.phase !== 'lobby') {
-          setJoinError('Partie déjà en cours dans cette room');
+          setJoinError(t('errors.gameInProgress'));
           clearRoomUrl();
           setAutoJoining(false);
           return;
@@ -185,7 +195,7 @@ function GameApp() {
     screen = (
       <div className="min-h-screen flex items-center justify-center text-black">
         <div style={{ fontFamily: '"Anton", sans-serif' }} className="text-2xl uppercase">
-          Connexion à la room…
+          {t('common.connecting')}
         </div>
       </div>
     );
@@ -205,7 +215,7 @@ function GameApp() {
       <Home
         playerId={playerId}
         onJoin={joinRoom}
-        initialError="Tu n'es plus dans cette room"
+        initialError={t('errors.notInRoom')}
         onLeftover={leaveRoom}
       />
     );

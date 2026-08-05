@@ -6,6 +6,7 @@ export const en = {
     close: 'Close',
     leave: 'Leave',
     ok: 'OK',
+    connecting: 'Connecting to the room…',
   },
   settings: {
     title: 'Settings',
@@ -207,6 +208,7 @@ export const en = {
     invalidCode: 'Invalid code',
     roomNotFound: 'Room not found',
     gameInProgress: 'A game is already in progress in this room',
+    notInRoom: "You're no longer in this room",
     roomFull: 'Room full ({max} players max)',
     firebaseConfig: 'Firebase error: check your .env config',
   },

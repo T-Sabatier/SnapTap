@@ -162,6 +162,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
       settings: {
         cats: defaultCats,
         winningScore: 5,
+        // Langue de la partie (celle de l'hôte) : tout le salon l'adopte.
+        lang: locale,
         sorts: { reroll: false, espion: false, vatout: false },
         // Mode Apero pre-active si l'hote le POSSEDE et l'a choisi sur l'accueil.
         ...(partyActive ? { partyMode: true } : {}),

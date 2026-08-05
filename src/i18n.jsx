@@ -62,16 +62,26 @@ function lookup(dict, key) {
 const LangContext = createContext(null);
 
 export function LanguageProvider({ children }) {
-  const [locale, setLocaleState] = useState(detectLocale);
+  // Préférence perso (persistée) + langue imposée par la partie en cours.
+  const [userLocale, setUserLocale] = useState(detectLocale);
+  const [roomLocale, setRoomLocaleState] = useState(null);
+  // La langue effective (affichée) : la room prime (une partie = 1 langue,
+  // celle de l'hôte) ; sinon la préférence perso.
+  const locale = roomLocale && DICTS[roomLocale] ? roomLocale : userLocale;
 
   const setLocale = useCallback((code) => {
     if (!DICTS[code]) return;
-    setLocaleState(code);
+    setUserLocale(code);
     try {
       localStorage.setItem(STORAGE_KEY, code);
     } catch {
       /* ignore */
     }
+  }, []);
+
+  // Imposée par la room (hôte). null = on revient à la préférence perso.
+  const setRoomLocale = useCallback((code) => {
+    setRoomLocaleState(code && DICTS[code] ? code : null);
   }, []);
 
   useEffect(() => {
@@ -83,14 +93,21 @@ export function LanguageProvider({ children }) {
   }, [locale]);
 
   return (
-    <LangContext.Provider value={{ locale, setLocale }}>
+    <LangContext.Provider value={{ locale, userLocale, setLocale, setRoomLocale }}>
       {children}
     </LangContext.Provider>
   );
 }
 
 export function useLang() {
-  return useContext(LangContext) || { locale: FALLBACK, setLocale: () => {} };
+  return (
+    useContext(LangContext) || {
+      locale: FALLBACK,
+      userLocale: FALLBACK,
+      setLocale: () => {},
+      setRoomLocale: () => {},
+    }
+  );
 }
 
 // Hook de traduction : const t = useT(); t('home.create') ; t('greet', {name}) .
