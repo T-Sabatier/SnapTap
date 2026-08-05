@@ -23,7 +23,9 @@ export const DICTS = { fr, en };
 // Liste affichée dans le sélecteur (grandit toute seule quand on ajoute une langue).
 export const LOCALES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
+  // Contenu US (célébrités, émissions, sport… américains) -> drapeau US.
+  // Une future version 🇬🇧 (en-GB) réutilisera l'UI anglaise + un deck GB.
+  { code: 'en', label: 'English', flag: '🇺🇸' },
 ];
 
 const FALLBACK = 'en';
