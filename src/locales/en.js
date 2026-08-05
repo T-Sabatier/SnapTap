@@ -1,7 +1,9 @@
 // ENGLISH dictionary. Every key mirrors the other locale files.
+// Simple HTML (<b>) in some values is rendered via dangerouslySetInnerHTML.
 export const en = {
   common: {
     language: 'Language',
+    close: 'Close',
   },
   settings: {
     title: 'Settings',
@@ -11,9 +13,77 @@ export const en = {
     yourName: 'Your name',
     namePlaceholder: 'Name…',
     start: 'Start',
-    orJoinCode: 'Or join with a code',
     create: 'Create a game',
+    orJoinCode: 'Or join with a code',
     codePlaceholder: 'CODE',
     join: 'Join',
+    taglineNormal: 'Guess what they like… or not',
+    taglineApero: 'Party mode: the cards make you drink',
+    invitedTitle: "You've been invited to the room",
+    invitedSub: 'Enter your name and join 👇',
+    shopButton: 'Shop',
+    joinTitle: "You're joining the game",
+    joinInstead: 'Or create a game instead',
+  },
+  apero: {
+    name: 'Party Mode',
+    onLabel: 'On · the cards make you drink!',
+    offLabel: 'Drinking game · turn it on',
+    premiumSub: 'Drinking game · premium',
+    premiumTag: 'Premium · drinking game',
+    teaserDesc:
+      'Turn Snap Tap into a <b>drinking game</b>: every chosen card triggers a rule that makes the table drink.',
+    teaserHost: 'The host unlocks it, <b>the whole room</b> enjoys it.',
+  },
+  rules: {
+    title: 'Rules',
+    titleApero: '🍻 Party rules',
+    normal: [
+      '• 3 players minimum, each on their own device',
+      '• A hand of <b>7 cards</b> each',
+      '• A random player calls <b>LIKE</b> or <b>DISLIKE</b>',
+      '• The others play a card face down',
+      '• They pick their favorite card → <b>+1 point</b>',
+      '• First to <b>5 points</b> wins',
+    ],
+    apero: [
+      '• 3 players minimum, each on their own device',
+      '• A player calls <b>LIKE</b> or <b>DISLIKE</b>',
+      '• They pick their favorite card → <b>+1 point</b>',
+      '• The chosen card triggers <b>a drinking rule</b>',
+      '• <b>The boss and the winner never drink</b>',
+    ],
+  },
+  shop: {
+    title: '🛒 Shop',
+    subtitle: 'Premium packs',
+    mobileOnly: 'Purchases available only in the mobile app',
+    mobileOnlyLong: 'These packs are bought in the mobile app',
+    owned: 'Unlocked',
+    buy: 'Buy {price}',
+    restore: 'Restore my purchases',
+    aperoName: 'Party Mode',
+    aperoDesc:
+      'The drinking game: every chosen card makes the table drink. Includes the "Wasted" category.',
+    ultraName: 'Ultra Pack',
+    ultraDesc:
+      '7 premium categories: Spicy (18+), Video Games, Cartoons, Tech, Pop Culture, Fashion, Politics.',
+  },
+  footer: {
+    privacy: 'Privacy',
+    terms: 'Terms',
+    legal: 'Legal notice',
+  },
+  errors: {
+    errorPrefix: 'Error: ',
+    enterName: 'Enter your name',
+    cantCreate: "Couldn't create a room, try again",
+    firebaseRules: 'Firebase error: check your rules (test mode)',
+    codeLength: 'The code is 4 letters',
+    invalidCode: 'Invalid code',
+    roomNotFound: 'Room not found',
+    gameInProgress: 'A game is already in progress in this room',
+    roomFull: 'Room full ({max} players max)',
+    firebaseConfig: 'Firebase error: check your .env config',
   },
 };

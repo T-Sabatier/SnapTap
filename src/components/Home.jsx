@@ -90,7 +90,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
     try {
       await purchase(productId);
     } catch (e) {
-      setShopError('Erreur : ' + (e?.message || e?.code || String(e)));
+      setShopError(t('errors.errorPrefix') + (e?.message || e?.code || String(e)));
     }
   }
   // Nettoie un code colle/tape : garde seulement les 4 caracteres valides
@@ -107,7 +107,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
     try {
       await restore();
     } catch (e) {
-      setShopError('Erreur : ' + (e?.message || e?.code || String(e)));
+      setShopError(t('errors.errorPrefix') + (e?.message || e?.code || String(e)));
     }
   }
 
@@ -119,7 +119,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   async function createRoom() {
     const n = name.trim();
     if (!n) {
-      setError('Mets ton prénom');
+      setError(t('errors.enterName'));
       return;
     }
     setBusy(true);
@@ -140,7 +140,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
       tries++;
     }
     if (exists) {
-      setError('Impossible de créer une room, réessaye');
+      setError(t('errors.cantCreate'));
       setBusy(false);
       return;
     }
@@ -173,7 +173,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
       bumpStats({ gamesCreated: 1, ...(partyActive ? { partyCreated: 1 } : {}) });
       onJoin(code);
     } catch (e) {
-      setError('Erreur Firebase : vérifie tes règles (mode test)');
+      setError(t('errors.firebaseRules'));
       setBusy(false);
     }
   }
@@ -182,17 +182,17 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
     const n = name.trim();
     const code = joinCode.trim().toUpperCase();
     if (!n) {
-      setError('Mets ton prénom');
+      setError(t('errors.enterName'));
       return;
     }
     if (code.length !== 4) {
-      setError('Le code fait 4 lettres');
+      setError(t('errors.codeLength'));
       return;
     }
     // Charset strict (celui de makeRoomCode) : pas de caractères exotiques
     // dans le chemin Firebase (les règles refuseraient de toute façon).
     if (!/^[A-HJ-NP-Z2-9]{4}$/.test(code)) {
-      setError('Code invalide');
+      setError(t('errors.invalidCode'));
       return;
     }
     setBusy(true);
@@ -201,7 +201,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
     try {
       const snap = await get(ref(db, `rooms/${code}`));
       if (!snap.exists()) {
-        setError('Room introuvable');
+        setError(t('errors.roomNotFound'));
         setBusy(false);
         return;
       }
@@ -210,13 +210,13 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
       const alreadyIn = r.players && r.players[playerId];
 
       if (r.phase !== 'lobby' && !alreadyIn) {
-        setError('Partie déjà en cours dans cette room');
+        setError(t('errors.gameInProgress'));
         setBusy(false);
         return;
       }
 
       if (!alreadyIn && Object.keys(r.players || {}).length >= MAX_PLAYERS) {
-        setError(`Room complète (${MAX_PLAYERS} joueurs max)`);
+        setError(t('errors.roomFull', { max: MAX_PLAYERS }));
         setBusy(false);
         return;
       }
@@ -233,7 +233,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
 
       onJoin(code);
     } catch (e) {
-      setError('Erreur Firebase : vérifie ta config .env');
+      setError(t('errors.firebaseConfig'));
       setBusy(false);
     }
   }
@@ -276,7 +276,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                 </div>
                 <button
                   onClick={() => setShowSettings(false)}
-                  aria-label="Fermer"
+                  aria-label={t('common.close')}
                   className="border-2 border-black bg-white p-1 active:translate-y-[1px]"
                 >
                   <X size={18} color="#000" />
@@ -360,7 +360,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest whitespace-nowrap text-black"
             >
-              {partyActive ? 'Mode apéro : les cartes font boire' : "Devine ce qu'ils aiment ou pas…"}
+              {partyActive ? t('home.taglineApero') : t('home.taglineNormal')}
             </div>
           </div>
         </div>
@@ -384,13 +384,13 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                 style={{ fontFamily: '"Anton", sans-serif' }}
                 className="text-2xl uppercase leading-none"
               >
-                Mode Apéro
+                {t('apero.name')}
               </div>
               <div
                 style={{ fontFamily: '"Space Mono", monospace' }}
                 className="text-[10px] uppercase tracking-widest mt-1 opacity-80"
               >
-                {party ? 'Activé · les cartes font boire !' : 'Jeu à boire · active-le'}
+                {party ? t('apero.onLabel') : t('apero.offLabel')}
               </div>
             </div>
             <div
@@ -422,13 +422,13 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   style={{ fontFamily: '"Anton", sans-serif' }}
                   className="text-2xl uppercase leading-none"
                 >
-                  Mode Apéro
+                  {t('apero.name')}
                 </div>
                 <div
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest mt-1 opacity-70"
                 >
-                  Jeu à boire · premium
+                  {t('apero.premiumSub')}
                 </div>
               </div>
             </div>
@@ -450,7 +450,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-60 mb-1"
             >
-              Tu as été invité dans la room
+              {t('home.invitedTitle')}
             </div>
             <div
               style={{
@@ -466,7 +466,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-60 mt-1"
             >
-              Mets ton prénom et rejoins 👇
+              {t('home.invitedSub')}
             </div>
           </div>
         )}
@@ -577,7 +577,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-xl uppercase tracking-wide"
           >
-            Boutique
+            {t('home.shopButton')}
           </span>
         </button>
 
@@ -589,26 +589,13 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-xl uppercase mb-2"
           >
-            {partyActive ? '🍻 Règles apéro' : 'Règles'}
+            {partyActive ? t('rules.titleApero') : t('rules.title')}
           </div>
-          {partyActive ? (
-            <ul className="text-sm leading-relaxed space-y-1">
-              <li>• 3 joueurs minimum, chacun sur son appareil</li>
-              <li>• Un joueur annonce <b>J'AIME</b> ou <b>J'AIME PAS</b></li>
-              <li>• Il choisit sa carte préférée → <b>+1 point</b></li>
-              <li>• La carte choisie déclenche <b>une règle à boire</b></li>
-              <li>• <b>Le boss et le gagnant ne boivent jamais</b></li>
-            </ul>
-          ) : (
-            <ul className="text-sm leading-relaxed space-y-1">
-              <li>• 3 joueurs minimum, chacun sur son appareil</li>
-              <li>• Main de <b>7 cartes</b> chacun</li>
-              <li>• Un joueur tiré au sort annonce <b>J'AIME</b> ou <b>J'AIME PAS</b></li>
-              <li>• Les autres posent une carte face cachée</li>
-              <li>• Il choisit sa carte préférée → <b>+1 point</b></li>
-              <li>• Premier à <b>5 points</b> gagne</li>
-            </ul>
-          )}
+          <ul className="text-sm leading-relaxed space-y-1">
+            {(partyActive ? t('rules.apero') : t('rules.normal')).map((r, i) => (
+              <li key={i} dangerouslySetInnerHTML={{ __html: r }} />
+            ))}
+          </ul>
         </div>
 
         <div className="mt-10">
@@ -629,7 +616,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               }}
               className="underline"
             >
-              Confidentialité
+              {t('footer.privacy')}
             </a>
             <span aria-hidden>·</span>
             <a
@@ -640,7 +627,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               }}
               className="underline"
             >
-              Conditions
+              {t('footer.terms')}
             </a>
             <span aria-hidden>·</span>
             <a
@@ -651,7 +638,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               }}
               className="underline"
             >
-              Mentions légales
+              {t('footer.legal')}
             </a>
           </div>
         </div>
@@ -681,7 +668,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
           >
             <button
               onClick={() => setShowJoinModal(false)}
-              aria-label="Fermer"
+              aria-label={t('common.close')}
               className="absolute top-3 right-3 active:opacity-50"
             >
               <X size={24} strokeWidth={3} />
@@ -690,7 +677,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-60 text-center mb-1 mt-1"
             >
-              Tu rejoins la partie
+              {t('home.joinTitle')}
             </div>
             <div
               style={{ fontFamily: '"Anton", sans-serif', letterSpacing: '0.15em' }}
@@ -702,13 +689,13 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-sm uppercase tracking-widest mb-2 opacity-80"
             >
-              Ton prénom
+              {t('home.yourName')}
             </div>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && joinRoom()}
-              placeholder="Prénom…"
+              placeholder={t('home.namePlaceholder')}
               maxLength={14}
               autoFocus
               className="w-full border-4 border-black bg-white px-3 py-3 outline-none placeholder-black/30 text-lg mb-4"
@@ -725,7 +712,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                 style={{ fontFamily: '"Anton", sans-serif' }}
                 className="text-2xl uppercase"
               >
-                Rejoindre
+                {t('home.join')}
               </span>
             </button>
             <button
@@ -736,7 +723,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                 style={{ fontFamily: '"Space Mono", monospace' }}
                 className="text-[10px] uppercase tracking-widest opacity-50"
               >
-                Ou créer une partie à la place
+                {t('home.joinInstead')}
               </span>
             </button>
           </div>
@@ -758,7 +745,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
           >
             <button
               onClick={() => setAperoTeaser(false)}
-              aria-label="Fermer"
+              aria-label={t('common.close')}
               className="absolute top-3 right-3 active:opacity-50"
             >
               <X size={24} strokeWidth={3} />
@@ -767,22 +754,23 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               style={{ fontFamily: '"Anton", sans-serif' }}
               className="text-3xl uppercase leading-none mb-1 mt-1 text-center"
             >
-              Mode Apéro
+              {t('apero.name')}
             </div>
             <div
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-60 mb-4 text-center"
             >
-              Premium · jeu à boire
+              {t('apero.premiumTag')}
             </div>
-            <p className="text-sm mb-4">
-              Transforme Snap Tap en <b>jeu à boire</b> : chaque carte choisie
-              déclenche une règle qui fait boire la table.
-            </p>
+            <p
+              className="text-sm mb-4"
+              dangerouslySetInnerHTML={{ __html: t('apero.teaserDesc') }}
+            />
             <div className="border-t-2 border-black/10 pt-4 flex items-end justify-between gap-3">
-              <p className="text-sm opacity-80 flex-1">
-                L'hôte débloque, <b>tout le salon</b> en profite.
-              </p>
+              <p
+                className="text-sm opacity-80 flex-1"
+                dangerouslySetInnerHTML={{ __html: t('apero.teaserHost') }}
+              />
               <div
                 style={{ fontFamily: '"Anton", sans-serif' }}
                 className="text-3xl leading-none shrink-0"
@@ -804,7 +792,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   style={{ fontFamily: '"Anton", sans-serif' }}
                   className="text-xl uppercase"
                 >
-                  {shopBusy ? '…' : `Acheter ${prices[PRODUCT_APERO] || '…'}`}
+                  {shopBusy ? '…' : t('shop.buy', { price: prices[PRODUCT_APERO] || '…' })}
                 </span>
               </button>
             ) : (
@@ -839,7 +827,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
           >
             <button
               onClick={() => setShowShop(false)}
-              aria-label="Fermer"
+              aria-label={t('common.close')}
               className="absolute top-3 right-3 active:opacity-50"
             >
               <X size={24} strokeWidth={3} />
@@ -848,13 +836,13 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               style={{ fontFamily: '"Anton", sans-serif' }}
               className="text-3xl uppercase leading-none mb-1 mt-1 text-center"
             >
-              🛒 Boutique
+              {t('shop.title')}
             </div>
             <div
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-60 mb-5 text-center"
             >
-              Packs premium
+              {t('shop.subtitle')}
             </div>
             {!billingAvailable && (
               <div
@@ -866,7 +854,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[11px] uppercase tracking-wide leading-tight"
                 >
-                  Achats disponibles uniquement sur l'app mobile
+                  {t('shop.mobileOnly')}
                 </span>
               </div>
             )}
@@ -874,15 +862,15 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               {[
                 {
                   emoji: '🍻',
-                  name: 'Mode Apéro',
-                  desc: 'Le jeu à boire : chaque carte choisie fait boire la table. Inclut la catégorie « Bourré·e ».',
+                  name: t('shop.aperoName'),
+                  desc: t('shop.aperoDesc'),
                   productId: PRODUCT_APERO,
                   owned: aperoOwned,
                 },
                 {
                   emoji: '🌶️',
-                  name: 'Pack Ultra',
-                  desc: '7 catégories premium : Coquin (+18), Jeux vidéo, Dessins animés, Tech, Culture FR, Mode, Politique.',
+                  name: t('shop.ultraName'),
+                  desc: t('shop.ultraDesc'),
                   productId: PRODUCT_ULTRA,
                   owned: ultraOwned,
                 },
@@ -922,7 +910,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                           style={{ fontFamily: '"Space Mono", monospace' }}
                           className="text-[11px] uppercase tracking-widest"
                         >
-                          Débloqué
+                          {t('shop.owned')}
                         </span>
                       </div>
                     ) : billingAvailable ? (
@@ -936,7 +924,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                           style={{ fontFamily: '"Space Mono", monospace' }}
                           className="text-[11px] uppercase tracking-widest"
                         >
-                          {shopBusy ? '…' : `Acheter ${price}`}
+                          {shopBusy ? '…' : t('shop.buy', { price })}
                         </span>
                       </button>
                     ) : null}
@@ -957,7 +945,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest opacity-70"
                 >
-                  Restaurer mes achats
+                  {t('shop.restore')}
                 </span>
               </button>
             ) : (
@@ -966,7 +954,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest opacity-60 mb-3 text-center"
                 >
-                  Ces packs s'achètent dans l'app mobile
+                  {t('shop.mobileOnlyLong')}
                 </div>
                 <InstallCta onNavigate={() => setShowShop(false)} />
               </div>
