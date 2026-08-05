@@ -74,7 +74,7 @@ async function fetchProducts(ids) {
 // Retourne { apero, ultra, prices, billingAvailable, busy, purchase, restore }.
 export function useBilling() {
   const [ent, setEnt] = useState({ apero: false, ultra: false });
-  const [prices, setPrices] = useState({}); // { mode_apero: '4,99 €', ... }
+  const [prices, setPrices] = useState({}); // prix formatés du store, ex. { mode_apero: '5,99 €', ... }
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {

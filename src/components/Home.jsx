@@ -360,7 +360,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               className="border-2 border-black px-2.5 py-1.5 text-sm uppercase tracking-widest shrink-0"
               style={{ fontFamily: '"Space Mono", monospace' }}
             >
-              4,99 €
+              {prices[PRODUCT_APERO] || '…'}
             </div>
           </button>
         )}
@@ -711,7 +711,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                 style={{ fontFamily: '"Anton", sans-serif' }}
                 className="text-3xl leading-none shrink-0"
               >
-                {prices[PRODUCT_APERO] || '4,99 €'}
+                {prices[PRODUCT_APERO] || '…'}
               </div>
             </div>
             {billingAvailable ? (
@@ -728,7 +728,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   style={{ fontFamily: '"Anton", sans-serif' }}
                   className="text-xl uppercase"
                 >
-                  {shopBusy ? '…' : `Acheter ${prices[PRODUCT_APERO] || '4,99 €'}`}
+                  {shopBusy ? '…' : `Acheter ${prices[PRODUCT_APERO] || '…'}`}
                 </span>
               </button>
             ) : (
@@ -811,7 +811,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   owned: ultraOwned,
                 },
               ].map((p) => {
-                const price = prices[p.productId] || '4,99 €';
+                const price = prices[p.productId] || '…';
                 return (
                   <div
                     key={p.name}

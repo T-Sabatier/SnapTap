@@ -930,7 +930,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   style={{ fontFamily: '"Anton", sans-serif' }}
                   className="text-3xl leading-none shrink-0"
                 >
-                  {prices[teaserPackId] || '4,99 €'}
+                  {prices[teaserPackId] || '…'}
                 </div>
               </div>
               {billingAvailable ? (
@@ -944,7 +944,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                     style={{ fontFamily: '"Anton", sans-serif' }}
                     className="text-xl uppercase"
                   >
-                    {shopBusy ? '…' : `Acheter ${prices[teaserPackId] || '4,99 €'}`}
+                    {shopBusy ? '…' : `Acheter ${prices[teaserPackId] || '…'}`}
                   </span>
                 </button>
               ) : (
