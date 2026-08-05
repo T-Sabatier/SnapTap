@@ -29,6 +29,14 @@ export const LOCALES = [
 const FALLBACK = 'en';
 const STORAGE_KEY = 'st_lang';
 
+// Faut-il afficher le sélecteur de langue ? (tant que la trad est incomplète)
+// Capturé ICI, au chargement du module, AVANT que App.jsx ne nettoie l'URL
+// (?room, ?i18n…). Sinon le paramètre a disparu au moment du rendu.
+export const SHOW_LANG_SWITCH =
+  import.meta.env.DEV ||
+  (typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('i18n'));
+
 // Langue du téléphone/navigateur -> code supporté (ex. "en-US" -> "en").
 export function detectLocale() {
   try {

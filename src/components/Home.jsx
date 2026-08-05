@@ -15,7 +15,7 @@ import { CATEGORIES, YELLOW, AMBER, PINK, APERO_ACCENT, MAX_PLAYERS, PLAYER_COLO
 import { useBilling, PRODUCT_APERO, PRODUCT_ULTRA } from '../purchases';
 import { bumpStats } from '../stats';
 import { ChevronRight, Lock, X } from 'lucide-react';
-import { useT, useLang, LOCALES } from '../i18n.jsx';
+import { useT, useLang, LOCALES, SHOW_LANG_SWITCH } from '../i18n.jsx';
 import InstallButton from './InstallButton.jsx';
 import InstallCta from './InstallCta.jsx';
 
@@ -46,12 +46,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   const [busy, setBusy] = useState(false);
   const t = useT();
   const { locale, setLocale } = useLang();
-  // Sélecteur de langue caché tant que la traduction n'est pas complète :
-  // visible en dev, ou sur le web via ...?i18n (pour tester sans l'exposer).
-  const showLangSwitch =
-    import.meta.env.DEV ||
-    (typeof window !== 'undefined' &&
-      new URLSearchParams(window.location.search).has('i18n'));
+  // Capturé au chargement du module (avant le nettoyage d'URL) — voir i18n.jsx.
+  const showLangSwitch = SHOW_LANG_SWITCH;
   const [invitedCode] = useState(getCodeFromUrl);
   // Arrivée via QR / lien avec un code → modal de join dédiée (prénom + Rejoindre)
   // pour éviter que le joueur clique par réflexe sur "Créer une partie".
