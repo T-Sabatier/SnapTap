@@ -5,6 +5,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import App from './App.jsx';
 import { authReady } from './firebase';
 import { initPurchases } from './purchases';
+import { LanguageProvider } from './i18n.jsx';
 import './index.css';
 
 // App native Android : le bouton retour systeme minimise l'app au lieu de la
@@ -68,7 +69,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
 function mount() {
   ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-      <App />
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
     </React.StrictMode>
   );
 }

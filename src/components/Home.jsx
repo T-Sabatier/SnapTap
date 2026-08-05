@@ -15,6 +15,7 @@ import { CATEGORIES, YELLOW, AMBER, PINK, APERO_ACCENT, MAX_PLAYERS, PLAYER_COLO
 import { useBilling, PRODUCT_APERO, PRODUCT_ULTRA } from '../purchases';
 import { bumpStats } from '../stats';
 import { ChevronRight, Lock, X } from 'lucide-react';
+import { useT, useLang, LOCALES } from '../i18n.jsx';
 import InstallButton from './InstallButton.jsx';
 import InstallCta from './InstallCta.jsx';
 
@@ -43,6 +44,14 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   const [joinCode, setJoinCode] = useState(getCodeFromUrl);
   const [error, setError] = useState(initialError || '');
   const [busy, setBusy] = useState(false);
+  const t = useT();
+  const { locale, setLocale } = useLang();
+  // Sélecteur de langue caché tant que la traduction n'est pas complète :
+  // visible en dev, ou sur le web via ...?i18n (pour tester sans l'exposer).
+  const showLangSwitch =
+    import.meta.env.DEV ||
+    (typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).has('i18n'));
   const [invitedCode] = useState(getCodeFromUrl);
   // Arrivée via QR / lien avec un code → modal de join dédiée (prénom + Rejoindre)
   // pour éviter que le joueur clique par réflexe sur "Créer une partie".
@@ -395,17 +404,38 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
           </div>
         )}
 
+        {/* Sélecteur de langue : change toute l'app (menus + deck). */}
+        {showLangSwitch && (
+        <div className="flex justify-end gap-2 mb-4">
+          {LOCALES.map((l) => (
+            <button
+              key={l.code}
+              onClick={() => setLocale(l.code)}
+              className="border-2 border-black px-2 py-1 text-lg leading-none active:translate-y-[1px]"
+              style={{
+                backgroundColor: locale === l.code ? PINK : '#FFF',
+                boxShadow: '2px 2px 0 #000',
+              }}
+              aria-label={l.label}
+              title={l.label}
+            >
+              {l.flag}
+            </button>
+          ))}
+        </div>
+        )}
+
         <div className="mb-8">
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-sm uppercase tracking-widest mb-2 opacity-80"
           >
-            Ton prénom
+            {t('home.yourName')}
           </div>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Prénom…"
+            placeholder={t('home.namePlaceholder')}
             maxLength={14}
             className="w-full border-4 border-black bg-white px-3 py-3 outline-none placeholder-black/30 text-lg"
             style={{ boxShadow: '4px 4px 0 #000' }}
@@ -418,7 +448,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-sm uppercase tracking-widest"
           >
-            Lancer
+            {t('home.start')}
           </div>
           <div className="h-1 flex-1 bg-black"></div>
         </div>
@@ -433,7 +463,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-2xl uppercase tracking-wide"
           >
-            Créer une partie
+            {t('home.create')}
           </div>
         </button>
 
@@ -443,7 +473,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-sm uppercase tracking-widest text-center"
           >
-            Ou rejoins avec un code
+            {t('home.orJoinCode')}
           </div>
           <div className="h-1 flex-1 bg-black"></div>
         </div>
@@ -456,7 +486,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               e.preventDefault();
               setJoinCode(cleanCode(e.clipboardData.getData('text')));
             }}
-            placeholder="CODE"
+            placeholder={t('home.codePlaceholder')}
             maxLength={4}
             inputMode="text"
             autoCapitalize="characters"
@@ -476,7 +506,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               style={{ fontFamily: '"Anton", sans-serif' }}
               className="text-lg uppercase"
             >
-              Rejoindre
+              {t('home.join')}
             </span>
             <ChevronRight size={20} />
           </button>
