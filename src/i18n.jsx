@@ -30,12 +30,23 @@ const FALLBACK = 'en';
 const STORAGE_KEY = 'st_lang';
 
 // Faut-il afficher le sélecteur de langue ? (tant que la trad est incomplète)
-// Capturé ICI, au chargement du module, AVANT que App.jsx ne nettoie l'URL
-// (?room, ?i18n…). Sinon le paramètre a disparu au moment du rendu.
-export const SHOW_LANG_SWITCH =
-  import.meta.env.DEV ||
-  (typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).has('i18n'));
+// Capturé ICI, au chargement du module, AVANT que App.jsx ne nettoie l'URL.
+// Une visite avec ?i18n MÉMORISE le flag → le rouage reste visible ensuite
+// (même sans le paramètre), sur cet appareil. Les visiteurs normaux : rien.
+const I18N_FLAG = 'st_i18n';
+export const SHOW_LANG_SWITCH = (() => {
+  if (import.meta.env.DEV) return true;
+  if (typeof window === 'undefined') return false;
+  try {
+    if (new URLSearchParams(window.location.search).has('i18n')) {
+      localStorage.setItem(I18N_FLAG, '1');
+      return true;
+    }
+    return localStorage.getItem(I18N_FLAG) === '1';
+  } catch {
+    return false;
+  }
+})();
 
 // Langue du téléphone/navigateur -> code supporté (ex. "en-US" -> "en").
 export function detectLocale() {
