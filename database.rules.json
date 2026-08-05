@@ -39,6 +39,20 @@
       ".write": "auth != null && root.child('admin').child(auth.uid).exists()"
     },
 
+    "cards_en": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('admin').child(auth.uid).exists()",
+      "$cardId": {
+        "t": { ".validate": "newData.isString() && newData.val().length <= 80" },
+        "cat": { ".validate": "newData.isString() && newData.val().length <= 40" }
+      }
+    },
+
+    "categories_en": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('admin').child(auth.uid).exists()"
+    },
+
     "deletedDefaults": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('admin').child(auth.uid).exists()"
