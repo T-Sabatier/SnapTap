@@ -244,16 +244,15 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
       className={`text-black overflow-x-hidden${partyActive ? ' apero-bg' : ''}`}
     >
       <div className="max-w-md mx-auto px-5 py-10">
-        {/* Rouage paramètres (haut gauche). Caché tant que la trad est incomplète. */}
+        {/* Rouage paramètres (haut droite, icône nue). Caché tant que la trad est incomplète. */}
         {showLangSwitch && (
-          <div className="mb-4">
+          <div className="mb-2 flex justify-end">
             <button
               onClick={() => setShowSettings(true)}
               aria-label={t('settings.title')}
-              className="border-2 border-black bg-white p-2 active:translate-y-[1px]"
-              style={{ boxShadow: '3px 3px 0 #000' }}
+              className="p-1 active:translate-y-[1px] active:opacity-70"
             >
-              <Settings size={22} color="#000" />
+              <Settings size={26} color="#000" />
             </button>
           </div>
         )}
