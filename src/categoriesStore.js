@@ -5,9 +5,10 @@ import { CATEGORIES as DEFAULT_CATEGORIES } from './cards';
 const CATEGORIES_PATH = 'categories';
 const DELETED_PATH = 'deletedCategories';
 
-// Catégories par langue : 'en' -> node `categories_en`, sinon FR par défaut.
+// Catégories par langue : 'en' -> `categories_en`, 'en-gb' -> `categories_en_gb`, sinon FR.
 function categoriesPath(lang) {
-  return lang === 'en' ? 'categories_en' : CATEGORIES_PATH;
+  if (!lang || lang === 'fr') return CATEGORIES_PATH;
+  return 'categories_' + lang.replace('-', '_');
 }
 
 export function subscribeCategories(cb, lang) {

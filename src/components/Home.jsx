@@ -50,7 +50,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   const showLangSwitch = SHOW_LANG_SWITCH;
   const [showSettings, setShowSettings] = useState(false);
   // Pages légales : version EN (/privacy-en…) quand l'app est en anglais.
-  const legalSuffix = locale === 'en' ? '-en' : '';
+  const legalSuffix = locale.startsWith('en') ? '-en' : '';
   const [invitedCode] = useState(getCodeFromUrl);
   // Arrivée via QR / lien avec un code → modal de join dédiée (prénom + Rejoindre)
   // pour éviter que le joueur clique par réflexe sur "Créer une partie".

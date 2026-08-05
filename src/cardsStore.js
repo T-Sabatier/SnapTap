@@ -5,9 +5,10 @@ import { DEFAULT_CARDS } from './cards';
 const CARDS_PATH = 'cards';
 const DELETED_DEFAULTS_PATH = 'deletedDefaults';
 
-// Deck par langue : 'en' -> node `cards_en`, sinon le deck FR par défaut.
+// Deck par langue : 'en' -> `cards_en`, 'en-gb' -> `cards_en_gb`, sinon FR.
 function cardsPath(lang) {
-  return lang === 'en' ? 'cards_en' : CARDS_PATH;
+  if (!lang || lang === 'fr') return CARDS_PATH;
+  return 'cards_' + lang.replace('-', '_');
 }
 
 export function subscribeCards(cb, lang) {

@@ -386,7 +386,7 @@ function GageRoulette({ players, targetId, onDone }) {
 function gageOf(card, cardId, round, playersObj, excludeIds = [], lang) {
   let text = card?.g;
   if (!text) {
-    const pool = GENERIC_GAGES[lang === 'en' ? 'en' : 'fr'];
+    const pool = GENERIC_GAGES[lang && lang.startsWith('en') ? 'en' : 'fr'];
     text = pool[hashStr(`${cardId}_${round}`) % pool.length];
   }
   if (!text.startsWith('@')) return { text, targetId: null };

@@ -18,14 +18,15 @@ import {
 import { fr } from './locales/fr';
 import { en } from './locales/en';
 
-export const DICTS = { fr, en };
+// L'UK réutilise le MÊME dictionnaire d'interface que l'US (c'est de l'anglais) ;
+// seul le DECK change (deck_en vs deck_en_gb).
+export const DICTS = { fr, en, 'en-gb': en };
 
 // Liste affichée dans le sélecteur (grandit toute seule quand on ajoute une langue).
 export const LOCALES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  // Contenu US (célébrités, émissions, sport… américains) -> drapeau US.
-  // Une future version 🇬🇧 (en-GB) réutilisera l'UI anglaise + un deck GB.
-  { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'en', label: 'English (US)', flag: '🇺🇸' },
+  { code: 'en-gb', label: 'English (UK)', flag: '🇬🇧' },
 ];
 
 const FALLBACK = 'en';
@@ -63,6 +64,7 @@ export function detectLocale() {
       (navigator.language || navigator.languages?.[0])) ||
     ''
   ).toLowerCase();
+  if (nav === 'en-gb') return 'en-gb'; // téléphone britannique -> deck UK
   const base = nav.split('-')[0];
   return DICTS[base] ? base : FALLBACK;
 }
