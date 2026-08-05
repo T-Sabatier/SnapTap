@@ -11,6 +11,7 @@ export const fr = {
   settings: {
     title: 'Paramètres',
     language: 'Langue',
+    langHint: 'La langue change aussi les cartes du jeu.',
   },
   home: {
     yourName: 'Ton prénom',

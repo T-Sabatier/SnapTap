@@ -11,6 +11,7 @@ export const en = {
   settings: {
     title: 'Settings',
     language: 'Language',
+    langHint: 'Language also changes the game cards.',
   },
   home: {
     yourName: 'Your name',

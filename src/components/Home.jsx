@@ -314,6 +314,12 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                   </button>
                 ))}
               </div>
+              <div
+                style={{ fontFamily: '"Space Mono", monospace' }}
+                className="text-[10px] uppercase tracking-widest text-black/50 mt-3"
+              >
+                {t('settings.langHint')}
+              </div>
             </div>
           </div>
         )}
