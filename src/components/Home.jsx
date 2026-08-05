@@ -49,6 +49,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   // Capturé au chargement du module (avant le nettoyage d'URL) — voir i18n.jsx.
   const showLangSwitch = SHOW_LANG_SWITCH;
   const [showSettings, setShowSettings] = useState(false);
+  // Pages légales : version EN (/privacy-en…) quand l'app est en anglais.
+  const legalSuffix = locale === 'en' ? '-en' : '';
   const [invitedCode] = useState(getCodeFromUrl);
   // Arrivée via QR / lien avec un code → modal de join dédiée (prénom + Rejoindre)
   // pour éviter que le joueur clique par réflexe sur "Créer une partie".
@@ -611,10 +613,10 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             className="text-[10px] uppercase tracking-widest opacity-50 flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
           >
             <a
-              href="https://www.snaptapparty.com/privacy"
+              href={`https://www.snaptapparty.com/privacy${legalSuffix}`}
               onClick={(e) => {
                 e.preventDefault();
-                openExternal('https://www.snaptapparty.com/privacy');
+                openExternal(`https://www.snaptapparty.com/privacy${legalSuffix}`);
               }}
               className="underline"
             >
@@ -622,10 +624,10 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             </a>
             <span aria-hidden>·</span>
             <a
-              href="https://www.snaptapparty.com/conditions"
+              href={`https://www.snaptapparty.com/conditions${legalSuffix}`}
               onClick={(e) => {
                 e.preventDefault();
-                openExternal('https://www.snaptapparty.com/conditions');
+                openExternal(`https://www.snaptapparty.com/conditions${legalSuffix}`);
               }}
               className="underline"
             >
@@ -633,10 +635,10 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             </a>
             <span aria-hidden>·</span>
             <a
-              href="https://www.snaptapparty.com/mentions-legales"
+              href={`https://www.snaptapparty.com/mentions-legales${legalSuffix}`}
               onClick={(e) => {
                 e.preventDefault();
-                openExternal('https://www.snaptapparty.com/mentions-legales');
+                openExternal(`https://www.snaptapparty.com/mentions-legales${legalSuffix}`);
               }}
               className="underline"
             >
