@@ -304,12 +304,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                       boxShadow: '2px 2px 0 #000',
                     }}
                   >
-                    <span className="text-lg leading-none">{l.flag}</span>
-                    <span
-                      style={{ fontFamily: '"Anton", sans-serif' }}
-                      className="text-sm uppercase"
-                    >
-                      {l.label}
+                    <span className="text-3xl leading-none" title={l.label}>
+                      {l.flag}
                     </span>
                   </button>
                 ))}
