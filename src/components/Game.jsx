@@ -256,6 +256,7 @@ function ReactionsLayer({ reactions }) {
 // lentement puis s'arrete sur le joueur cible (targetId). Deterministe (meme
 // cible partout), l'animation est locale mais finit toujours sur le meme nom.
 function GageRoulette({ players, targetId, onDone }) {
+  const t = useT();
   const targetIdx = Math.max(0, players.findIndex((p) => p.id === targetId));
   const [active, setActive] = useState(0);
   const [done, setDone] = useState(false);
@@ -313,7 +314,7 @@ function GageRoulette({ players, targetId, onDone }) {
           style={{ fontFamily: '"Space Mono", monospace' }}
           className="text-[11px] uppercase tracking-widest opacity-70 mb-4"
         >
-          C'est à toi de jouer
+          {t('game.gageYou')}
         </div>
         <span
           style={{
@@ -820,7 +821,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
 
   async function leaveGame() {
     if (busy) return;
-    if (!confirm('Quitter la partie ?')) return;
+    if (!confirm(t('game.leaveConfirm'))) return;
     setBusy(true);
     try {
       const remaining = players.filter((p) => p.id !== playerId);
@@ -868,7 +869,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest"
             >
-              Quitter
+              {t('common.leave')}
             </span>
           </button>
           <div className="flex items-center gap-2">
@@ -880,7 +881,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             </div>
             <button
               onClick={() => setShowHelp(true)}
-              aria-label="Aide : les catégories"
+              aria-label={t('game.helpAria')}
               className="w-6 h-6 flex items-center justify-center border-2 border-black rounded-full active:translate-y-[1px]"
               style={{ fontFamily: '"Anton", sans-serif', backgroundColor: '#FFF', color: '#000', lineHeight: 1 }}
             >
@@ -891,7 +892,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest text-right min-w-[60px]"
           >
-            {right || (partyMode ? '🍻 Apéro' : '')}
+            {right || (partyMode ? '🍻 ' + t('game.aperoTag') : '')}
           </div>
         </div>
       </div>
@@ -912,11 +913,11 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Anton", sans-serif' }}
                 className="text-2xl uppercase text-black"
               >
-                Les catégories
+                {t('game.helpTitle')}
               </div>
               <button
                 onClick={() => setShowHelp(false)}
-                aria-label="Fermer"
+                aria-label={t('common.close')}
                 className="border-2 border-black bg-white p-1 active:translate-y-[1px]"
               >
                 <X size={18} color="#000" />
@@ -926,7 +927,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest text-black/60 mb-4"
             >
-              L'emoji en haut de chaque carte = sa catégorie
+              {t('game.helpSub')}
             </div>
             <div className="grid grid-cols-2 gap-2">
               {CATEGORIES.map((c) => (
@@ -1022,7 +1023,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Anton", sans-serif', ...NAME_STYLE }}
               className="text-lg uppercase leading-none"
             >
-              {done} / {others.length} ont posé
+              {t('game.played', { done, total: others.length })}
             </span>
           </div>
         </div>
@@ -1072,7 +1073,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[11px] uppercase tracking-[0.35em] opacity-70 mb-4"
             >
-              C'est ton tour
+              {t('game.yourTurn')}
             </div>
             <div
               style={{
@@ -1092,13 +1093,13 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Anton", sans-serif' }}
               className="text-2xl uppercase mb-1 mt-4"
             >
-              Annonce ton mode
+              {t('game.announceMode')}
             </div>
             <div
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-70 mb-6"
             >
-              Les autres poseront en fonction
+              {t('game.othersWillPlay')}
             </div>
 
             <div className="flex flex-col gap-6 mt-2">
@@ -1117,7 +1118,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   style={{ fontFamily: '"Anton", sans-serif', lineHeight: 0.9 }}
                   className="text-3xl uppercase"
                 >
-                  J'aime
+                  {t('game.like')}
                 </div>
                 <Heart size={36} fill="#000" strokeWidth={0} />
               </button>
@@ -1141,7 +1142,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   }}
                   className="text-3xl uppercase"
                 >
-                  J'aime pas
+                  {t('game.dislike')}
                 </div>
                 <HeartCrack size={36} color="#FFF" strokeWidth={2.5} />
               </button>
@@ -1194,7 +1195,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest opacity-60 mt-4 mb-2"
           >
-            En attente
+            {t('game.waiting')}
           </div>
           <div
             style={{
@@ -1214,7 +1215,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-xl uppercase opacity-80"
           >
-            choisit son mode…
+            {t('game.choosingMode')}
           </div>
         </div>
       </div>
@@ -1243,7 +1244,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Anton", sans-serif', lineHeight: 0.9 }}
                 className="text-3xl uppercase"
               >
-                {room.mode === 'like' ? "J'aime" : "J'aime pas"}
+                {room.mode === 'like' ? t('game.like') : t('game.dislike')}
               </div>
               {room.mode === 'like' ? (
                 <Heart size={32} fill="#000" strokeWidth={0} />
@@ -1259,7 +1260,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               }}
               className="text-3xl uppercase mb-4 mt-3"
             >
-              Les joueurs<br />posent leur carte
+              {t('game.playersPlaying')}
             </div>
             <div className="w-full mt-2">
               <WaitingProgress />
@@ -1282,7 +1283,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-60 mb-2"
             >
-              Ta carte
+              {t('game.yourCard')}
             </div>
             <div
               className="border-4 border-black p-5 mb-6 max-w-xs w-full relative"
@@ -1314,7 +1315,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Anton", sans-serif', lineHeight: 0.95 }}
               className="text-3xl uppercase mb-3"
             >
-              En attente<br />des autres
+              {t('game.waitingOthers')}
             </div>
             <div className="w-full mt-2">
               <WaitingProgress />
@@ -1354,7 +1355,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               >
                 {boss?.name || '…'}
               </span>{' '}
-              veut {isLike ? "J'aime" : "J'aime pas"}
+              {t('game.wants')} {isLike ? t('game.like') : t('game.dislike')}
             </div>
             {isLike ? (
               <Heart size={40} fill="#000" strokeWidth={0} className="shrink-0" />
@@ -1371,11 +1372,11 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-lg uppercase leading-tight"
           >
-            Pose la carte qui va{' '}
+            {t('game.playHintPre')}{' '}
             <span style={{ color: PINK }}>
-              {isLike ? 'lui plaire' : 'lui déplaire'}
+              {isLike ? t('game.playHintLike') : t('game.playHintDislike')}
             </span>{' '}
-            le plus
+            {t('game.playHintPost')}
           </span>
         </div>
 
@@ -1447,7 +1448,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                     style={{ fontFamily: '"Space Mono", monospace', color: DISLIKE_RED }}
                     className="text-[10px] uppercase tracking-widest"
                   >
-                    dépêche-toi !
+                    {t('game.hurry')}
                   </span>
                 )}
               </div>
@@ -1467,7 +1468,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                         style={{ fontFamily: '"Anton", sans-serif' }}
                         className="text-sm uppercase leading-none"
                       >
-                        {myUsed.reroll ? 'Reroll utilisé' : 'Reroll'}
+                        {myUsed.reroll ? t('game.rerollUsed') : t('game.reroll')}
                       </span>
                     </button>
                   )}
@@ -1493,16 +1494,16 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                         className="text-sm uppercase leading-none"
                       >
                         {myUsed.vatout
-                          ? 'x2 utilisé'
+                          ? t('game.x2Used')
                           : vatoutArmed
-                            ? 'x2 activé !'
+                            ? t('game.x2On')
                             : 'x2'}
                       </span>
                     </button>
                   )}
                   <button
                     onClick={() => setSortsOpen(false)}
-                    aria-label="Fermer les sorts"
+                    aria-label={t('common.close')}
                     className="border-4 border-black bg-black text-white px-3 active:translate-x-[2px] active:translate-y-[2px] flex items-center justify-center"
                     style={{ boxShadow: '4px 4px 0 #000' }}
                   >
@@ -1525,7 +1526,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       style={{ fontFamily: '"Anton", sans-serif' }}
                       className="text-sm uppercase leading-none"
                     >
-                      {vatoutArmed ? 'x2 armé' : 'Sorts'}
+                      {vatoutArmed ? t('game.x2Armed') : t('game.spellsBtn')}
                     </span>
                   </button>
                 </div>
@@ -1543,9 +1544,9 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 >
                   {selectedCard
                     ? vatoutArmed
-                      ? 'Jouer en x2 🔥'
-                      : 'Jouer cette carte'
-                    : 'Choisis une carte'}
+                      ? t('game.playX2')
+                      : t('game.playCard')
+                    : t('game.pickCard')}
                 </span>
                 {selectedCard && <ChevronRight size={24} />}
               </div>
@@ -1618,15 +1619,15 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-60"
             >
-              C'est ton tour de choisir
+              {t('game.yourTurnChoose')}
             </div>
             <div
               style={{ fontFamily: '"Anton", sans-serif', lineHeight: 0.95 }}
               className="text-2xl uppercase mt-1"
             >
-              Choisis la carte que tu{' '}
+              {t('game.chooseCard')}{' '}
               <span style={{ color: room.mode === 'like' ? '#000' : PINK }}>
-                {room.mode === 'like' ? 'aimes le plus' : 'aimes le moins'}
+                {room.mode === 'like' ? t('game.likeMost') : t('game.likeLeast')}
               </span>
             </div>
           </div>
@@ -1702,7 +1703,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                     style={{ fontFamily: '"Anton", sans-serif' }}
                     className="text-xl uppercase tracking-wide"
                   >
-                    {room.bossPick ? 'Valider mon choix' : 'Choisis une carte'}
+                    {room.bossPick ? t('game.confirmChoice') : t('game.pickCard')}
                   </span>
                   {room.bossPick && <ChevronRight size={24} />}
                 </div>
@@ -1763,7 +1764,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Anton", sans-serif' }}
                 className="text-base uppercase leading-none"
               >
-                choisit ce qu'il {revealIsLike ? 'aime' : 'aime pas'}
+                {t('game.chooses')} {revealIsLike ? t('game.likes') : t('game.dislikes')}
               </span>
             </div>
             {sorts.espion && (
@@ -1785,10 +1786,10 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   className="text-sm uppercase leading-none"
                 >
                   {myUsed.espion || espionDone
-                    ? 'Espion utilisé'
+                    ? t('game.spyUsed')
                     : espionArming
-                      ? 'Tape une carte…'
-                      : 'Espion'}
+                      ? t('game.spyTap')
+                      : t('game.spy')}
                 </span>
               </button>
             )}
@@ -1973,7 +1974,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[11px] uppercase tracking-widest opacity-70"
                 >
-                  Posée par
+                  {t('game.playedBy')}
                 </span>
                 <div
                   style={{
@@ -2090,7 +2091,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                               style={{ color: YELLOW }}
                               className="block mb-1"
                             >
-                              Votez pour :
+                              {t('game.voteFor')}
                             </span>
                             {voteSubject}
                             {voteConseq && (
@@ -2114,7 +2115,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                         style={{ fontFamily: '"Space Mono", monospace', color: '#000' }}
                         className="text-base font-bold uppercase tracking-wide mt-5"
                       >
-                        Le boss et le gagnant ne boivent pas
+                        {t('game.bossWinnerNoDrink')}
                       </div>
                     </>
                   );
@@ -2127,7 +2128,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Space Mono", monospace' }}
                 className="text-[10px] uppercase tracking-widest opacity-60 mb-2"
               >
-                Carte choisie
+                {t('game.chosenCard')}
               </div>
               <div
                 className="border-4 border-black p-6 mb-6 max-w-sm w-full relative"
@@ -2154,7 +2155,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Space Mono", monospace' }}
                 className="text-[10px] uppercase tracking-widest opacity-60 mb-3"
               >
-                Posée par
+                {t('game.playedBy')}
               </div>
               <div
                 style={{
@@ -2180,7 +2181,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 }}
                 className="inline-block border-4 border-black px-3 py-2 text-2xl uppercase"
               >
-                +{winnerGain} point{winnerGain > 1 ? 's' : ''}
+                +{winnerGain} {winnerGain > 1 ? t('game.points') : t('game.point')}
               </div>
               {winnerGain > 1 && !jackpot && (
                 <div
@@ -2193,7 +2194,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   }}
                   className="inline-block border-4 border-black px-3 py-1 text-lg uppercase mt-3 ml-2"
                 >
-                  🔥 x2 réussi
+                  🔥 {t('game.x2Success')}
                 </div>
               )}
             </>
@@ -2217,8 +2218,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   className="text-xl uppercase tracking-wide"
                 >
                   {willWinGame
-                    ? 'Voir le gagnant'
-                    : `À ${winnerP?.name} de jouer`}
+                    ? t('game.seeWinner')
+                    : t('game.turnOf', { name: winnerP?.name })}
                 </span>
                 <ChevronRight size={24} />
               </div>
@@ -2228,7 +2229,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest text-center py-3 opacity-60"
             >
-              En attente du host pour continuer…
+              {t('game.waitHostContinue')}
             </div>
           )}
         </div>
@@ -2258,7 +2259,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest opacity-60 mt-4 mb-2"
           >
-            {partyMode ? 'Roi·ne de la soirée 🍻' : 'Champion·ne du jour'}
+            {partyMode ? t('game.kingOfNight') : t('game.champOfDay')}
           </div>
           <div
             style={{
@@ -2354,7 +2355,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Anton", sans-serif' }}
                 className="text-lg uppercase"
               >
-                Retour au salon
+                {t('game.backToLobby')}
               </span>
             </button>
           ) : (
@@ -2362,7 +2363,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest opacity-60"
             >
-              En attente du host…
+              {t('game.waitHost')}
             </div>
           )}
         </div>
