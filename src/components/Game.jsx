@@ -33,18 +33,32 @@ function catEmojiOf(card) {
 // Mode Apero — regles a boire GENERIQUES, utilisees quand la carte choisie
 // n'a pas de regle dediee (champ g pose via l'admin/deck-tool). Le tirage est
 // DETERMINISTE (hash cardId + manche) : meme regle affichee chez tous.
-const GENERIC_GAGES = [
-  'Le gagnant distribue 3 gorgées',
-  'Tout le monde trinque, le dernier à reposer son verre boit 2',
-  "Ceux qui n'ont pas encore marqué de point boivent 2",
-  'Les voisins du gagnant boivent 2',
-  "Le gagnant choisit quelqu'un : il boit 3",
-  'Vote : le plus susceptible de finir sous la table boit 2',
-  'Le plus jeune de la table boit 2',
-  'Ceux qui ont leur tel à moins de 30% boivent 2',
-  'Tout le monde boit 1 à la santé du gagnant',
-  'Le dernier à lever la main boit 2',
-];
+const GENERIC_GAGES = {
+  fr: [
+    'Le gagnant distribue 3 gorgées',
+    'Tout le monde trinque, le dernier à reposer son verre boit 2',
+    "Ceux qui n'ont pas encore marqué de point boivent 2",
+    'Les voisins du gagnant boivent 2',
+    "Le gagnant choisit quelqu'un : il boit 3",
+    'Vote : le plus susceptible de finir sous la table boit 2',
+    'Le plus jeune de la table boit 2',
+    'Ceux qui ont leur tel à moins de 30% boivent 2',
+    'Tout le monde boit 1 à la santé du gagnant',
+    'Le dernier à lever la main boit 2',
+  ],
+  en: [
+    'The winner hands out 3 sips',
+    'Everyone cheers, the last to put their glass down drinks 2',
+    "Anyone who hasn't scored yet drinks 2",
+    "The winner's neighbors drink 2",
+    'The winner picks someone: they drink 3',
+    'Vote: the most likely to end up under the table drinks 2',
+    'The youngest at the table drinks 2',
+    'Anyone with their phone under 30% drinks 2',
+    'Everyone drinks 1 to the winner',
+    'The last to raise their hand drinks 2',
+  ],
+};
 
 function hashStr(s) {
   let h = 0;
@@ -369,10 +383,11 @@ function GageRoulette({ players, targetId, onDone }) {
 // Sont EXCLUS du tirage du defi : le GAGNANT (il a gagne, il ne boit pas) et
 // le BOSS (c'est lui qui menait la manche). Le defi tombe donc sur un
 // "perdant". Si aucun eligible (cas degenere), pas de cible → texte simple.
-function gageOf(card, cardId, round, playersObj, excludeIds = []) {
+function gageOf(card, cardId, round, playersObj, excludeIds = [], lang) {
   let text = card?.g;
   if (!text) {
-    text = GENERIC_GAGES[hashStr(`${cardId}_${round}`) % GENERIC_GAGES.length];
+    const pool = GENERIC_GAGES[lang === 'en' ? 'en' : 'fr'];
+    text = pool[hashStr(`${cardId}_${round}`) % pool.length];
   }
   if (!text.startsWith('@')) return { text, targetId: null };
   const ids = Object.keys(playersObj || {})
@@ -707,7 +722,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       // normal, winnerInfo.gage est simplement ignore.
       const wCard = (room.pool || {})[entry.cardId];
       const excluded = [entry.playerId, room.bossId];
-      const g = gageOf(wCard, entry.cardId, room.round || 1, room.players, excluded);
+      const g = gageOf(wCard, entry.cardId, room.round || 1, room.players, excluded, room.settings?.lang);
       await update(ref(db, `rooms/${roomCode}`), {
         winnerInfo: {
           playerId: entry.playerId,
@@ -2018,7 +2033,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       room.winnerInfo.cardId,
                       room.round || 1,
                       room.players,
-                      excluded
+                      excluded,
+                      room.settings?.lang
                     );
                   const eligible = players.filter(
                     (p) => !excluded.includes(p.id)
@@ -2066,7 +2082,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   // « distribue 2 ») du sujet -> petite pastille, pas de pronom
                   // (jamais faux) et pas de bloc « sujet + verbe » colle.
                   const voteMatch = isVote
-                    ? ruleText.match(/^(.*?)\s+((?:boit|distribue)\s+\d+)\s*$/i)
+                    ? ruleText.match(/^(.*?)\s+((?:boit|distribue|drinks?|downs?|hands? out)\s+\d+)\s*$/i)
                     : null;
                   const voteSubject = voteMatch ? voteMatch[1] : ruleText;
                   const voteConseq = voteMatch ? voteMatch[2] : null;

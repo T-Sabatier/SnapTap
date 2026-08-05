@@ -5,8 +5,13 @@ import { CATEGORIES as DEFAULT_CATEGORIES } from './cards';
 const CATEGORIES_PATH = 'categories';
 const DELETED_PATH = 'deletedCategories';
 
-export function subscribeCategories(cb) {
-  const r = ref(db, CATEGORIES_PATH);
+// Catégories par langue : 'en' -> node `categories_en`, sinon FR par défaut.
+function categoriesPath(lang) {
+  return lang === 'en' ? 'categories_en' : CATEGORIES_PATH;
+}
+
+export function subscribeCategories(cb, lang) {
+  const r = ref(db, categoriesPath(lang));
   return onValue(r, (snap) => {
     const val = snap.val() || {};
     const arr = Object.entries(val).map(([id, c]) => ({ id, ...c }));

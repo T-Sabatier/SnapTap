@@ -5,8 +5,13 @@ import { DEFAULT_CARDS } from './cards';
 const CARDS_PATH = 'cards';
 const DELETED_DEFAULTS_PATH = 'deletedDefaults';
 
-export function subscribeCards(cb) {
-  const r = ref(db, CARDS_PATH);
+// Deck par langue : 'en' -> node `cards_en`, sinon le deck FR par défaut.
+function cardsPath(lang) {
+  return lang === 'en' ? 'cards_en' : CARDS_PATH;
+}
+
+export function subscribeCards(cb, lang) {
+  const r = ref(db, cardsPath(lang));
   return onValue(r, (snap) => {
     const val = snap.val() || {};
     const arr = Object.entries(val).map(([id, c]) => ({ id, ...c }));

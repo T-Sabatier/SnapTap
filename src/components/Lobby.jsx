@@ -93,13 +93,15 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
   useEffect(() => {
     // Pas de seed ici : réservé à l'admin par les règles (il échouait toujours
     // pour un joueur) — le bootstrap d'une base vide se fait depuis /admin.
-    const unsubCards = subscribeCards(setAllCards);
-    const unsubCats = subscribeCategories(setAllCategories);
+    // Deck dans la langue de la partie (fixée par l'hôte à la création).
+    const deckLang = room.settings?.lang;
+    const unsubCards = subscribeCards(setAllCards, deckLang);
+    const unsubCats = subscribeCategories(setAllCategories, deckLang);
     return () => {
       unsubCards();
       unsubCats();
     };
-  }, []);
+  }, [room.settings?.lang]);
 
   // Les brouillons (draft) sont invisibles en partie : ils n'existent que
   // dans l'admin, en attente de validation/publication.
