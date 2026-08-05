@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
-import { getStoredAperoUnlock } from './utils';
+import { SHOW_LANG_SWITCH } from './i18n.jsx';
 import { subscribeMyPacks, ownsPack } from './entitlements';
 
 // Cle API PUBLIQUE RevenueCat (Android). Publique = OK dans le bundle client.
@@ -85,26 +85,23 @@ export function useBilling() {
       // cote serveur uniquement). Le flag localStorage apero ne compte QU'EN DEV
       // (bouton "activer pour tester") : en prod web, un simple
       // localStorage.fc_apero_unlocked='1' en console debloquait le mode. ---
-      let devUnlock = import.meta.env.DEV && getStoredAperoUnlock();
+      // Mode test (dev, ou web via ?i18n) : débloque apéro + ultra pour tester
+      // tout le deck. Sur le web ces packs ne sont PAS vendus (achat mobile
+      // only) → aucun risque de revenu. À nettoyer au lancement (comme ?i18n).
+      const testUnlock = import.meta.env.DEV || SHOW_LANG_SWITCH;
       let packs = {};
       const apply = () =>
         setEnt({
-          apero: devUnlock || ownsPack(packs, PRODUCT_APERO),
-          ultra: ownsPack(packs, PRODUCT_ULTRA),
+          apero: testUnlock || ownsPack(packs, PRODUCT_APERO),
+          ultra: testUnlock || ownsPack(packs, PRODUCT_ULTRA),
         });
       apply();
       const unsub = subscribeMyPacks((p) => {
         packs = p || {};
         apply();
       });
-      const onFocus = () => {
-        devUnlock = import.meta.env.DEV && getStoredAperoUnlock();
-        apply();
-      };
-      window.addEventListener('focus', onFocus);
       return () => {
         unsub && unsub();
-        window.removeEventListener('focus', onFocus);
       };
     }
 
