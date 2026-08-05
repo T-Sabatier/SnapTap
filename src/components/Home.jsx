@@ -247,7 +247,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
       style={{ backgroundColor: partyActive ? AMBER : YELLOW, minHeight: '100vh' }}
       className={`text-black overflow-x-hidden${partyActive ? ' apero-bg' : ''}`}
     >
-      <div className="max-w-md mx-auto px-5 py-10">
+      <div className="max-w-md mx-auto px-5 pt-4 pb-10">
         {/* Rouage paramètres (haut droite, icône nue). Caché tant que la trad est incomplète. */}
         {showLangSwitch && (
           <div className="mb-2 flex justify-end">
