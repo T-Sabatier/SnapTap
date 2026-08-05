@@ -212,4 +212,23 @@ export const en = {
     roomFull: 'Room full ({max} players max)',
     firebaseConfig: 'Firebase error: check your .env config',
   },
+  install: {
+    download: 'Download the app',
+    install: 'Install the app',
+    soonIphone: 'Coming soon on iPhone',
+    scanToInstall: 'Scan to install the app',
+    getApp: '🍻 Get the app!',
+    nudgeDesc:
+      'Unlock <b>Party Mode</b> (drinking game) and the <b>premium packs</b> — only in the app.',
+    continueWeb: 'Continue on the web',
+    iosTitle: 'On iPhone:',
+    iosTapPre: '1. Tap',
+    iosShare: 'Share',
+    iosTapPost: '(bottom of Safari)',
+    iosStep2: '2. Choose "Add to Home Screen"',
+    androidTitle: 'To install:',
+    androidMenu: 'Browser menu (⋮)',
+    androidInstall: '→ "Install app"',
+    androidAdd: 'or "Add to Home Screen"',
+  },
 };

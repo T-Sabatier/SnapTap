@@ -1,6 +1,7 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { webPlatform, PLAY_STORE_URL } from '../utils';
 import { PINK } from '../cards';
+import { useT } from '../i18n.jsx';
 
 // CTA d'installation adaptatif selon la plateforme web :
 //  - Android : bouton -> Play Store (install directe).
@@ -9,6 +10,7 @@ import { PINK } from '../cards';
 // Ne rend rien en natif (on est deja dans l'app). onNavigate = callback pour
 // fermer la modale parente au clic.
 export default function InstallCta({ onNavigate }) {
+  const t = useT();
   const platform = webPlatform();
 
   if (platform === 'android') {
@@ -22,7 +24,7 @@ export default function InstallCta({ onNavigate }) {
         style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
       >
         <span style={{ fontFamily: '"Anton", sans-serif' }} className="text-xl uppercase">
-          Installer l'app
+          {t('install.install')}
         </span>
       </a>
     );
@@ -35,7 +37,7 @@ export default function InstallCta({ onNavigate }) {
         style={{ boxShadow: '4px 4px 0 #000' }}
       >
         <span style={{ fontFamily: '"Anton", sans-serif' }} className="text-xl uppercase">
-          Bientôt sur iPhone
+          {t('install.soonIphone')}
         </span>
       </div>
     );
@@ -54,7 +56,7 @@ export default function InstallCta({ onNavigate }) {
         style={{ fontFamily: '"Space Mono", monospace' }}
         className="text-[11px] uppercase tracking-widest text-center"
       >
-        Scanne pour installer l'app
+        {t('install.scanToInstall')}
       </span>
     </div>
   );

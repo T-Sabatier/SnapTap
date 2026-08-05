@@ -3,6 +3,7 @@ import { Download, Share, X } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { YELLOW } from '../cards';
 import { isAndroidWeb, PLAY_STORE_URL } from '../utils';
+import { useT } from '../i18n.jsx';
 
 function isStandalone() {
   if (typeof window === 'undefined') return false;
@@ -22,6 +23,7 @@ function isIOS() {
 // variant "compact" : meme taille/police que "Quitter" (en-tetes).
 // variant "block"   : gros bouton pleine largeur (bas de page).
 export default function InstallButton({ align = 'right', variant = 'compact' }) {
+  const t = useT();
   // Recupere l'event eventuellement deja capture par main.jsx
   const [deferred, setDeferred] = useState(
     () => (typeof window !== 'undefined' ? window.__deferredInstallPrompt : null)
@@ -86,28 +88,28 @@ export default function InstallButton({ align = 'right', variant = 'compact' }) 
           onClick={handleClick}
           className="w-full border-4 border-black bg-white py-3 flex items-center justify-center gap-2 active:translate-x-[2px] active:translate-y-[2px]"
           style={{ boxShadow: '4px 4px 0 #000' }}
-          aria-label="Télécharger l'app"
+          aria-label={t('install.download')}
         >
           {ios ? <Share size={20} /> : <Download size={20} />}
           <span
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-xl uppercase tracking-wide"
           >
-            Télécharger l'app
+            {t('install.download')}
           </span>
         </button>
       ) : (
         <button
           onClick={handleClick}
           className="flex items-center gap-1.5"
-          aria-label="Télécharger l'app"
+          aria-label={t('install.download')}
         >
           {ios ? <Share size={18} /> : <Download size={18} />}
           <span
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest"
           >
-            Télécharger l'app
+            {t('install.download')}
           </span>
         </button>
       )}
@@ -122,7 +124,7 @@ export default function InstallButton({ align = 'right', variant = 'compact' }) 
           <button
             onClick={() => setShowHelp(false)}
             className="absolute top-2 right-2"
-            aria-label="Fermer"
+            aria-label={t('common.close')}
           >
             <X size={18} color={YELLOW} />
           </button>
@@ -132,17 +134,23 @@ export default function InstallButton({ align = 'right', variant = 'compact' }) 
           >
             {ios ? (
               <>
-                Sur iPhone :<br />
-                1. Touche <Share size={13} className="inline -mt-0.5" /> Partager
-                (en bas de Safari)<br />
-                2. Choisis « Sur l'écran d'accueil »
+                {t('install.iosTitle')}
+                <br />
+                {t('install.iosTapPre')}{' '}
+                <Share size={13} className="inline -mt-0.5" /> {t('install.iosShare')}{' '}
+                {t('install.iosTapPost')}
+                <br />
+                {t('install.iosStep2')}
               </>
             ) : (
               <>
-                Pour installer :<br />
-                Menu du navigateur (⋮)<br />
-                → « Installer l'application »<br />
-                ou « Ajouter à l'écran d'accueil »
+                {t('install.androidTitle')}
+                <br />
+                {t('install.androidMenu')}
+                <br />
+                {t('install.androidInstall')}
+                <br />
+                {t('install.androidAdd')}
               </>
             )}
           </div>

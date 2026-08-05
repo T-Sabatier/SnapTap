@@ -212,4 +212,23 @@ export const fr = {
     roomFull: 'Room complète ({max} joueurs max)',
     firebaseConfig: 'Erreur Firebase : vérifie ta config .env',
   },
+  install: {
+    download: "Télécharger l'app",
+    install: "Installer l'app",
+    soonIphone: 'Bientôt sur iPhone',
+    scanToInstall: "Scanne pour installer l'app",
+    getApp: "🍻 Prends l'app !",
+    nudgeDesc:
+      "Débloque le <b>Mode Apéro</b> (jeu à boire) et les <b>packs premium</b> — dispo uniquement dans l'app.",
+    continueWeb: 'Continuer sur le web',
+    iosTitle: 'Sur iPhone :',
+    iosTapPre: '1. Touche',
+    iosShare: 'Partager',
+    iosTapPost: '(en bas de Safari)',
+    iosStep2: "2. Choisis « Sur l'écran d'accueil »",
+    androidTitle: 'Pour installer :',
+    androidMenu: 'Menu du navigateur (⋮)',
+    androidInstall: "→ « Installer l'application »",
+    androidAdd: "ou « Ajouter à l'écran d'accueil »",
+  },
 };

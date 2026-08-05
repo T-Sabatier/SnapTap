@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { isInstallableWeb } from '../utils';
 import InstallCta from './InstallCta.jsx';
+import { useT } from '../i18n.jsx';
 
 // Pop-up "installe l'app" pour les joueurs sur navigateur (Android = bouton
 // Play, desktop = QR ; pas iOS, pas natif). Objectif : convertir les joueurs
@@ -11,6 +12,7 @@ import InstallCta from './InstallCta.jsx';
 const SESSION_KEY = 'snaptap_install_nudge_seen';
 
 export default function InstallNudge() {
+  const t = useT();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function InstallNudge() {
       >
         <button
           onClick={() => setShow(false)}
-          aria-label="Fermer"
+          aria-label={t('common.close')}
           className="absolute top-3 right-3 active:opacity-50"
         >
           <X size={24} strokeWidth={3} />
@@ -44,19 +46,19 @@ export default function InstallNudge() {
           style={{ fontFamily: '"Anton", sans-serif' }}
           className="text-3xl uppercase leading-none mb-2 mt-1"
         >
-          🍻 Prends l'app !
+          {t('install.getApp')}
         </div>
-        <p className="text-sm mb-5 opacity-80">
-          Débloque le <b>Mode Apéro</b> (jeu à boire) et les <b>packs premium</b>
-          {' '}— dispo uniquement dans l'app.
-        </p>
+        <p
+          className="text-sm mb-5 opacity-80"
+          dangerouslySetInnerHTML={{ __html: t('install.nudgeDesc') }}
+        />
         <InstallCta onNavigate={() => setShow(false)} />
         <button onClick={() => setShow(false)} className="mt-3 w-full text-center">
           <span
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[11px] uppercase tracking-widest opacity-60"
           >
-            Continuer sur le web
+            {t('install.continueWeb')}
           </span>
         </button>
       </div>
