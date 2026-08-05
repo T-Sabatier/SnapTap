@@ -14,7 +14,7 @@ import {
 import { CATEGORIES, YELLOW, AMBER, PINK, APERO_ACCENT, MAX_PLAYERS, PLAYER_COLORS } from '../cards';
 import { useBilling, PRODUCT_APERO, PRODUCT_ULTRA } from '../purchases';
 import { bumpStats } from '../stats';
-import { ChevronRight, Lock, X } from 'lucide-react';
+import { ChevronRight, Lock, X, Settings } from 'lucide-react';
 import { useT, useLang, LOCALES, SHOW_LANG_SWITCH } from '../i18n.jsx';
 import InstallButton from './InstallButton.jsx';
 import InstallCta from './InstallCta.jsx';
@@ -48,6 +48,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   const { locale, setLocale } = useLang();
   // Capturé au chargement du module (avant le nettoyage d'URL) — voir i18n.jsx.
   const showLangSwitch = SHOW_LANG_SWITCH;
+  const [showSettings, setShowSettings] = useState(false);
   const [invitedCode] = useState(getCodeFromUrl);
   // Arrivée via QR / lien avec un code → modal de join dédiée (prénom + Rejoindre)
   // pour éviter que le joueur clique par réflexe sur "Créer une partie".
@@ -243,6 +244,77 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
       className={`text-black overflow-x-hidden${partyActive ? ' apero-bg' : ''}`}
     >
       <div className="max-w-md mx-auto px-5 py-10">
+        {/* Rouage paramètres (haut gauche). Caché tant que la trad est incomplète. */}
+        {showLangSwitch && (
+          <div className="mb-4">
+            <button
+              onClick={() => setShowSettings(true)}
+              aria-label={t('settings.title')}
+              className="border-2 border-black bg-white p-2 active:translate-y-[1px]"
+              style={{ boxShadow: '3px 3px 0 #000' }}
+            >
+              <Settings size={22} color="#000" />
+            </button>
+          </div>
+        )}
+
+        {showSettings && (
+          <div
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-6"
+            onClick={() => setShowSettings(false)}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm border-4 border-black bg-white p-5"
+              style={{ boxShadow: '10px 10px 0 #000' }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div
+                  style={{ fontFamily: '"Anton", sans-serif' }}
+                  className="text-2xl uppercase text-black"
+                >
+                  {t('settings.title')}
+                </div>
+                <button
+                  onClick={() => setShowSettings(false)}
+                  aria-label="Fermer"
+                  className="border-2 border-black bg-white p-1 active:translate-y-[1px]"
+                >
+                  <X size={18} color="#000" />
+                </button>
+              </div>
+              <div
+                style={{ fontFamily: '"Space Mono", monospace' }}
+                className="text-[10px] uppercase tracking-widest text-black/60 mb-2"
+              >
+                {t('settings.language')}
+              </div>
+              <div className="flex gap-2">
+                {LOCALES.map((l) => (
+                  <button
+                    key={l.code}
+                    onClick={() => setLocale(l.code)}
+                    className="flex-1 border-2 border-black px-2 py-2 flex items-center justify-center gap-2 active:translate-y-[1px]"
+                    style={{
+                      backgroundColor: locale === l.code ? PINK : '#FFF',
+                      color: locale === l.code ? '#FFF' : '#000',
+                      boxShadow: '2px 2px 0 #000',
+                    }}
+                  >
+                    <span className="text-lg leading-none">{l.flag}</span>
+                    <span
+                      style={{ fontFamily: '"Anton", sans-serif' }}
+                      className="text-sm uppercase"
+                    >
+                      {l.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mb-10">
           <h1
             style={{
@@ -398,27 +470,6 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               Mets ton prénom et rejoins 👇
             </div>
           </div>
-        )}
-
-        {/* Sélecteur de langue : change toute l'app (menus + deck). */}
-        {showLangSwitch && (
-        <div className="flex justify-end gap-2 mb-4">
-          {LOCALES.map((l) => (
-            <button
-              key={l.code}
-              onClick={() => setLocale(l.code)}
-              className="border-2 border-black px-2 py-1 text-lg leading-none active:translate-y-[1px]"
-              style={{
-                backgroundColor: locale === l.code ? PINK : '#FFF',
-                boxShadow: '2px 2px 0 #000',
-              }}
-              aria-label={l.label}
-              title={l.label}
-            >
-              {l.flag}
-            </button>
-          ))}
-        </div>
         )}
 
         <div className="mb-8">

@@ -3,6 +3,10 @@ export const fr = {
   common: {
     language: 'Langue',
   },
+  settings: {
+    title: 'Paramètres',
+    language: 'Langue',
+  },
   home: {
     yourName: 'Ton prénom',
     namePlaceholder: 'Prénom…',

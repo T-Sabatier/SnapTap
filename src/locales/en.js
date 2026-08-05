@@ -3,6 +3,10 @@ export const en = {
   common: {
     language: 'Language',
   },
+  settings: {
+    title: 'Settings',
+    language: 'Language',
+  },
   home: {
     yourName: 'Your name',
     namePlaceholder: 'Name…',
