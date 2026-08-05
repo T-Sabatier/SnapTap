@@ -8,6 +8,7 @@ import { subscribeCategories } from '../categoriesStore';
 import { useBilling } from '../purchases';
 import { bumpStats } from '../stats';
 import { ChevronRight, ChevronDown, X, LogOut, Copy, Check, Lock } from 'lucide-react';
+import { useT } from '../i18n.jsx';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
 import InstallButton from './InstallButton.jsx';
@@ -15,6 +16,7 @@ import InstallNudge from './InstallNudge.jsx';
 import InstallCta from './InstallCta.jsx';
 
 export default function Lobby({ room, roomCode, playerId, onLeave }) {
+  const t = useT();
   const isHost = room.host === playerId;
   // Mode Apero (jeu a boire) : active a la creation via le switch d'accueil.
   const partyMode = !!room.settings?.partyMode;
@@ -270,14 +272,14 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest"
             >
-              Quitter
+              {t('common.leave')}
             </span>
           </button>
           <div
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-4xl uppercase"
           >
-            Salon
+            {t('lobby.title')}
           </div>
           <div className="w-14" />
         </div>
@@ -292,7 +294,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Space Mono", monospace' }}
                 className="text-[10px] uppercase tracking-widest opacity-60 mb-1"
               >
-                Code de la room
+                {t('lobby.roomCode')}
               </div>
               <div
                 style={{
@@ -313,7 +315,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest"
                 >
-                  {linkCopied ? 'Lien copié' : 'Copier le lien'}
+                  {linkCopied ? t('lobby.linkCopied') : t('lobby.copyLink')}
                 </span>
               </button>
             </div>
@@ -326,7 +328,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Space Mono", monospace' }}
                 className="text-[9px] uppercase tracking-widest opacity-60 mt-2"
               >
-                Scanne
+                {t('lobby.scan')}
               </div>
             </div>
           </div>
@@ -343,13 +345,13 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-2xl uppercase mb-1"
           >
-            Ton prénom
+            {t('home.yourName')}
           </div>
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest opacity-70 mb-3"
           >
-            Entre ton prénom pour rejoindre 👇
+            {t('lobby.enterNameJoin')}
           </div>
           <div className="flex items-stretch gap-2">
             <input
@@ -362,7 +364,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   e.currentTarget.blur();
                 }
               }}
-              placeholder="Prénom…"
+              placeholder={t('home.namePlaceholder')}
               maxLength={14}
               autoFocus={!myName}
               className="flex-1 min-w-0 border-4 border-black bg-white px-3 py-3 outline-none placeholder-black/30 text-lg"
@@ -378,7 +380,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Anton", sans-serif' }}
                 className="text-lg uppercase"
               >
-                OK
+                {t('common.ok')}
               </span>
             </button>
           </div>
@@ -390,13 +392,13 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-2xl uppercase mb-1"
           >
-            Joueurs · {players.length}
+            {t('lobby.players')} · {players.length}
           </div>
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest mb-3 opacity-70"
           >
-            Min. 3 joueurs pour lancer
+            {t('lobby.minPlayers')}
           </div>
           {/* Pastilles triées par largeur (longs noms d'abord) puis étirées
               pour remplir chaque ligne : plus de vide en drapeau à droite. */}
@@ -435,7 +437,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                     <span
                       style={{ fontFamily: '"Space Mono", monospace' }}
                       className="text-xs whitespace-nowrap"
-                      title="Victoires dans cette room"
+                      title={t('lobby.winsTitle')}
                     >
                       🏆×{room.wins[p.id]}
                     </span>
@@ -455,8 +457,8 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   {isHost && !isTheHost && (
                     <button
                       onClick={() => kickPlayer(p)}
-                      aria-label={`Exclure ${p.name}`}
-                      title={`Exclure ${p.name}`}
+                      aria-label={t('lobby.kick', { name: p.name })}
+                      title={t('lobby.kick', { name: p.name })}
                       className="ml-0.5 -mr-1 flex items-center justify-center active:opacity-50"
                       style={{ color: fg }}
                     >
@@ -474,13 +476,13 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-2xl uppercase mb-1"
           >
-            Ta couleur
+            {t('lobby.yourColor')}
           </div>
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest mb-3 opacity-70"
           >
-            Choisis-en une avant de lancer · une seule par joueur
+            {t('lobby.colorHint')}
           </div>
           <div className="flex flex-wrap gap-2">
             {PLAYER_COLORS.map((c) => {
@@ -515,14 +517,14 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-2xl uppercase mb-1"
           >
-            Score gagnant
+            {t('lobby.winningScore')}
           </div>
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest mb-3 opacity-70"
           >
-            Premier à {winningScore} points gagne
-            {!isHost && ' · Seul le host peut changer'}
+            {t('lobby.firstToWin', { n: winningScore })}
+            {!isHost && t('lobby.hostOnly')}
           </div>
           <div className="flex flex-wrap gap-2">
             {SCORE_OPTIONS.map((n) => {
@@ -560,15 +562,15 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-2xl uppercase mb-1"
           >
-            Timer par tour
+            {t('lobby.turnTimer')}
           </div>
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest mb-3 opacity-70"
           >
             {turnTimer > 0
-              ? `${turnTimer}s pour jouer sa carte, sinon carte au hasard !`
-              : 'Sans limite de temps'}
+              ? t('lobby.timerOn', { s: turnTimer })
+              : t('lobby.timerOff')}
           </div>
           <div className="flex flex-wrap gap-2">
             {TIMER_OPTIONS.map((n) => {
@@ -606,14 +608,14 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-2xl uppercase mb-1"
           >
-            Catégories
+            {t('lobby.categories')}
           </div>
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest mb-3 opacity-70"
           >
-            {totalAvailable} cartes dans le paquet
-            {!isHost && ' · Seul le host peut changer'}
+            {t('lobby.cardsInDeck', { n: totalAvailable })}
+            {!isHost && t('lobby.hostOnly')}
           </div>
           <div className="grid grid-cols-2 gap-3">
             {sortedCategories.map((cat) => {
@@ -680,7 +682,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
               className="text-[10px] uppercase tracking-widest mt-3 opacity-60 flex items-center gap-1.5"
             >
               <Lock size={12} strokeWidth={3} />
-              {lockedCount} catégories verrouillées · Pack Ultra
+              {t('lobby.lockedCats', { n: lockedCount })}
             </div>
           )}
         </div>
@@ -692,13 +694,13 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             style={{ fontFamily: '"Anton", sans-serif' }}
             className="text-2xl uppercase mb-1"
           >
-            Sorts
+            {t('lobby.spells')}
           </div>
           <div
             style={{ fontFamily: '"Space Mono", monospace' }}
             className="text-[10px] uppercase tracking-widest mb-3 opacity-70"
           >
-            Pouvoirs spéciaux · 1 usage chacun par joueur
+            {t('lobby.spellsHint')}
           </div>
           <div className="flex flex-col gap-3">
             {SORTS.map((s) => {
@@ -729,7 +731,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                       style={{ fontFamily: '"Space Mono", monospace' }}
                       className="text-[9px] uppercase tracking-widest opacity-70 mt-1"
                     >
-                      {s.desc}
+                      {t(`spells.${s.id}Desc`)}
                     </div>
                   </div>
                   <div
@@ -764,7 +766,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Anton", sans-serif' }}
               className="text-2xl uppercase"
             >
-              🍻 Mode Apéro
+              🍻 {t('apero.name')}
             </span>
             <ChevronDown
               size={24}
@@ -777,9 +779,9 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
           </button>
           {aperoRulesOpen && (
             <ul className="text-sm leading-relaxed space-y-1 mt-2">
-              <li>• Chaque carte choisie déclenche <b>une règle à boire</b></li>
-              <li>• Elle s'affiche à la fin de la manche, <b>appliquez-la</b></li>
-              <li>• <b>Le boss et le gagnant ne boivent jamais</b></li>
+              {t('lobby.aperoRules').map((r, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: r }} />
+              ))}
             </ul>
           )}
         </div>
@@ -798,7 +800,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-center text-[10px] uppercase tracking-widest opacity-60 py-3"
             >
-              En attente que le host lance la partie…
+              {t('lobby.waitHost')}
             </div>
           ) : (
             <>
@@ -807,7 +809,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest mb-2 text-center"
                 >
-                  Il faut au moins 3 joueurs
+                  {t('lobby.need3')}
                 </div>
               )}
               {enoughPlayers && !enoughCards && (
@@ -815,7 +817,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest mb-2 text-center"
                 >
-                  Pas assez de cartes, coche plus de catégories
+                  {t('lobby.notEnoughCards')}
                 </div>
               )}
               {enoughPlayers && enoughCards && !allNamed && (
@@ -823,7 +825,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest mb-2 text-center"
                 >
-                  En attente que tout le monde entre son prénom
+                  {t('lobby.waitNames')}
                 </div>
               )}
               <button
@@ -837,7 +839,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                     style={{ fontFamily: '"Anton", sans-serif' }}
                     className="text-2xl uppercase tracking-wide"
                   >
-                    Lancer la partie
+                    {t('lobby.start')}
                   </span>
                   <ChevronRight size={28} />
                 </div>
@@ -869,7 +871,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
             >
               <button
                 onClick={() => setTeaserPackId(null)}
-                aria-label="Fermer"
+                aria-label={t('common.close')}
                 className="absolute top-3 right-3 active:opacity-50"
               >
                 <X size={24} strokeWidth={3} />
@@ -884,8 +886,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                 style={{ fontFamily: '"Space Mono", monospace' }}
                 className="text-[10px] uppercase tracking-widest opacity-60 mb-4 text-center"
               >
-                Pack premium · {packCats.length} catégorie
-                {packCats.length > 1 ? 's' : ''} · {packCardCount} cartes
+                {t('lobby.packInfo', { cats: packCats.length, cards: packCardCount })}
               </div>
               {hasSpicy && (
                 <div
@@ -901,7 +902,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                     style={{ fontFamily: '"Anton", sans-serif' }}
                     className="uppercase text-sm leading-tight"
                   >
-                    Inclut le Coquin +18
+                    {t('lobby.includesSpicy')}
                   </span>
                 </div>
               )}
@@ -923,9 +924,10 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                 ))}
               </div>
               <div className="border-t-2 border-black/10 pt-4 flex items-end justify-between gap-3">
-                <p className="text-sm opacity-80 flex-1">
-                  Si l'hôte a le pack, <b>tout le salon</b> en profite.
-                </p>
+                <p
+                  className="text-sm opacity-80 flex-1"
+                  dangerouslySetInnerHTML={{ __html: t('lobby.packHost') }}
+                />
                 <div
                   style={{ fontFamily: '"Anton", sans-serif' }}
                   className="text-3xl leading-none shrink-0"
@@ -944,7 +946,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                     style={{ fontFamily: '"Anton", sans-serif' }}
                     className="text-xl uppercase"
                   >
-                    {shopBusy ? '…' : `Acheter ${prices[teaserPackId] || '…'}`}
+                    {shopBusy ? '…' : t('shop.buy', { price: prices[teaserPackId] || '…' })}
                   </span>
                 </button>
               ) : (
