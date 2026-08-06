@@ -12,7 +12,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'store-assets', 'screenshots-en');
 mkdirSync(outDir, { recursive: true });
 
-// Écrans du store → scénario Debug (mêmes 6 que la version FR).
+// Écrans du store → scénario Debug. 6 en mode normal + 3 en mode apéro
+// (party = flag home fc_party ; apero = param URL → partyMode dans le jeu).
 const SHOTS = [
   { file: '01-home.png', scene: 'home' },
   { file: '02-lobby.png', scene: 'lobby-host' },
@@ -20,6 +21,9 @@ const SHOTS = [
   { file: '04-choix.png', scene: 'reveal-boss' },
   { file: '05-revelation.png', scene: 'result' },
   { file: '06-champion.png', scene: 'game_over' },
+  { file: 'apero-01-home.png', scene: 'home', party: true },
+  { file: 'apero-02-play.png', scene: 'play-hand', apero: true },
+  { file: 'apero-03-result.png', scene: 'result', apero: true },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -42,14 +46,18 @@ await page.evaluate(() => {
   sessionStorage.setItem('snaptap_install_nudge_seen', '1');
 });
 
-for (const { file, scene } of SHOTS) {
-  const url = `${BASE}/?debug&cap=1&scene=${scene}`;
+for (const { file, scene, apero, party } of SHOTS) {
+  // Flag home "mode apéro" (fc_party) — lu au montage, donc AVANT le goto.
+  await page.evaluate((on) => {
+    localStorage.setItem('fc_party', on ? '1' : '0');
+  }, !!party);
+  const url = `${BASE}/?debug&cap=1&scene=${scene}${apero ? '&apero=1' : ''}`;
   await page.goto(url, { waitUntil: 'networkidle2' });
   // Polices chargées + laisse les animations (confettis/feux) s'installer.
   await page.evaluate(() => document.fonts && document.fonts.ready);
   await sleep(2200);
   await page.screenshot({ path: join(outDir, file) });
-  console.log(`✓ ${file}  (scene=${scene})`);
+  console.log(`✓ ${file}  (scene=${scene}${apero ? ' apéro' : ''}${party ? ' party' : ''})`);
 }
 
 await browser.close();
