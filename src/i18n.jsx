@@ -29,7 +29,8 @@ export const LOCALES = [
   { code: 'en-gb', label: 'English (UK)', flag: '🇬🇧' },
 ];
 
-const FALLBACK = 'en';
+const FALLBACK = 'en'; // clé de trad manquante -> anglais
+const DEFAULT_LOCALE = 'fr'; // langue non gérée par l'app -> français
 const STORAGE_KEY = 'st_lang';
 
 // Sélecteur de langue affiché pour tous (lancement US + UK, anglais GA).
@@ -52,7 +53,7 @@ export function detectLocale() {
   ).toLowerCase();
   if (nav === 'en-gb') return 'en-gb'; // téléphone britannique -> deck UK
   const base = nav.split('-')[0];
-  return DICTS[base] ? base : FALLBACK;
+  return DICTS[base] ? base : DEFAULT_LOCALE;
 }
 
 // Résout une clé "a.b.c" dans un dictionnaire imbriqué.
