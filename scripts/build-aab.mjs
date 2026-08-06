@@ -24,16 +24,18 @@ const vName = (gradle.match(/versionName\s+"([^"]+)"/) || [])[1] || 'x';
 const vCode = (gradle.match(/versionCode\s+(\d+)/) || [])[1] || '0';
 
 // --- Copies ---
+// UN SEUL endroit pour le fichier à uploader : la RACINE du Bureau, nom évident.
+// Les archives versionnées vont dans un SEUL dossier.
 const src = join(root, 'android', 'app', 'build', 'outputs', 'bundle', 'release', 'app-release.aab');
-const storeDir = 'C:/Users/Valky/Desktop/snap-tap-store';
-const versionsDir = join(storeDir, 'Versions');
+const desktop = 'C:/Users/Valky/Desktop';
+const versionsDir = join(desktop, 'snap-tap-store', 'Versions');
 mkdirSync(versionsDir, { recursive: true });
 
-const latest = join(storeDir, 'snap-tap-LATEST.aab');
+const latest = join(desktop, 'SNAPTAP-A-UPLOADER.aab');
 const archive = join(versionsDir, `snap-tap-v${vName}-vc${vCode}.aab`);
 copyFileSync(src, latest);
 copyFileSync(src, archive);
 
 console.log(`\n✅ AAB v${vName} (vc${vCode}) prêt.`);
-console.log(`   À UPLOADER  → ${latest}`);
-console.log(`   Archive     → ${archive}`);
+console.log(`   >>> À UPLOADER : ${latest}`);
+console.log(`   (archive : ${archive})`);
