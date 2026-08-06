@@ -1910,7 +1910,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               onClick={() => sendReaction(e)}
               className="text-3xl leading-none active:scale-90 transition-transform"
               style={{ transition: 'transform 80ms' }}
-              aria-label={`Réagir ${e}`}
+              aria-label={t('game.reactAria', { e })}
             >
               {e}
             </button>
@@ -2347,7 +2347,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       <span
                         style={{ fontFamily: '"Space Mono", monospace' }}
                         className="text-xs whitespace-nowrap shrink-0"
-                        title="Victoires dans cette room"
+                        title={t('game.winsTooltip')}
                       >
                         🏆×{room.wins[p.id]}
                       </span>

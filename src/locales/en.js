@@ -76,6 +76,8 @@ export const en = {
   game: {
     specialRound: 'Special round',
     roundLabel: 'ROUND {n}',
+    winsTooltip: 'Wins in this room',
+    reactAria: 'React {e}',
     jackpot: 'Jackpot',
     jackpotApero: 'Everyone drinks to',
     jackpotNormal: 'Congrats',
@@ -213,6 +215,7 @@ export const en = {
     gameInProgress: 'A game is already in progress in this room',
     notInRoom: "You're no longer in this room",
     roomFull: 'Room full ({max} players max)',
+    connection: 'Connection error, try again',
     firebaseConfig: 'Firebase error: check your .env config',
   },
   install: {

@@ -116,7 +116,7 @@ function GameApp() {
         const snap = await get(ref(db, `rooms/${code}`));
         if (cancelled) return;
         if (!snap.exists()) {
-          setJoinError('Room introuvable');
+          setJoinError(t('errors.roomNotFound'));
           clearRoomUrl();
           setAutoJoining(false);
           return;
@@ -140,7 +140,7 @@ function GameApp() {
           return;
         }
         if (Object.keys(r.players || {}).length >= MAX_PLAYERS) {
-          setJoinError(`Room complète (${MAX_PLAYERS} joueurs max)`);
+          setJoinError(t('errors.roomFull', { max: MAX_PLAYERS }));
           clearRoomUrl();
           setAutoJoining(false);
           return;
@@ -157,7 +157,7 @@ function GameApp() {
         setAutoJoining(false);
       } catch (e) {
         if (!cancelled) {
-          setJoinError('Erreur de connexion, réessaie');
+          setJoinError(t('errors.connection'));
           setAutoJoining(false);
         }
       }
