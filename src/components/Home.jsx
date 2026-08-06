@@ -75,6 +75,9 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   } = useBilling();
   // Mode apero reellement actif = voulu ET possede.
   const partyActive = party && aperoOwned;
+  // Le jeu de mots "SNAP ÉRO" (apéro) ne marche qu'en français. En anglais on
+  // garde "SNAP TAP" (juste teinté couleur apéro), "Éro" n'y voulant rien dire.
+  const aperoPun = partyActive && locale.startsWith('fr');
   function toggleParty() {
     const v = !party;
     setParty(v);
@@ -335,7 +338,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
             className="uppercase whitespace-nowrap flex items-center justify-center gap-3"
           >
             <span>
-              {partyActive ? (
+              {aperoPun ? (
                 <>
                   Sn
                   <span
@@ -361,7 +364,7 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                 boxShadow: '6px 6px 0 #000',
               }}
             >
-              {partyActive ? 'Éro' : 'Tap'}
+              {aperoPun ? 'Éro' : 'Tap'}
             </span>
           </h1>
           <div className="mt-4 flex items-center gap-2">
