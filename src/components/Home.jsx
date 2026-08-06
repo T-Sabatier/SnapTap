@@ -292,22 +292,22 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               >
                 {t('settings.language')}
               </div>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {LOCALES.map((l) => (
                   <button
                     key={l.code}
                     onClick={() => setLocale(l.code)}
-                    className="flex-1 border-2 border-black px-2 py-2 flex items-center justify-center gap-2 active:translate-y-[1px]"
+                    className="border-2 border-black px-2 py-2 flex items-center justify-center gap-1.5 active:translate-y-[1px] min-w-0"
                     style={{
                       backgroundColor: locale === l.code ? PINK : '#FFF',
                       color: locale === l.code ? '#FFF' : '#000',
                       boxShadow: '2px 2px 0 #000',
                     }}
                   >
-                    <span className="text-2xl leading-none">{l.flag}</span>
+                    <span className="text-xl leading-none">{l.flag}</span>
                     <span
                       style={{ fontFamily: '"Anton", sans-serif' }}
-                      className="text-base uppercase"
+                      className="text-sm uppercase leading-tight truncate"
                     >
                       {l.label}
                     </span>
