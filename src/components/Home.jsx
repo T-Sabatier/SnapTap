@@ -49,8 +49,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   // Capturé au chargement du module (avant le nettoyage d'URL) — voir i18n.jsx.
   const showLangSwitch = SHOW_LANG_SWITCH;
   const [showSettings, setShowSettings] = useState(false);
-  // Pages légales : version EN (/privacy-en…) quand l'app est en anglais.
-  const legalSuffix = locale.startsWith('en') ? '-en' : '';
+  // Pages légales par pays : fr -> '', en (US) -> '-en', en-gb (UK) -> '-en-gb'.
+  const legalSuffix = locale === 'fr' ? '' : '-' + locale;
   const [invitedCode] = useState(getCodeFromUrl);
   // Arrivée via QR / lien avec un code → modal de join dédiée (prénom + Rejoindre)
   // pour éviter que le joueur clique par réflexe sur "Créer une partie".
