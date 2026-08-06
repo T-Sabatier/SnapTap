@@ -126,6 +126,7 @@ export const en = {
     playCard: 'Play this card',
     pickCard: 'Pick a card',
     yourTurnChoose: "It's your turn to choose",
+    cardsCount: '{n} CARDS',
     chooseCard: 'Choose the card you',
     likeMost: 'like the most',
     likeLeast: 'like the least',

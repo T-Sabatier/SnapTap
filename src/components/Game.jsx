@@ -1627,7 +1627,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       return (
         <div key={room.phase} style={baseWrap} className={`relative text-black flex flex-col ${baseClass}`}>
           <ReactionsLayer reactions={room.reactions} />
-          <TopBar right={`${playedEntries.length} CARTES`} />
+          <TopBar right={t('game.cardsCount', { n: playedEntries.length })} />
           <Scoreboard />
           <div className="px-5 pt-3 pb-2 max-w-xl mx-auto w-full">
             <div
@@ -1737,7 +1737,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a' }} className="relative text-white flex flex-col">
         <ReactionsLayer reactions={room.reactions} />
-        <TopBar right={`${playedEntries.length} CARTES`} />
+        <TopBar right={t('game.cardsCount', { n: playedEntries.length })} />
         <Scoreboard />
 
         {/* Entete projecteur : gros nom du boss qui pulse + halo couleur du mode */}

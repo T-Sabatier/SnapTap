@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ref, set, onValue, remove } from 'firebase/database';
 import { db } from '../firebase';
+import { useLang } from '../i18n.jsx';
 import Home from './Home.jsx';
 import Lobby from './Lobby.jsx';
 import Game from './Game.jsx';
@@ -50,6 +51,40 @@ const PLAYERS = {
   gui: { name: 'Guillaume', score: 2, color: 'orange', joinedAt: 5 },
 };
 
+// Variantes ANGLAISES pour les captures store US/UK : cartes CHOISIES COMMUNES
+// aux decks US et UK (pas dans les 59 overrides UK) → mêmes screenshots valables
+// pour les deux marchés. Mêmes ids que POOL/PLAYERS.
+const EN_POOL = {
+  c1: { t: 'Beyoncé', cat: 'musique', spicy: false, g: 'Anyone with her in a playlist drinks 2' },
+  c2: { t: 'Tokyo', cat: 'voyages', spicy: false },
+  c3: { t: 'A wasp at the picnic', cat: 'nature', spicy: false, g: '@Swat an imaginary wasp or drink 2' },
+  c4: { t: 'Sushi', cat: 'bouffe', spicy: false },
+  c5: { t: 'Pineapple on pizza', cat: 'bouffe', spicy: false, g: 'Team pineapple drinks 1, purists drink 2' },
+  c6: { t: 'Texting your ex', cat: 'bourre', spicy: false },
+  c7: { t: 'Socks with sandals', cat: 'mode', spicy: false },
+  c8: { t: 'Ramen', cat: 'bouffe', spicy: false },
+  c9: { t: 'New York', cat: 'voyages', spicy: false },
+  c10: { t: 'Messi', cat: 'sport', spicy: false },
+  c11: { t: 'Tacos', cat: 'bouffe', spicy: false },
+  c12: { t: 'Zelda', cat: 'gaming', spicy: false },
+  c13: { t: 'A deserted beach', cat: 'voyages', spicy: false },
+  c14: { t: 'Black coffee', cat: 'bouffe', spicy: false },
+  c15: { t: 'Basketball', cat: 'sport', spicy: false },
+  c16: { t: 'Bali', cat: 'voyages', spicy: false },
+  c17: { t: 'Burger', cat: 'bouffe', spicy: false },
+  c18: { t: 'Tennis', cat: 'sport', spicy: false },
+  c19: { t: 'Karaoke', cat: 'musique', spicy: false },
+  c20: { t: 'Iceland', cat: 'voyages', spicy: false },
+};
+
+const EN_PLAYERS = {
+  me: { name: 'Tim', score: 2, color: 'yellow', joinedAt: 1 },
+  alex: { name: 'Max', score: 3, color: 'blue', joinedAt: 2 },
+  sam: { name: 'Chloe', score: 1, color: 'green', joinedAt: 3 },
+  jo: { name: 'Ava', score: 4, color: 'violet', joinedAt: 4 },
+  gui: { name: 'Will', score: 2, color: 'orange', joinedAt: 5 },
+};
+
 const SCENARIOS = [
   { key: 'home', label: 'Accueil' },
   { key: 'lobby-host', label: 'Salon · host' },
@@ -68,11 +103,11 @@ const SCENARIOS = [
 
 const noop = () => {};
 
-function buildScenario(key, mode, pick, apero, special, sorts) {
+function buildScenario(key, mode, pick, apero, special, sorts, pool, players, lang) {
   const base = {
     host: null,
     round: 3,
-    pool: POOL,
+    pool: pool,
     deck: DECK,
     discard: [],
     special: special || null,
@@ -83,8 +118,9 @@ function buildScenario(key, mode, pick, apero, special, sorts) {
         ? { reroll: true, espion: true, vatout: true }
         : { reroll: false, espion: false, vatout: false },
       ...(apero ? { partyMode: true } : {}),
+      ...(lang ? { lang } : {}),
     },
-    players: PLAYERS,
+    players: players,
   };
   switch (key) {
     case 'home':
@@ -121,7 +157,24 @@ function buildScenario(key, mode, pick, apero, special, sorts) {
 }
 
 export default function Debug() {
-  const [key, setKey] = useState('play-hand');
+  const { locale } = useLang();
+  const isEn = locale.startsWith('en');
+  // POOL/joueurs anglais quand l'UI est en anglais (captures store US/UK).
+  const POOL_ACTIVE = isEn ? EN_POOL : POOL;
+  const PLAYERS_ACTIVE = isEn ? EN_PLAYERS : PLAYERS;
+  const langArg = isEn ? locale : undefined; // charge categories_en / _en_gb dans le lobby
+
+  // Pilotage par URL (pour capture headless) : ?debug&scene=<key>&cap=1
+  const params =
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search)
+      : new URLSearchParams();
+  const sceneParam = params.get('scene');
+  const capParam = params.has('cap');
+
+  const [key, setKey] = useState(
+    sceneParam && SCENARIOS.some((s) => s.key === sceneParam) ? sceneParam : 'play-hand'
+  );
   const [mode, setMode] = useState('like');
   const [pick, setPick] = useState(false);
   const [apero, setApero] = useState(false);
@@ -130,7 +183,7 @@ export default function Debug() {
   const [capturing, setCapturing] = useState(false); // masque la barre pour screener
   const [liveRoom, setLiveRoom] = useState(null);
 
-  const scenario = buildScenario(key, mode, pick, apero, special, sorts);
+  const scenario = buildScenario(key, mode, pick, apero, special, sorts, POOL_ACTIVE, PLAYERS_ACTIVE, langArg);
   const SPECIAL_CYCLE = [null, 'double', 'chrono', 'swap'];
 
   // Abonnement permanent a la room debug
@@ -145,7 +198,7 @@ export default function Debug() {
 
   // (Re)seed la room a chaque changement de scenario / mode / choix boss / options
   useEffect(() => {
-    const sc = buildScenario(key, mode, pick, apero, special, sorts);
+    const sc = buildScenario(key, mode, pick, apero, special, sorts, POOL_ACTIVE, PLAYERS_ACTIVE, langArg);
     if (sc.kind === 'home') {
       setLiveRoom(null);
       remove(ref(db, 'rooms/DEBG')).catch(() => {});
@@ -154,7 +207,7 @@ export default function Debug() {
     setLiveRoom(sc.room); // optimiste, evite le flash
     set(ref(db, 'rooms/DEBG'), sc.room).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, mode, pick, apero, special, sorts]);
+  }, [key, mode, pick, apero, special, sorts, isEn]);
 
   function renderScreen() {
     if (scenario.kind === 'home') {
@@ -177,7 +230,8 @@ export default function Debug() {
   }
 
   // Pendant la capture : uniquement l'ecran, plein, sans rien de debug.
-  if (capturing) {
+  // ?cap=1 dans l'URL → mode capture permanent (pilotage headless).
+  if (capturing || capParam) {
     return <div>{renderScreen()}</div>;
   }
 
