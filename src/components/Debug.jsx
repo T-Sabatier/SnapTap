@@ -178,7 +178,9 @@ export default function Debug() {
   const [mode, setMode] = useState('like');
   const [pick, setPick] = useState(false);
   const [apero, setApero] = useState(params.has('apero'));
-  const [special, setSpecial] = useState(null); // null | 'double' | 'chrono' | 'swap'
+  const [special, setSpecial] = useState(
+    ['double', 'chrono', 'swap'].includes(params.get('special')) ? params.get('special') : null
+  ); // null | 'double' | 'chrono' | 'swap'
   const [sorts, setSorts] = useState(true);
   const [capturing, setCapturing] = useState(false); // masque la barre pour screener
   const [liveRoom, setLiveRoom] = useState(null);

@@ -94,15 +94,19 @@ function SpecialAnnounce({ special }) {
   const t = useT();
   const s = SPECIALS[special];
   const [phase, setPhase] = useState('in'); // 'in' → 'out' → hidden
+  // Mode capture (?cap) : on fige l'annonce à l'écran pour la screener.
+  const freeze =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('cap');
   useEffect(() => {
-    if (!s) return undefined;
+    if (!s || freeze) return undefined;
     const t1 = setTimeout(() => setPhase('out'), 2100);
     const t2 = setTimeout(() => setPhase('hidden'), 2500);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [s]);
+  }, [s, freeze]);
   if (!s || phase === 'hidden') return null;
   return (
     <div
@@ -1080,7 +1084,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       return (
         <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
           <SpecialAnnounce key={room.round} special={room.special} />
-          <TopBar right={`TOUR ${room.round || 1}`} />
+          <TopBar right={t('game.roundLabel', { n: room.round || 1 })} />
           <Scoreboard />
           <SpecialBanner special={room.special} />
           <div className="flex-1 px-5 py-6 flex flex-col max-w-xl mx-auto w-full text-center">
@@ -1201,7 +1205,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     return (
       <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
         <SpecialAnnounce key={room.round} special={room.special} />
-        <TopBar right={`TOUR ${room.round || 1}`} />
+        <TopBar right={t('game.roundLabel', { n: room.round || 1 })} />
         <Scoreboard />
         <SpecialBanner special={room.special} />
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">

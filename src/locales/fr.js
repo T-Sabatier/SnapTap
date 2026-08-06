@@ -75,6 +75,7 @@ export const fr = {
   },
   game: {
     specialRound: 'Manche spéciale',
+    roundLabel: 'TOUR {n}',
     jackpot: 'Jackpot',
     jackpotApero: 'Tout le monde boit 1 à la santé de',
     jackpotNormal: 'Félicitations',

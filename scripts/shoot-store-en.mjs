@@ -24,6 +24,9 @@ const SHOTS = [
   { file: 'apero-01-home.png', scene: 'home', party: true },
   { file: 'apero-02-play.png', scene: 'play-hand', apero: true },
   { file: 'apero-03-result.png', scene: 'result', apero: true },
+  // Annonce manche spéciale ÉCHANGE (figée par ?cap). Scène "wait" = pas de
+  // panneau dev "forcer une manche spéciale" en fond.
+  { file: 'special-swap.png', scene: 'boss_choose-wait', special: 'swap' },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -46,18 +49,21 @@ await page.evaluate(() => {
   sessionStorage.setItem('snaptap_install_nudge_seen', '1');
 });
 
-for (const { file, scene, apero, party } of SHOTS) {
+for (const { file, scene, apero, party, special } of SHOTS) {
   // Flag home "mode apéro" (fc_party) — lu au montage, donc AVANT le goto.
   await page.evaluate((on) => {
     localStorage.setItem('fc_party', on ? '1' : '0');
   }, !!party);
-  const url = `${BASE}/?debug&cap=1&scene=${scene}${apero ? '&apero=1' : ''}`;
+  const url =
+    `${BASE}/?debug&cap=1&scene=${scene}` +
+    (apero ? '&apero=1' : '') +
+    (special ? `&special=${special}` : '');
   await page.goto(url, { waitUntil: 'networkidle2' });
   // Polices chargées + laisse les animations (confettis/feux) s'installer.
   await page.evaluate(() => document.fonts && document.fonts.ready);
   await sleep(2200);
   await page.screenshot({ path: join(outDir, file) });
-  console.log(`✓ ${file}  (scene=${scene}${apero ? ' apéro' : ''}${party ? ' party' : ''})`);
+  console.log(`✓ ${file}  (scene=${scene}${apero ? ' apéro' : ''}${party ? ' party' : ''}${special ? ' ' + special : ''})`);
 }
 
 await browser.close();

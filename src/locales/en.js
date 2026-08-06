@@ -75,6 +75,7 @@ export const en = {
   },
   game: {
     specialRound: 'Special round',
+    roundLabel: 'ROUND {n}',
     jackpot: 'Jackpot',
     jackpotApero: 'Everyone drinks to',
     jackpotNormal: 'Congrats',
