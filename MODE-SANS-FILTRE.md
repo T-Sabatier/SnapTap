@@ -56,40 +56,90 @@ ou strip si activé.
 
 # Première fournée de cartes
 
-## 🗳️ POUR / CONTRE (opinions, débats, "would you")
+## 🗳️ POUR / CONTRE (opinions, débats, "would you") — 37
+**Sociétal**
 - La peine de mort
 - L'avortement
 - L'euthanasie
 - Légaliser toutes les drogues
+- La légalisation du cannabis
 - La prostitution légale
 - Le port d'armes
 - La GPA (mère porteuse)
-- Le mariage, une arnaque ?
+- La religion / croire en Dieu
+- La chirurgie esthétique à 20 ans
+- Le véganisme
+- La corrida
+- La chasse
+- Le nucléaire
+- Le revenu universel
+- Le service militaire obligatoire
+- Les zoos (animaux en captivité)
+
+**Couple / relations**
 - La monogamie
+- Le mariage, une arnaque ?
 - Un enfant avant 25 ans
 - Coucher le premier soir
-- Tromper, c'est impardonnable ?
 - Le sexe sans sentiments
+- Pardonner une infidélité
+- Rester ami avec son ex
+- Un compte bancaire commun
+- Payer l'addition au 1er rendez-vous
+- Rester ensemble "pour les enfants"
+- Dire à ton pote que sa/son partenaire le trompe
+- Le contrat de mariage (prénup)
+- Regarder du porno en couple
+
+**Moral / dark / would-you**
 - Manger un pote pour survivre
 - Aider un pote à cacher un corps
 - Garder un portefeuille plein trouvé par terre
 - Balancer un pote à la police
+- Vendre son âme pour réussir
+- Connaître la date de sa mort
+- Coucher pour une promotion
 
-## 🔥 CHAUD / PAS CHAUD (ça te tente ?)
+## 🔥 CHAUD / PAS CHAUD (ça te tente ?) — 14
 - Sexe pendant les règles
 - Le plan à trois
 - La sodomie
 - Un coup d'un soir
 - Les sextoys dans le couple
 - Coucher avec le parent d'un pote
+- La partouze
+- L'échangisme
+- Le BDSM (domination / soumission)
+- Les menottes
+- La fessée
+- Les jeux de rôle au lit
+- Le sexe entre amis (friends with benefits)
+- Le sexe réconciliation
 
-## 😳 DÉJÀ FAIT / JAMAIS (confessions)
+## 😳 DÉJÀ FAIT / JAMAIS (confessions) — 23
 - Fouiller le tel de son/sa partenaire
 - Stalker son ex sur Insta
 - Envoyer un nude
+- Envoyer un nude à la mauvaise personne
 - Coucher avec un(e) collègue
 - Simuler un orgasme
 - Mentir sur son nombre de partenaires
+- Coucher avec quelqu'un rencontré le soir même
+- Coucher avec l'ex d'un(e) pote
+- Faire l'amour dans un lieu public
+- Recoucher avec un ex
+- Draguer quelqu'un en couple
+- Se filmer (sextape)
+- Coucher avec deux personnes le même jour
+- Répondre à un ex à 3h du mat
+- Tromper quelqu'un
+- Ghoster quelqu'un du jour au lendemain
+- Faire semblant d'aimer un cadeau de merde
+- Mentir sur où on était à son/sa partenaire
+- Voler un truc en magasin
+- Resquiller dans le train / le métro
+- Pisser dans une piscine
+- Conduire sans permis
 
 ## 🎯 Défis (forfait boire — toujours dispo)
 - Le dernier à lever la main boit 3
