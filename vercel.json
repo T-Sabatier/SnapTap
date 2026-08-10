@@ -3,6 +3,12 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/conditions", "destination": "/conditions.html" },
     { "source": "/mentions-legales", "destination": "/mentions-legales.html" },
+    { "source": "/privacy-en", "destination": "/privacy-en.html" },
+    { "source": "/conditions-en", "destination": "/conditions-en.html" },
+    { "source": "/mentions-legales-en", "destination": "/mentions-legales-en.html" },
+    { "source": "/privacy-en-gb", "destination": "/privacy-en-gb.html" },
+    { "source": "/conditions-en-gb", "destination": "/conditions-en-gb.html" },
+    { "source": "/mentions-legales-en-gb", "destination": "/mentions-legales-en-gb.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

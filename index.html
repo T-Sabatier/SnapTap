@@ -14,18 +14,143 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Snap Tap" />
-    <title>Snap Tap</title>
+
+    <!-- SEO / crawlers : l'app est une SPA (tout se charge en JS), donc tout ce
+         que les robots, IA et previews de liens voient est DANS CE FICHIER.
+         Garder ces metas + le contenu statique de #root a jour. -->
+    <title>Snap Tap : le jeu de soirée entre amis</title>
+    <meta
+      name="description"
+      content="Snap Tap, le jeu de soirée qui teste si tes amis te connaissent vraiment. Plutôt pastis ou bubble tea ? 3 à 16 joueurs, chacun sur son téléphone, gratuit et sans compte."
+    />
+    <link rel="canonical" href="https://www.snaptapparty.com/" />
+
+    <!-- Open Graph (previews WhatsApp, Messenger, Discord, iMessage...) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Snap Tap" />
+    <meta property="og:title" content="Snap Tap : le jeu de soirée entre amis" />
+    <meta
+      property="og:description"
+      content="Devine ce que tes amis aiment... ou détestent. 3 à 16 joueurs, chacun sur son téléphone, parties de 15 à 30 minutes, sans compte. Aussi sur Google Play."
+    />
+    <meta property="og:url" content="https://www.snaptapparty.com/" />
+    <meta property="og:image" content="https://www.snaptapparty.com/og-image.png" />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="500" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="en_GB" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Snap Tap : le jeu de soirée entre amis" />
+    <meta
+      name="twitter:description"
+      content="Devine ce que tes amis aiment... ou détestent. 3 à 16 joueurs, chacun sur son téléphone, sans compte."
+    />
+    <meta name="twitter:image" content="https://www.snaptapparty.com/og-image.png" />
+
+    <!-- Donnees structurees (Google, moteurs, assistants IA) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": ["WebApplication", "VideoGame"],
+        "name": "Snap Tap",
+        "alternateName": "Snap Tap Party",
+        "url": "https://www.snaptapparty.com/",
+        "image": "https://www.snaptapparty.com/og-image.png",
+        "description": "Jeu de soirée multijoueur : à chaque manche, un joueur annonce s'il veut ce qu'il AIME ou ce qu'il DÉTESTE, les autres posent la carte qui lui correspond le mieux, il choisit sa préférée sans savoir qui l'a posée. 3 à 16 joueurs, chacun sur son téléphone, plus de 300 cartes et 20 catégories, mode apéro (jeu à boire) en option. Gratuit, sans compte, jouable dans le navigateur ou via l'app Android.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Web, Android",
+        "browserRequirements": "Nécessite JavaScript",
+        "genre": ["Party game", "Jeu de société"],
+        "playMode": "MultiPlayer",
+        "inLanguage": ["fr", "en"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "installUrl": "https://play.google.com/store/apps/details?id=com.snaptap.game",
+        "contentRating": "IARC 18+",
+        "author": { "@type": "Organization", "name": "Coconoa" }
+      }
+    </script>
+
     <!-- Polices auto-hebergees (self-host) : aucune requete vers Google.
          Fichiers dans public/fonts/, servis depuis notre propre domaine. -->
     <link rel="stylesheet" href="/fonts/fonts.css" />
   </head>
   <body>
     <div id="root">
-      <!-- Placeholder remplace par React au montage (apres l'auth anonyme) -->
-      <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: sans-serif; text-transform: uppercase; letter-spacing: 0.1em; color: #000">
-        Chargement…
+      <!-- Splash statique remplace par React au montage (apres l'auth anonyme).
+           Il sert aussi de contenu pour les robots qui n'executent pas le JS :
+           garder ce texte synchro avec le pitch de la fiche store. -->
+      <div
+        style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; background: #ffe600; color: #000; font-family: sans-serif"
+      >
+        <h1
+          style="font-family: 'Anton', sans-serif; text-transform: uppercase; line-height: 0.82; letter-spacing: -0.02em; font-size: clamp(3.25rem, 18vw, 6rem); display: flex; align-items: center; gap: 12px; margin: 0"
+        >
+          <span>Snap</span>
+          <span
+            style="display: inline-block; padding: 8px 20px; transform: rotate(-2deg); background: #ff2d6f; color: #fff; border: 4px solid #000; box-shadow: 6px 6px 0 #000"
+            >Tap</span
+          >
+        </h1>
+        <p
+          style="margin: 24px 0 0; text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 700"
+        >
+          Le jeu de soirée qui teste si tes amis te connaissent vraiment
+        </p>
+        <p style="margin: 16px 0 0; max-width: 420px; font-size: 14px; line-height: 1.5">
+          Plutôt pastis ou bubble tea ? À chaque manche, un joueur annonce s'il
+          veut ce qu'il aime ou ce qu'il déteste, les autres posent la carte qui
+          lui correspond le mieux. 3 à 16 joueurs, chacun sur son téléphone,
+          gratuit et sans compte. Aussi sur Google Play.
+        </p>
+        <p
+          style="margin: 32px 0 0; text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; opacity: 0.6"
+        >
+          Chargement…
+        </p>
       </div>
     </div>
+    <noscript>
+      <div style="max-width: 560px; margin: 0 auto; padding: 24px; font-family: sans-serif; line-height: 1.6">
+        <h2>Snap Tap, c'est quoi ?</h2>
+        <p>
+          Snap Tap est un jeu de soirée multijoueur qui met vos certitudes à
+          l'épreuve. À chaque manche, un joueur annonce s'il veut ce qu'il AIME
+          ou ce qu'il DÉTESTE. Les autres posent la carte qui, selon eux, lui
+          correspond le mieux. Il choisit sa préférée sans savoir qui l'a posée
+          : si c'est la tienne, tu marques un point.
+        </p>
+        <ul>
+          <li>3 à 16 joueurs, chacun sur son propre téléphone</li>
+          <li>Crée un salon, tes amis rejoignent en scannant un QR code</li>
+          <li>Parties de 15 à 30 minutes, aucun compte à créer</li>
+          <li>Plus de 300 cartes, 20 catégories (bouffe, ciné, musique, voyages...)</li>
+          <li>Manches spéciales, réactions en direct, compteur de victoires</li>
+          <li>Mode apéro en option : jeu à boire avec règles liées aux cartes (adultes, avec modération)</li>
+        </ul>
+        <p lang="en">
+          Snap Tap is a multiplayer party game: each round, one player says
+          whether they want what they LOVE or what they HATE, and everyone else
+          plays the card that fits them best. 3 to 16 players, each on their own
+          phone, free, no account needed. Available in French and English.
+        </p>
+        <p>
+          Ce jeu nécessite JavaScript pour fonctionner. Télécharge l'app Android
+          sur
+          <a href="https://play.google.com/store/apps/details?id=com.snaptap.game">Google Play</a>
+          ou active JavaScript pour jouer dans le navigateur.
+        </p>
+        <p>
+          <a href="/privacy">Confidentialité</a> ·
+          <a href="/conditions">Conditions</a> ·
+          <a href="/mentions-legales">Mentions légales</a> ·
+          Contact : snaptap@coconoa.fr
+        </p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
