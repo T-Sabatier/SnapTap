@@ -21,7 +21,7 @@ const creds = JSON.parse(readFileSync(new URL('scripts/.admin-credentials.json',
 await signInWithEmailAndPassword(getAuth(app), creds.email, creds.password);
 const db = getDatabase(app);
 
-const nodes = ['cards', 'categories', 'cards_en', 'categories_en', 'cards_en_gb', 'categories_en_gb'];
+const nodes = ['cards', 'categories', 'cards_en', 'categories_en', 'cards_en_gb', 'categories_en_gb', 'cards_en_au', 'categories_en_au'];
 for (const n of nodes) {
   const snap = await get(ref(db, n));
   const count = snap.exists() ? Object.keys(snap.val()).length : 0;
