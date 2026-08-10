@@ -26,8 +26,11 @@ Pas de "boss", pas de points → mode 100% party/débat/à boire.
 
 ## Les 2 types de cartes
 ### 1. DÉBAT (le cœur)
-Sujet clivant + 2 camps. La minorité paie. Chaque carte porte ses 2 boutons
-(POUR/CONTRE, CHAUD/PAS CHAUD, JE L'AI FAIT/JAMAIS, ÇA ME TENTE/JAMAIS…).
+Sujet clivant + 2 camps. La minorité paie. **Boutons HARMONISÉS : seulement 3
+paires** (pas un truc différent à chaque carte) :
+- **POUR / CONTRE** → opinions & débats (+ les "would you", POUR = je le ferais)
+- **CHAUD / PAS CHAUD** → "ça te tente ?" (sexe)
+- **DÉJÀ FAIT / JAMAIS** → confessions
 
 ### 2. DÉFI (intercalé, pour le rythme façon Picolo)
 Défi direct qui désigne quelqu'un (dernier à…, vote…, le plus…). Forfait boire,
@@ -53,42 +56,40 @@ ou strip si activé.
 
 # Première fournée de cartes
 
-## 🗳️ Débats société (pour/contre — la minorité paie)
-- La peine de mort — POUR / CONTRE
-- L'avortement — POUR / CONTRE
-- L'euthanasie — POUR / CONTRE
-- Légaliser toutes les drogues — POUR / CONTRE
-- La prostitution légale — POUR / CONTRE
-- Le port d'armes — POUR / CONTRE
-- La GPA (mère porteuse) — POUR / CONTRE
-- Le mariage, une arnaque ? — D'ACCORD / PAS D'ACCORD
-- La monogamie — À VIE / SURCÔTÉ
-- Un enfant avant 25 ans — POUR / JAMAIS
+## 🗳️ POUR / CONTRE (opinions, débats, "would you")
+- La peine de mort
+- L'avortement
+- L'euthanasie
+- Légaliser toutes les drogues
+- La prostitution légale
+- Le port d'armes
+- La GPA (mère porteuse)
+- Le mariage, une arnaque ?
+- La monogamie
+- Un enfant avant 25 ans
+- Coucher le premier soir
+- Tromper, c'est impardonnable ?
+- Le sexe sans sentiments
+- Manger un pote pour survivre
+- Aider un pote à cacher un corps
+- Garder un portefeuille plein trouvé par terre
+- Balancer un pote à la police
 
-## 🔥 Débats intimes / tabou
-- Sexe pendant les règles — CHAUD / PAS CHAUD
-- Le plan à trois — CHAUD / JAMAIS
-- Coucher le premier soir — POUR / FAUT ATTENDRE
-- Tromper, c'est impardonnable ? — OUI / ÇA DÉPEND
-- La sodomie — POUR / CONTRE
-- Le sexe sans sentiments — POUR / IMPOSSIBLE
-- Un coup d'un soir — POUR / JAMAIS
-- Les sextoys dans le couple — POUR / BOF
+## 🔥 CHAUD / PAS CHAUD (ça te tente ?)
+- Sexe pendant les règles
+- Le plan à trois
+- La sodomie
+- Un coup d'un soir
+- Les sextoys dans le couple
+- Coucher avec le parent d'un pote
 
-## 😳 Confessions (déjà fait / jamais)
-- Fouiller le tel de son/sa partenaire — JE L'AI FAIT / JAMAIS
-- Stalker son ex sur Insta — CETTE SEMAINE / JAMAIS
-- Envoyer un nude — DÉJÀ FAIT / JAMAIS
-- Coucher avec un(e) collègue — DÉJÀ FAIT / JAMAIS
-- Simuler un orgasme — DÉJÀ FAIT / JAMAIS
-- Mentir sur son nombre de partenaires — DÉJÀ FAIT / JAMAIS
-
-## 😈 Would you (je le ferais / jamais)
-- Manger un pote pour survivre — JE LE FERAIS / JAMAIS
-- Aider un pote à cacher un corps — JE PRENDS LA PELLE / J'APPELLE LES FLICS
-- Coucher avec le parent d'un pote — ÇA ME TENTE / JAMAIS
-- Garder un portefeuille plein trouvé par terre — JE GARDE / JE RENDS
-- Balancer un pote à la police — ÇA DÉPEND / JAMAIS
+## 😳 DÉJÀ FAIT / JAMAIS (confessions)
+- Fouiller le tel de son/sa partenaire
+- Stalker son ex sur Insta
+- Envoyer un nude
+- Coucher avec un(e) collègue
+- Simuler un orgasme
+- Mentir sur son nombre de partenaires
 
 ## 🎯 Défis (forfait boire — toujours dispo)
 - Le dernier à lever la main boit 3
