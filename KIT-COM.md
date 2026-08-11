@@ -97,16 +97,21 @@ Le principe en 3 étapes. Tu crois connaître tes potes, le jeu vérifie. Gratui
 du profil, avec de vraies captures du jeu. Pour regénérer : `npm run dev`
 puis `node scripts/shoot-carousel.mjs` puis `node scripts/gen-carousel.mjs`.
 
-### Pour le carrousel-jeu « à toi de jouer » (store-assets/promo/carousel-jeu/, 4 slides)
+### Pour les posts « tague ton pote » (store-assets/promo/tague/)
 
 ```
-Tu joues. Léa veut ce qu'elle déteste : tu poses quelle carte ? Réponse en commentaire avant de swiper. Pas de triche.
+Tu crois le connaître ? Tague ton pote avec ta réponse, il valide ou il conteste.
 ```
 
-Le lecteur joue une manche : il choisit sa carte, swipe pour la révélation,
-et répond en commentaire (c'est le but, les commentaires font remonter le
-post). Format à décliner : change la main et la carte choisie en tête de
-`scripts/gen-carousel-jeu.mjs` et regénère, ça fait un nouveau post-jeu.
+```
+Réponds pour lui, on verra s'il assume.
+```
+
+Le moteur du format : chaque pote tagué vient voir le post, donc chaque
+commentaire est une nouvelle personne touchée. C'est la mécanique du jeu
+(deviner les goûts de l'autre) jouée en vrai dans les commentaires. Varie
+les légendes d'un post à l'autre. Cartes éditables en tête de
+`scripts/gen-tague.mjs`.
 
 ### Story sondage (la mécanique du jeu en vrai)
 
