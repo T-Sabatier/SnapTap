@@ -61,20 +61,52 @@ const USE_VOICE = false;
 // `sub` = ce qui est dit. `sec` = duree (ajustable). `showSub: false` quand le
 // texte est deja en enorme a l'ecran (pas de doublon sous-titre).
 export const SEGMENTS = [
-  { key: 'hook', sec: 2.0, sub: 'Tu crois connaître tes potes ?', showSub: false },
-  { key: 'prouve', sec: 1.5, sub: 'Prouve-le.', showSub: false },
-  { key: 'annonce', sec: 2.8, sub: "Léa veut ce qu'elle aime." },
-  { key: 'pose', sec: 3.2, sub: 'Pose la carte qui lui va le mieux.' },
-  { key: 'choix', sec: 3.5, sub: "Elle choisit à l'aveugle." },
-  { key: 'point', sec: 3.0, sub: "C'est ta carte ? Plus un point !" },
-  { key: 'apero', sec: 2.0, sub: 'Et en mode apéro ?', showSub: false },
-  { key: 'regle', sec: 3.5, sub: 'Chaque carte a sa règle à boire !' },
-  { key: 'pitch', sec: 2.5, sub: 'Trois à seize joueurs. Gratuit.' },
-  { key: 'fin', sec: 3.0, sub: 'Snap Tap. Lien en bio !' },
+  { key: 'hook', sec: 1.6, sub: 'Tu crois connaître tes potes ?', showSub: false },
+  { key: 'prouve', sec: 1.3, sub: 'Prouve-le.', showSub: false },
+  { key: 'annonce', sec: 2.3, sub: "Léa veut ce qu'elle aime." },
+  { key: 'pose', sec: 2.8, sub: 'Pose la carte qui lui va le mieux.' },
+  { key: 'choix', sec: 3.2, sub: "Elle choisit à l'aveugle." },
+  { key: 'point', sec: 2.6, sub: "C'est ta carte ? Plus un point !" },
+  { key: 'apero', sec: 1.6, sub: 'Et en mode apéro ?', showSub: false },
+  { key: 'regle', sec: 3.0, sub: 'Chaque carte a sa règle à boire !' },
+  { key: 'pitch', sec: 2.2, sub: 'Trois à seize joueurs. Gratuit.' },
+  { key: 'fin', sec: 2.6, sub: 'Snap Tap. Lien en bio !' },
 ];
 
 const frames = (s) => Math.round(s * FPS);
 export const TOTAL_FRAMES = SEGMENTS.reduce((n, s) => n + frames(s.sec), 0);
+
+// ================= ENERGIE DE MONTAGE =================
+
+// Zoom continu + micro-derive : chaque plan est une "camera vivante".
+const Zoomy = ({ children, dur }) => {
+  const frame = useCurrentFrame();
+  const scale = interpolate(frame, [0, dur], [1.0, 1.08]);
+  const rot = Math.sin(frame / 11) * 0.5;
+  return (
+    <AbsoluteFill style={{ transform: `scale(${scale.toFixed(4)}) rotate(${rot.toFixed(2)}deg)` }}>
+      {children}
+    </AbsoluteFill>
+  );
+};
+
+// Flash blanc sur la coupe (2-3 frames) : rythme de montage nerveux.
+const CutFlash = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 2, 6], [0.85, 0.6, 0], {
+    extrapolateRight: 'clamp',
+  });
+  if (frame > 6) return null;
+  return (
+    <AbsoluteFill style={{ backgroundColor: '#fff', opacity, zIndex: 60, pointerEvents: 'none' }} />
+  );
+};
+
+// Secousse a l'entree de chaque plan (impact de coupe).
+const CutShake = ({ children }) => {
+  const shake = useShake(1, 9, 10);
+  return <AbsoluteFill style={{ transform: `translate(0,0)${shake}` }}>{children}</AbsoluteFill>;
+};
 
 // ================= SOUS-TITRE INCRUSTE (slam) =================
 
@@ -90,8 +122,8 @@ const Subtitle = ({ text, tilt = -1.5 }) => (
       justifyContent: 'center',
     }}
   >
-    <Stamp from={2}>
-      <Wiggle amp={1.4} speed={9}>
+    <Stamp from={3.2}>
+      <Wiggle amp={2.2} speed={7}>
         <div
           style={{
             ...anton,
@@ -316,10 +348,13 @@ export const Presentation = () => {
         cursor += dur;
         return (
           <Sequence key={seg.key} from={from} durationInFrames={dur}>
-            {SCENE_BY_KEY[seg.key](dur)}
+            <CutShake>
+              <Zoomy dur={dur}>{SCENE_BY_KEY[seg.key](dur)}</Zoomy>
+            </CutShake>
             {seg.showSub !== false && (
               <Subtitle text={seg.sub} tilt={i % 2 === 0 ? -1.5 : 1.5} />
             )}
+            <CutFlash />
           </Sequence>
         );
       })}

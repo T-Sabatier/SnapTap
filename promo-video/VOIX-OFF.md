@@ -15,18 +15,18 @@ caler, et si une ligne déborde tu ajustes juste son `sec` dans `SEGMENTS`
 
 | Début | Durée | Texte à lire |
 |-------|-------|--------------|
-| 0:00.0 | 2,0 s | Tu crois connaître tes potes ? |
-| 0:02.0 | 1,5 s | Prouve-le. |
-| 0:03.5 | 2,8 s | Léa veut ce qu'elle aime. |
-| 0:06.3 | 3,2 s | Pose la carte qui lui va le mieux. |
-| 0:09.5 | 3,5 s | Elle choisit à l'aveugle. |
-| 0:13.0 | 3,0 s | C'est ta carte ? Plus un point ! |
-| 0:16.0 | 2,0 s | Et en mode apéro ? |
-| 0:18.0 | 3,5 s | Chaque carte a sa règle à boire ! |
-| 0:21.5 | 2,5 s | Trois à seize joueurs. Gratuit. |
-| 0:24.0 | 3,0 s | Snap Tap. Lien en bio ! |
+| 0:00.0 | 1,6 s | Tu crois connaître tes potes ? |
+| 0:01.6 | 1,3 s | Prouve-le. |
+| 0:02.9 | 2,3 s | Léa veut ce qu'elle aime. |
+| 0:05.2 | 2,8 s | Pose la carte qui lui va le mieux. |
+| 0:08.0 | 3,2 s | Elle choisit à l'aveugle. |
+| 0:11.2 | 2,6 s | C'est ta carte ? Plus un point ! |
+| 0:13.8 | 1,6 s | Et en mode apéro ? |
+| 0:15.4 | 3,0 s | Chaque carte a sa règle à boire ! |
+| 0:18.4 | 2,2 s | Trois à seize joueurs. Gratuit. |
+| 0:20.6 | 2,6 s | Snap Tap. Lien en bio ! |
 
-Fin : 0:27.0 (810 frames à 30 fps).
+Fin : 0:23.2 (696 frames à 30 fps).
 
 ## Si l'audio ne rentre pas dans un segment
 
