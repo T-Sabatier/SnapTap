@@ -1032,6 +1032,48 @@ const SceneEnd = () => (
   </AbsoluteFill>
 );
 
+// ================= EXPORTS PARTAGES =================
+// Briques reutilisees par Presentation.jsx (video avec voix off + sous-titres).
+export {
+  YELLOW,
+  AMBER,
+  PINK,
+  LIKE_GREEN,
+  DISLIKE_RED,
+  anton,
+  nameStyle,
+  LEA,
+  SARAH,
+  MAX,
+  PLAYERS,
+  Stamp,
+  Appear,
+  Wiggle,
+  Bounce,
+  useShake,
+  usePunch,
+  EmojiBurst,
+  EmojiRain,
+  TapRing,
+  Center,
+  Chip,
+  GameChrome,
+  BottomBar,
+  ModeBanner,
+  EyeIcon,
+  CardBadge,
+  SmallCard,
+  HandGrid,
+  PlayButton,
+  SceneLogo,
+  ScenePlay,
+  SceneReveal,
+  SceneResult,
+  ScenePitch,
+  SceneEnd,
+  Intertitle,
+};
+
 // ================= COMPOSITION =================
 
 export const Promo = () => (

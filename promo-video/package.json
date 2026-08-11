@@ -4,7 +4,8 @@
   "description": "Videos de com Snap Tap en motion design (Remotion). npm run studio pour previsualiser, npm run render pour produire le MP4.",
   "scripts": {
     "studio": "remotion studio src/index.jsx",
-    "render": "remotion render src/index.jsx SnapTapPromo ../store-assets/promo/snap-tap-promo-1080x1920.mp4"
+    "render": "remotion render src/index.jsx SnapTapPromo ../store-assets/promo/snap-tap-promo-1080x1920.mp4",
+    "render-presentation": "remotion render src/index.jsx SnapTapPresentation ../store-assets/promo/snap-tap-presentation-1080x1920.mp4"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.0",
