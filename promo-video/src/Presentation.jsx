@@ -234,15 +234,26 @@ const SceneRegleApero = () => {
           </Wiggle>
         </Stamp>
         <div style={{ height: 50 }} />
+        {/* Le VRAI gage de la carte (deck live, cf GAGES.md). */}
         <Stamp delay={18} from={2.8}>
-          <Wiggle amp={2.6} speed={7}>
-            <Chip text="TEAM ANANAS BOIT 1" bg={PINK} tilt={2} fontSize={62} />
-          </Wiggle>
-        </Stamp>
-        <div style={{ height: 26 }} />
-        <Stamp delay={30} from={2.8}>
-          <Wiggle amp={2.6} speed={7} phase={2}>
-            <Chip text="LES PURISTES BOIVENT 2" bg="#fff" color="#000" tilt={-2} fontSize={54} />
+          <Wiggle amp={2.4} speed={7}>
+            <div
+              style={{
+                ...anton,
+                width: 800,
+                backgroundColor: PINK,
+                color: '#fff',
+                border: '8px solid #000',
+                boxShadow: '11px 11px 0 #000',
+                transform: 'rotate(2deg)',
+                padding: '30px 34px 40px',
+                fontSize: 58,
+                lineHeight: 1.05,
+                textAlign: 'center',
+              }}
+            >
+              LES DÉFENSEURS DE L'ANANAS BOIVENT 2, FIÈREMENT
+            </div>
           </Wiggle>
         </Stamp>
         <div style={{ height: 45 }} />

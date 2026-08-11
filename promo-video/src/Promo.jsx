@@ -797,15 +797,13 @@ const SceneResult = () => {
   );
 };
 
-// ---------- 5. Ecran PLAY apero : mise de gorgees ----------
+// ---------- 5. Ecran PLAY apero (systeme actuel : pas de mise) ----------
 
-const A_TAP_CARD = 45;
-const A_TAP_BET = 90;
-const A_PRESS = 135;
+const A_TAP_CARD = 55;
+const A_PRESS = 110;
 
 const SceneAperoPlay = () => {
   const frame = useCurrentFrame();
-  const betOn = frame >= A_TAP_BET + 4;
   const punch = usePunch();
   return (
     <AbsoluteFill style={{ transform: punch }}>
@@ -814,7 +812,7 @@ const SceneAperoPlay = () => {
         style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover' }}
       />
       <GameChrome right="🍻 APÉRO" bg={AMBER} vip="SARAH" />
-      <Center style={{ paddingTop: 175, paddingBottom: 300 }}>
+      <Center style={{ paddingTop: 175, paddingBottom: 260 }}>
         <Appear delay={0}>
           <Wiggle amp={1.8} speed={9}>
             <ModeBanner name="SARAH" color={SARAH} like />
@@ -824,39 +822,8 @@ const SceneAperoPlay = () => {
         <HandGrid selectedIdx={0} tapAt={A_TAP_CARD} />
       </Center>
       <BottomBar bg={AMBER}>
-        <div style={{ display: 'flex', gap: 26 }}>
-          {[1, 2, 3, 4].map((n, i) => {
-            const on = i === 2 && betOn;
-            return (
-              <div key={n} style={{ position: 'relative' }}>
-                <Wiggle amp={on ? 3 : 1.3} speed={on ? 6 : 11} phase={i * 1.4}>
-                  <div
-                    style={{
-                      ...anton,
-                      width: 132,
-                      height: 108,
-                      backgroundColor: on ? PINK : '#fff',
-                      color: on ? '#fff' : '#000',
-                      border: '9px solid #000',
-                      boxShadow: on ? '11px 11px 0 #000' : '5px 5px 0 #000',
-                      transform: on ? 'translate(-4px,-4px)' : 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 62,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {n}
-                  </div>
-                </Wiggle>
-                {i === 2 && <TapRing delay={A_TAP_BET} />}
-              </div>
-            );
-          })}
-        </div>
         <PlayButton
-          label={betOn ? 'JOUER · MISE 3 🍺' : 'MISE TES GORGÉES (1-4)'}
+          label={frame >= A_TAP_CARD + 4 ? 'JOUER CETTE CARTE ▸' : 'CHOISIS UNE CARTE'}
           pressed={frame >= A_PRESS}
         />
       </BottomBar>
@@ -929,16 +896,33 @@ const SceneAperoResult = () => {
           </div>
         </Stamp>
         <div style={{ height: 50 }} />
+        {/* Le VRAI gage de la carte (deck live, cf GAGES.md). */}
         <Stamp delay={52} from={3.2}>
-          <Wiggle amp={2.8} speed={7}>
-            <Chip text="TOUT LE MONDE BOIT 3" bg={PINK} tilt={3} fontSize={68} />
+          <Wiggle amp={2.4} speed={7}>
+            <div
+              style={{
+                ...anton,
+                width: 800,
+                backgroundColor: PINK,
+                color: '#fff',
+                border: '8px solid #000',
+                boxShadow: '11px 11px 0 #000',
+                transform: 'rotate(2deg)',
+                padding: '28px 32px 38px',
+                fontSize: 56,
+                lineHeight: 1.05,
+                textAlign: 'center',
+              }}
+            >
+              LES DÉFENSEURS DE L'ANANAS BOIVENT 2, FIÈREMENT
+            </div>
           </Wiggle>
         </Stamp>
         <div style={{ height: 32 }} />
         <Appear delay={75}>
           <Bounce delay={75} amp={8} speed={8}>
             <div style={{ ...anton, fontSize: 32, opacity: 0.65, textAlign: 'center' }}>
-              LE GAGNANT NE BOIT PAS 😎
+              LE GAGNANT NE BOIT JAMAIS 😎
             </div>
           </Bounce>
         </Appear>
