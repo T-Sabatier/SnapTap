@@ -159,9 +159,27 @@ function buildScenario(key, mode, pick, apero, special, sorts, pool, players, la
 export default function Debug() {
   const { locale } = useLang();
   const isEn = locale.startsWith('en');
+  // ?safe : variante MARKETING (visuels reseaux sociaux) — aucune vraie
+  // personne ni marque dans les cartes visibles (regle editoriale : opinion
+  // dans le jeu OK, exploitation d'image en pub NON), et le boss s'appelle
+  // Lea comme dans la video promo.
+  const safeMode =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('safe');
   // POOL/joueurs anglais quand l'UI est en anglais (captures store US/UK).
-  const POOL_ACTIVE = isEn ? EN_POOL : POOL;
-  const PLAYERS_ACTIVE = isEn ? EN_PLAYERS : PLAYERS;
+  const basePool = isEn ? EN_POOL : POOL;
+  const basePlayers = isEn ? EN_PLAYERS : PLAYERS;
+  const POOL_ACTIVE = safeMode
+    ? {
+        ...basePool,
+        c1: { t: 'Kebab à 3h du mat', cat: 'bouffe', spicy: false, g: 'Ceux qui ont déjà craqué boivent 2' },
+        c10: { t: 'Marathon', cat: 'sport', spicy: false },
+        c12: { t: 'Karaoké', cat: 'musique', spicy: false },
+      }
+    : basePool;
+  const PLAYERS_ACTIVE = safeMode
+    ? { ...basePlayers, alex: { ...basePlayers.alex, name: 'Léa' } }
+    : basePlayers;
   const langArg = isEn ? locale : undefined; // charge categories_en / _en_gb dans le lobby
 
   // Pilotage par URL (pour capture headless) : ?debug&scene=<key>&cap=1
