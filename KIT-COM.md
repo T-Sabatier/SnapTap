@@ -97,6 +97,24 @@ Le principe en 3 étapes. Tu crois connaître tes potes, le jeu vérifie. Gratui
 du profil, avec de vraies captures du jeu. Pour regénérer : `npm run dev`
 puis `node scripts/shoot-carousel.mjs` puis `node scripts/gen-carousel.mjs`.
 
+### Pour le carrousel-jeu « à toi de jouer » (store-assets/promo/carousel-jeu/, 4 slides)
+
+```
+Tu joues. Léa veut ce qu'elle déteste : tu poses quelle carte ? Réponse en commentaire avant de swiper. Pas de triche.
+```
+
+Le lecteur joue une manche : il choisit sa carte, swipe pour la révélation,
+et répond en commentaire (c'est le but, les commentaires font remonter le
+post). Format à décliner : change la main et la carte choisie en tête de
+`scripts/gen-carousel-jeu.mjs` et regénère, ça fait un nouveau post-jeu.
+
+### Story sondage (la mécanique du jeu en vrai)
+
+Prends un visuel mème story (`store-assets/promo/*story*.png`), publie-le en
+story et pose PAR-DESSUS le sticker sondage Instagram avec deux options :
+J'aime / J'aime pas. Les gens votent pour de vrai, c'est littéralement une
+manche de Snap Tap. Garde les meilleures en « À la une » sur le profil.
+
 ### Pour la vidéo de gameplay
 
 ```
