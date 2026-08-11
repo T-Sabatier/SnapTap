@@ -87,6 +87,15 @@ Il y a deux types de personnes. Vous êtes lesquels ?
 Question qui a détruit des amitiés. À vous.
 ```
 
+### Pour le carrousel « comment on joue » (store-assets/promo/carousel/, 6 slides dans l'ordre)
+
+```
+Le principe en 4 étapes. Tu crois connaître tes potes, le jeu vérifie. Gratuit, sans compte, lien en bio.
+```
+
+À publier en post épinglé : c'est lui qui apprend les règles aux visiteurs
+du profil. Regénérable via `node scripts/gen-carousel.mjs`.
+
 ### Pour la vidéo de gameplay
 
 ```
