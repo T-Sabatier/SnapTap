@@ -1,19 +1,17 @@
-// Video de PRESENTATION Snap Tap (~43 s, 1080x1920) — explique le jeu posement,
-// SOUS-TITRES incrustes synchronises sur un script voix off (ElevenLabs).
+// Video de PRESENTATION Snap Tap (~27 s, 1080x1920) — rythme REELS : accroche
+// en 1re seconde, phrases voix off COURTES, punch/secousses/emojis partout,
+// sous-titres incrustes synchronises (voix ElevenLabs par-dessus).
 //
 // WORKFLOW VOIX OFF :
 //   1. Le script est dans SEGMENTS ci-dessous (aussi dans VOIX-OFF.md a cote).
-//   2. Genere la voix sur ElevenLabs (une piste par segment, ou une lecture
-//      complete du script).
+//   2. Genere la voix sur ElevenLabs (un clip par ligne, debit energique).
 //   3. Depose le mp3 dans public/voix-off.mp3 et passe USE_VOICE a true,
-//      OU monte la voix par-dessus le MP4 dans CapCut (les sous-titres et les
-//      timecodes de VOIX-OFF.md servent de guide).
-//   4. Si un segment est trop court/long pour l'audio : ajuste son `sec`
-//      ci-dessous et re-render (npm run render-presentation).
+//      OU monte la voix par-dessus le MP4 dans CapCut (timecodes VOIX-OFF.md).
+//   4. Segment trop court/long pour l'audio : ajuste son `sec` et re-render
+//      (npm run render-presentation). Les segments suivants se decalent seuls.
 //
 // REGLE EDITORIALE : cartes generiques, pas de coquin (tous publics), et la
-// scene apero montre les REGLES A BOIRE liees aux cartes (le systeme actuel),
-// pas l'ancienne mise de gorgees.
+// scene apero montre les REGLES A BOIRE liees aux cartes (systeme actuel).
 import {
   AbsoluteFill,
   Sequence,
@@ -33,6 +31,9 @@ import {
   Appear,
   Wiggle,
   Bounce,
+  useShake,
+  usePunch,
+  EmojiBurst,
   EmojiRain,
   Center,
   Chip,
@@ -41,7 +42,6 @@ import {
   ModeBanner,
   PlayButton,
   HandGrid,
-  SceneLogo,
   SceneReveal,
   SceneResult,
   ScenePitch,
@@ -53,107 +53,137 @@ const FPS = 30;
 
 // Musique de fond baissee pour laisser la place a la voix.
 const USE_MUSIC = true;
-const MUSIC_VOLUME = 0.16;
+const MUSIC_VOLUME = 0.2;
 // Passe a true quand public/voix-off.mp3 existe (voix ElevenLabs).
 const USE_VOICE = false;
 
 // ================= SCRIPT VOIX OFF / SOUS-TITRES =================
-// `sub` = ce qui est dit ET affiche. `sec` = duree du segment (ajustable).
+// `sub` = ce qui est dit. `sec` = duree (ajustable). `showSub: false` quand le
+// texte est deja en enorme a l'ecran (pas de doublon sous-titre).
 export const SEGMENTS = [
-  { key: 'logo', sec: 4.5, sub: "Snap Tap, c'est le jeu qui teste si tes potes te connaissent vraiment." },
-  { key: 'annonce', sec: 5.0, sub: "À chaque manche, un joueur annonce s'il veut ce qu'il aime… ou ce qu'il déteste." },
-  { key: 'pose', sec: 4.5, sub: 'Les autres posent la carte qui lui correspond le mieux.' },
-  { key: 'choix', sec: 4.5, sub: 'Elle choisit sa préférée, sans savoir qui a posé quoi.' },
-  { key: 'point', sec: 3.5, sub: "Si c'est ta carte : plus un point." },
-  { key: 'but', sec: 3.0, sub: 'Premier à cinq points, victoire.' },
-  { key: 'apero', sec: 3.5, sub: 'Et pour pimenter la soirée : le mode apéro.' },
-  { key: 'regle', sec: 5.0, sub: 'Chaque carte déclenche sa règle à boire. Et le gagnant, lui, ne boit jamais.' },
-  { key: 'pitch', sec: 4.5, sub: 'De 3 à 16 joueurs, chacun sur son téléphone. Gratuit, sans compte.' },
-  { key: 'fin', sec: 5.0, sub: 'Snap Tap, sur le Play Store et sur snaptapparty.com.' },
+  { key: 'hook', sec: 2.0, sub: 'Tu crois connaître tes potes ?', showSub: false },
+  { key: 'prouve', sec: 1.5, sub: 'Prouve-le.', showSub: false },
+  { key: 'annonce', sec: 2.8, sub: "Léa veut ce qu'elle aime." },
+  { key: 'pose', sec: 3.2, sub: 'Pose la carte qui lui va le mieux.' },
+  { key: 'choix', sec: 3.5, sub: "Elle choisit à l'aveugle." },
+  { key: 'point', sec: 3.0, sub: "C'est ta carte ? Plus un point !" },
+  { key: 'apero', sec: 2.0, sub: 'Et en mode apéro ?', showSub: false },
+  { key: 'regle', sec: 3.5, sub: 'Chaque carte a sa règle à boire !' },
+  { key: 'pitch', sec: 2.5, sub: 'Trois à seize joueurs. Gratuit.' },
+  { key: 'fin', sec: 3.0, sub: 'Snap Tap. Lien en bio !' },
 ];
 
 const frames = (s) => Math.round(s * FPS);
 export const TOTAL_FRAMES = SEGMENTS.reduce((n, s) => n + frames(s.sec), 0);
 
-// ================= SOUS-TITRE INCRUSTE =================
+// ================= SOUS-TITRE INCRUSTE (slam) =================
 
-const Subtitle = ({ text }) => {
-  const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 6], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const y = interpolate(frame, [0, 6], [24, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+const Subtitle = ({ text, tilt = -1.5 }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left: 40,
+      right: 40,
+      bottom: 130,
+      zIndex: 40,
+      display: 'flex',
+      justifyContent: 'center',
+    }}
+  >
+    <Stamp from={2}>
+      <Wiggle amp={1.4} speed={9}>
+        <div
+          style={{
+            ...anton,
+            backgroundColor: '#000',
+            color: '#fff',
+            boxShadow: '10px 10px 0 rgba(0,0,0,0.35)',
+            padding: '18px 34px 26px',
+            fontSize: 52,
+            lineHeight: 1.1,
+            textAlign: 'center',
+            textTransform: 'none',
+            transform: `rotate(${tilt}deg)`,
+          }}
+        >
+          {text}
+        </div>
+      </Wiggle>
+    </Stamp>
+  </div>
+);
+
+// ================= SCENES =================
+
+// Accroche noire, plein ecran, slam.
+const SceneHook = () => (
+  <Intertitle lines={['TU CROIS CONNAÎTRE', 'TES POTES ?']} emoji="🤨" />
+);
+
+// "Prouve-le." + mini logo : flash rapide.
+const SceneProuve = () => {
+  const shake = useShake(4, 10, 14);
   return (
-    <div
-      style={{
-        position: 'absolute',
-        left: 50,
-        right: 50,
-        bottom: 120,
-        zIndex: 40,
-        display: 'flex',
-        justifyContent: 'center',
-        opacity,
-        transform: `translateY(${y}px)`,
-      }}
-    >
-      <div
-        style={{
-          ...anton,
-          backgroundColor: 'rgba(0,0,0,0.92)',
-          color: '#fff',
-          border: '5px solid #000',
-          boxShadow: `8px 8px 0 rgba(0,0,0,0.35)`,
-          padding: '20px 34px 28px',
-          fontSize: 46,
-          lineHeight: 1.14,
-          textAlign: 'center',
-          textTransform: 'none',
-        }}
-      >
-        {text}
-      </div>
-    </div>
-  );
-};
-
-// ================= SCENES SPECIFIQUES =================
-
-// Annonce : le bandeau J'AIME, puis bascule J'AIME PAS a mi-segment.
-const SceneAnnonce = ({ dur }) => {
-  const frame = useCurrentFrame();
-  const swap = frame >= dur / 2;
-  return (
-    <AbsoluteFill style={{ backgroundColor: YELLOW }}>
-      <GameChrome right="MANCHE 3" />
-      <Center style={{ paddingTop: 120 }}>
-        <Stamp from={2}>
-          <Wiggle amp={1.8} speed={9}>
-            <ModeBanner name="LÉA" color={LEA} like={!swap} />
+    <AbsoluteFill style={{ backgroundColor: YELLOW, transform: `scale(1)${shake}` }}>
+      <Center>
+        <Stamp from={3.4}>
+          <Wiggle amp={2.4} speed={7}>
+            <Chip text="PROUVE-LE." bg="#000" color={YELLOW} tilt={-2} fontSize={110} />
           </Wiggle>
         </Stamp>
         <div style={{ height: 60 }} />
-        <Appear delay={10}>
-          <div style={{ ...anton, fontSize: 44, opacity: 0.65, textAlign: 'center' }}>
-            ELLE ANNONCE LA COULEUR
-          </div>
-        </Appear>
+        <Stamp delay={8} from={2.6}>
+          <Wiggle amp={2} speed={9} phase={2}>
+            <div
+              style={{
+                ...anton,
+                fontSize: 64,
+                lineHeight: 1,
+                color: '#fff',
+                backgroundColor: PINK,
+                border: '8px solid #000',
+                boxShadow: '10px 10px 0 #000',
+                padding: '8px 34px 14px',
+                transform: 'rotate(2deg)',
+              }}
+            >
+              SNAP TAP
+            </div>
+          </Wiggle>
+        </Stamp>
       </Center>
     </AbsoluteFill>
   );
 };
 
-// Pose : la main de cartes, tap, bouton jouer (rythme adapte au segment).
+// Annonce : le bandeau claque, secousse, burst de coeurs.
+const SceneAnnonce = () => {
+  const punch = usePunch();
+  const shake = useShake(6, 12, 16);
+  return (
+    <AbsoluteFill style={{ backgroundColor: YELLOW, transform: punch + shake }}>
+      <GameChrome right="MANCHE 3" />
+      <EmojiBurst emojis={['💚', '❤️']} delay={8} x="50%" y="42%" count={10} />
+      <Center style={{ paddingTop: 120 }}>
+        <Stamp from={3}>
+          <Wiggle amp={2.2} speed={8}>
+            <ModeBanner name="LÉA" color={LEA} like />
+          </Wiggle>
+        </Stamp>
+      </Center>
+    </AbsoluteFill>
+  );
+};
+
+// Pose : main de cartes, tap rapide, bouton presse.
 const ScenePose = () => {
   const frame = useCurrentFrame();
-  const TAP = 50;
-  const PRESS = 95;
+  const TAP = 30;
+  const PRESS = 62;
+  const punch = usePunch();
+  const shake = useShake(TAP + 4, 10, 12);
   return (
-    <AbsoluteFill style={{ backgroundColor: YELLOW }}>
+    <AbsoluteFill style={{ backgroundColor: YELLOW, transform: punch + shake }}>
       <GameChrome right="0/4 POSÉ" />
       <Center style={{ paddingTop: 175, paddingBottom: 260 }}>
         <Appear delay={0}>
@@ -174,90 +204,78 @@ const ScenePose = () => {
   );
 };
 
-// But : premier a 5 points.
-const SceneBut = () => (
-  <AbsoluteFill style={{ backgroundColor: YELLOW }}>
-    <Center>
-      <Stamp from={2.6}>
-        <Bounce amp={12} speed={9}>
-          <Chip text="PREMIER À 5 POINTS" bg="#000" color={YELLOW} tilt={-2} fontSize={84} />
-        </Bounce>
-      </Stamp>
-      <div style={{ height: 70 }} />
-      <Stamp delay={14} from={3}>
-        <Wiggle amp={6} speed={6}>
-          <div style={{ fontSize: 170, lineHeight: 1 }}>🏆</div>
-        </Wiggle>
-      </Stamp>
-    </Center>
-  </AbsoluteFill>
-);
-
-// Regle apero : la carte choisie declenche SA regle a boire (systeme actuel).
-const SceneRegleApero = () => (
-  <AbsoluteFill style={{ backgroundColor: AMBER }}>
-    <GameChrome right="🍻 APÉRO" bg={AMBER} />
-    <EmojiRain emoji="🍺" delay={40} count={8} />
-    <Center style={{ paddingTop: 170 }}>
-      <Appear delay={0}>
-        <div style={{ ...anton, fontSize: 36, opacity: 0.6, textAlign: 'center' }}>
-          CARTE CHOISIE
-        </div>
-      </Appear>
-      <div style={{ height: 24 }} />
-      <Stamp delay={4} from={1.6}>
-        <Wiggle amp={1.6} speed={10}>
-          <div
-            style={{
-              ...anton,
-              width: 720,
-              backgroundColor: '#000',
-              color: YELLOW,
-              boxShadow: '16px 16px 0 #000',
-              transform: 'rotate(-2deg)',
-              padding: '58px 46px',
-              fontSize: 80,
-              lineHeight: 0.95,
-              textAlign: 'center',
-            }}
-          >
-            PIZZA ANANAS
-          </div>
-        </Wiggle>
-      </Stamp>
-      <div style={{ height: 60 }} />
-      <Stamp delay={28} from={2.6}>
-        <Wiggle amp={2.4} speed={8}>
-          <Chip text="TEAM ANANAS BOIT 1" bg={PINK} tilt={2} fontSize={62} />
-        </Wiggle>
-      </Stamp>
-      <div style={{ height: 30 }} />
-      <Stamp delay={44} from={2.6}>
-        <Wiggle amp={2.4} speed={8} phase={2}>
-          <Chip text="LES PURISTES BOIVENT 2" bg="#fff" color="#000" tilt={-2} fontSize={56} />
-        </Wiggle>
-      </Stamp>
-      <div style={{ height: 55 }} />
-      <Appear delay={70}>
-        <Bounce delay={70} amp={8} speed={8}>
-          <div style={{ ...anton, fontSize: 40, textAlign: 'center', color: LIKE_GREEN, WebkitTextStroke: '2px #000', paintOrder: 'stroke fill' }}>
-            LE GAGNANT NE BOIT JAMAIS 😎
-          </div>
-        </Bounce>
-      </Appear>
-    </Center>
-  </AbsoluteFill>
-);
+// Regle apero : la carte declenche SA regle a boire, pluie de bieres.
+const SceneRegleApero = () => {
+  const punch = usePunch();
+  const shake = useShake(20, 12, 14);
+  return (
+    <AbsoluteFill style={{ backgroundColor: AMBER, transform: punch + shake }}>
+      <GameChrome right="🍻 APÉRO" bg={AMBER} />
+      <EmojiRain emoji="🍺" delay={18} count={12} />
+      <Center style={{ paddingTop: 170 }}>
+        <Stamp from={1.8}>
+          <Wiggle amp={1.8} speed={9}>
+            <div
+              style={{
+                ...anton,
+                width: 720,
+                backgroundColor: '#000',
+                color: YELLOW,
+                boxShadow: '16px 16px 0 #000',
+                transform: 'rotate(-2deg)',
+                padding: '54px 46px',
+                fontSize: 80,
+                lineHeight: 0.95,
+                textAlign: 'center',
+              }}
+            >
+              PIZZA ANANAS
+            </div>
+          </Wiggle>
+        </Stamp>
+        <div style={{ height: 50 }} />
+        <Stamp delay={18} from={2.8}>
+          <Wiggle amp={2.6} speed={7}>
+            <Chip text="TEAM ANANAS BOIT 1" bg={PINK} tilt={2} fontSize={62} />
+          </Wiggle>
+        </Stamp>
+        <div style={{ height: 26 }} />
+        <Stamp delay={30} from={2.8}>
+          <Wiggle amp={2.6} speed={7} phase={2}>
+            <Chip text="LES PURISTES BOIVENT 2" bg="#fff" color="#000" tilt={-2} fontSize={54} />
+          </Wiggle>
+        </Stamp>
+        <div style={{ height: 45 }} />
+        <Appear delay={48}>
+          <Bounce delay={48} amp={9} speed={7}>
+            <div
+              style={{
+                ...anton,
+                fontSize: 40,
+                textAlign: 'center',
+                color: LIKE_GREEN,
+                WebkitTextStroke: '2px #000',
+                paintOrder: 'stroke fill',
+              }}
+            >
+              LE GAGNANT NE BOIT JAMAIS 😎
+            </div>
+          </Bounce>
+        </Appear>
+      </Center>
+    </AbsoluteFill>
+  );
+};
 
 // ================= COMPOSITION =================
 
 const SCENE_BY_KEY = {
-  logo: () => <SceneLogo />,
-  annonce: (dur) => <SceneAnnonce dur={dur} />,
+  hook: () => <SceneHook />,
+  prouve: () => <SceneProuve />,
+  annonce: () => <SceneAnnonce />,
   pose: () => <ScenePose />,
   choix: () => <SceneReveal />,
   point: () => <SceneResult />,
-  but: () => <SceneBut />,
   apero: () => <Intertitle lines={['ET EN', 'MODE APÉRO ?']} emoji="🍻" />,
   regle: () => <SceneRegleApero />,
   pitch: () => <ScenePitch />,
@@ -273,7 +291,7 @@ export const Presentation = () => {
           src={staticFile('Sunlit Loop.mp3')}
           volume={(f) =>
             MUSIC_VOLUME *
-            interpolate(f, [TOTAL_FRAMES - 60, TOTAL_FRAMES - 10], [1, 0], {
+            interpolate(f, [TOTAL_FRAMES - 50, TOTAL_FRAMES - 8], [1, 0], {
               extrapolateLeft: 'clamp',
               extrapolateRight: 'clamp',
             })
@@ -281,14 +299,16 @@ export const Presentation = () => {
         />
       )}
       {USE_VOICE && <Audio src={staticFile('voix-off.mp3')} />}
-      {SEGMENTS.map((seg) => {
+      {SEGMENTS.map((seg, i) => {
         const dur = frames(seg.sec);
         const from = cursor;
         cursor += dur;
         return (
           <Sequence key={seg.key} from={from} durationInFrames={dur}>
             {SCENE_BY_KEY[seg.key](dur)}
-            <Subtitle text={seg.sub} />
+            {seg.showSub !== false && (
+              <Subtitle text={seg.sub} tilt={i % 2 === 0 ? -1.5 : 1.5} />
+            )}
           </Sequence>
         );
       })}
