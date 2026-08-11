@@ -102,9 +102,10 @@ const CutFlash = () => {
   );
 };
 
-// Secousse a l'entree de chaque plan (impact de coupe).
+// Secousse a l'entree de chaque plan — DOUCE (retour utilisateur : les
+// secousses fortes sont enervantes, on garde juste un petit impact).
 const CutShake = ({ children }) => {
-  const shake = useShake(1, 9, 10);
+  const shake = useShake(1, 6, 4);
   return <AbsoluteFill style={{ transform: `translate(0,0)${shake}` }}>{children}</AbsoluteFill>;
 };
 
@@ -122,8 +123,8 @@ const Subtitle = ({ text, tilt = -1.5 }) => (
       justifyContent: 'center',
     }}
   >
-    <Stamp from={3.2}>
-      <Wiggle amp={2.2} speed={7}>
+    <Stamp from={2.6}>
+      <Wiggle amp={1.5} speed={8}>
         <div
           style={{
             ...anton,
@@ -154,7 +155,7 @@ const SceneHook = () => (
 
 // "Prouve-le." + mini logo : flash rapide.
 const SceneProuve = () => {
-  const shake = useShake(4, 10, 14);
+  const shake = useShake(4, 8, 6);
   return (
     <AbsoluteFill style={{ backgroundColor: YELLOW, transform: `scale(1)${shake}` }}>
       <Center>
@@ -191,7 +192,7 @@ const SceneProuve = () => {
 // Annonce : le bandeau claque, secousse, burst de coeurs.
 const SceneAnnonce = () => {
   const punch = usePunch();
-  const shake = useShake(6, 12, 16);
+  const shake = useShake(6, 10, 7);
   return (
     <AbsoluteFill style={{ backgroundColor: YELLOW, transform: punch + shake }}>
       <GameChrome right="MANCHE 3" />
@@ -213,7 +214,7 @@ const ScenePose = () => {
   const TAP = 30;
   const PRESS = 62;
   const punch = usePunch();
-  const shake = useShake(TAP + 4, 10, 12);
+  const shake = useShake(TAP + 4, 8, 6);
   return (
     <AbsoluteFill style={{ backgroundColor: YELLOW, transform: punch + shake }}>
       <GameChrome right="0/4 POSÉ" />
@@ -239,7 +240,7 @@ const ScenePose = () => {
 // Regle apero : la carte declenche SA regle a boire, pluie de bieres.
 const SceneRegleApero = () => {
   const punch = usePunch();
-  const shake = useShake(20, 12, 14);
+  const shake = useShake(20, 10, 6);
   return (
     <AbsoluteFill style={{ backgroundColor: AMBER, transform: punch + shake }}>
       <GameChrome right="🍻 APÉRO" bg={AMBER} />
