@@ -94,6 +94,11 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
     // Pas de seed ici : réservé à l'admin par les règles (il échouait toujours
     // pour un joueur) — le bootstrap d'une base vide se fait depuis /admin.
     // Deck dans la langue de la partie (fixée par l'hôte à la création).
+    // SEUL L'HÔTE s'abonne : lui seul se sert des cartes/catégories (compteur,
+    // grille des catégories, canStart). Les autres joueurs téléchargeaient tout
+    // le deck pour rien — à des milliers de parties, c'est la facture Firebase.
+    // isHost est dans les deps : si l'hôte part et que je le deviens, je m'abonne.
+    if (!isHost) return undefined;
     const deckLang = room.settings?.lang;
     const unsubCards = subscribeCards(setAllCards, deckLang);
     const unsubCats = subscribeCategories(setAllCategories, deckLang);
@@ -101,7 +106,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
       unsubCards();
       unsubCats();
     };
-  }, [room.settings?.lang]);
+  }, [room.settings?.lang, isHost]);
 
   // Les brouillons (draft) sont invisibles en partie : ils n'existent que
   // dans l'admin, en attente de validation/publication.

@@ -17,7 +17,7 @@ import {
 } from '../categoriesStore';
 import { Lock, Plus, Pencil, Trash2, Check, X, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { auth, db } from '../firebase';
-import { ref, onValue, get, remove, query, orderByChild, endAt } from 'firebase/database';
+import { ref, onValue, get, remove, query, orderByChild, endAt, limitToFirst } from 'firebase/database';
 import { ROOM_TTL_MS } from '../utils';
 import {
   subscribeAnnouncement,
@@ -217,8 +217,11 @@ function Dashboard({ onLogout }) {
     // Sweep des rooms expirées (> TTL). Fait ICI car les règles ne permettent
     // plus qu'à l'admin de lister /rooms (anti-énumération des codes) — les
     // joueurs ne lisent que la room dont ils connaissent le code.
+    // Borné à 500 rooms par ouverture : sans limite, le sweep téléchargeait
+    // TOUTES les rooms expirées d'un coup (à des milliers de parties/jour,
+    // des centaines de Mo → onglet gelé). Le stock se résorbe à chaque visite.
     const cutoff = Date.now() - ROOM_TTL_MS;
-    get(query(ref(db, 'rooms'), orderByChild('createdAt'), endAt(cutoff)))
+    get(query(ref(db, 'rooms'), orderByChild('createdAt'), endAt(cutoff), limitToFirst(500)))
       .then((snap) => {
         if (!snap.exists()) return;
         Object.keys(snap.val()).forEach((code) => {
