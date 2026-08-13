@@ -872,14 +872,9 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               </div>
             )}
             <div className="space-y-4">
+              {/* Le Mode Apero est GRATUIT depuis le 13/08/2026 : il n'apparait
+                  plus en boutique. Seul le Pack Ultra est en vente. */}
               {[
-                {
-                  emoji: '🍻',
-                  name: t('shop.aperoName'),
-                  desc: t('shop.aperoDesc'),
-                  productId: PRODUCT_APERO,
-                  owned: aperoOwned,
-                },
                 {
                   emoji: '🌶️',
                   name: t('shop.ultraName'),

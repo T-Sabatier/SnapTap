@@ -185,7 +185,12 @@ export function useBilling() {
   }, []);
 
   return {
-    apero: ent.apero,
+    // DECISION STRATEGIQUE (13/08/2026) : le Mode Apero est GRATUIT pour tous
+    // (c'est l'argument d'acquisition n°1 du jeu, pas un produit). La categorie
+    // Bourre-e (pack mode_apero) est donc debloquee aussi. Le produit Play
+    // `mode_apero` doit etre desactive cote Play Console / RevenueCat.
+    // La plomberie (entitlement apero) est conservee au cas ou, mais ignoree ici.
+    apero: true,
     ultra: ent.ultra,
     prices,
     billingAvailable: BILLING_AVAILABLE,
