@@ -342,23 +342,31 @@ function JackpotAnnounce({ apero, winnerName }) {
 // pas noir — a valider en test). ~4 s (le temps de lire une phrase) puis se
 // fond ; la regle reste affichee sur l'ecran resultat en dessous.
 // Pour un DEFI cible, montee seulement APRES la roulette, avec le prenom.
-function GageAnnounce({ text, targetName, targetColor, kicker }) {
+function GageAnnounce({ text, targetName, targetColor, kicker, delay = 0 }) {
   const t = useT();
-  const [phase, setPhase] = useState('in'); // 'in' → 'out' → hidden
+  // ORDRE DE LECTURE (bilan anti-brouillon) : delay > 0 laisse d'abord voir
+  // QUI a gagne sur l'ecran resultat, PUIS le slam annonce le defi/gage.
+  // Une info a la fois. 'wait' → 'in' → 'out' → hidden.
+  const [phase, setPhase] = useState(delay > 0 ? 'wait' : 'in');
   // Mode capture (?cap) : on fige l'annonce a l'ecran pour la screener.
   const freeze =
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).has('cap');
   useEffect(() => {
-    if (freeze) return undefined;
-    const t1 = setTimeout(() => setPhase('out'), 3700);
-    const t2 = setTimeout(() => setPhase('hidden'), 4100);
+    if (freeze) {
+      setPhase('in');
+      return undefined;
+    }
+    const t0 = setTimeout(() => setPhase('in'), delay);
+    const t1 = setTimeout(() => setPhase('out'), delay + 3700);
+    const t2 = setTimeout(() => setPhase('hidden'), delay + 4100);
     return () => {
+      clearTimeout(t0);
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [freeze]);
-  if (phase === 'hidden') return null;
+  }, [freeze, delay]);
+  if (phase === 'hidden' || phase === 'wait') return null;
   return (
     <div
       className={`fixed inset-0 z-[55] flex items-center justify-center p-6 ${phase === 'out' ? 'special-fade' : ''}`}
@@ -581,52 +589,9 @@ function WinnerNextChoice({ chrono, busy, onPick, hasAction }) {
   );
 }
 
-// Compte a rebours 3-2-1 a l'arrivee de la revelation : un petit "roulement
-// de tambour" collectif avant de decouvrir les cartes posees (donne un beat
-// a chaque manche). Chaque client le joue localement (~1.5 s), pas besoin de
-// synchro : tout le monde arrive sur la revelation au meme moment.
-function RevealCountdown() {
-  // Mode capture (?cap) : pas de compte a rebours (il masquerait l'ecran).
-  const skip =
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).has('cap');
-  const [count, setCount] = useState(skip ? 0 : 3);
-  useEffect(() => {
-    if (skip) return undefined;
-    const iv = setInterval(() => {
-      setCount((c) => {
-        if (c <= 1) {
-          clearInterval(iv);
-          return 0;
-        }
-        return c - 1;
-      });
-    }, 500);
-    return () => clearInterval(iv);
-  }, [skip]);
-  if (count <= 0) return null;
-  return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.88)' }}
-    >
-      <div
-        key={count}
-        className="special-slam"
-        style={{
-          fontFamily: '"Anton", sans-serif',
-          color: YELLOW,
-          WebkitTextStroke: '4px #000',
-          paintOrder: 'stroke fill',
-          fontSize: '9rem',
-          lineHeight: 1,
-        }}
-      >
-        {count}
-      </div>
-    </div>
-  );
-}
+// NB : le compte a rebours 3-2-1 avant la revelation a ete RETIRE le 16/08
+// (bilan anti-brouillon avec l'utilisateur : plein ecran a CHAQUE manche
+// sans aucune info = du bruit des la 3e manche). Ne pas le reintroduire.
 
 // Couche d'affichage des reactions : chaque reaction recente (< 3.5 s) monte
 // et s'estompe. Position horizontale deterministe (hash de la cle) → placee
@@ -2218,7 +2183,6 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     if (isBoss) {
       return (
         <div key={room.phase} style={baseWrap} className={`relative text-black flex flex-col ${baseClass}`}>
-          <RevealCountdown key={room.round} />
           <ReactionsLayer reactions={room.reactions} />
           <TopBar right={t('game.cardsCount', { n: playedEntries.length })} />
           <Scoreboard />
@@ -2329,7 +2293,6 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     const modeColor = revealIsLike ? LIKE_GREEN : DISLIKE_RED;
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a' }} className="relative text-white flex flex-col">
-        <RevealCountdown key={room.round} />
         <ReactionsLayer reactions={room.reactions} />
         <TopBar right={t('game.cardsCount', { n: playedEntries.length })} />
         <Scoreboard />
@@ -2704,7 +2667,11 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       {/* Slam plein ecran a l'arrivee sur le resultat (sauf
                           jackpot, qui a deja son propre gros slam x4). */}
                       {!jackpot && (
-                        <GageAnnounce key={room.round} text={gage.text} />
+                        <GageAnnounce
+                          key={room.round}
+                          text={gage.text}
+                          delay={2000}
+                        />
                       )}
                       {/* Regle de VOTE : « VOTEZ POUR : » (jaune) au-dessus du
                           sujet, et la consequence (« boit 2 ») en pastille. */}
@@ -2904,6 +2871,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                         key={room.round}
                         kicker={defiKicker}
                         text={defi.text}
+                        delay={2000}
                       />
                     )}
                     <div
