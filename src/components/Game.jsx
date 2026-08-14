@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { ref, update, runTransaction, remove, set, push } from 'firebase/database';
 import { db } from '../firebase';
 import {
@@ -243,6 +243,71 @@ function JackpotAnnounce({ apero, winnerName }) {
   );
 }
 
+// Annonce PLEIN ECRAN de la regle a boire (Mode Apero), a l'ecran resultat :
+// les joueurs ne lisaient pas la regle affichee en bas (constat de soiree).
+// Meme "slam" que les manches speciales mais aux couleurs APERO (fond rose,
+// pas noir — a valider en test). ~4 s (le temps de lire une phrase) puis se
+// fond ; la regle reste affichee sur l'ecran resultat en dessous.
+// Pour un DEFI cible, montee seulement APRES la roulette, avec le prenom.
+function GageAnnounce({ text, targetName, targetColor }) {
+  const t = useT();
+  const [phase, setPhase] = useState('in'); // 'in' → 'out' → hidden
+  // Mode capture (?cap) : on fige l'annonce a l'ecran pour la screener.
+  const freeze =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('cap');
+  useEffect(() => {
+    if (freeze) return undefined;
+    const t1 = setTimeout(() => setPhase('out'), 3700);
+    const t2 = setTimeout(() => setPhase('hidden'), 4100);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [freeze]);
+  if (phase === 'hidden') return null;
+  return (
+    <div
+      className={`fixed inset-0 z-[55] flex items-center justify-center p-6 ${phase === 'out' ? 'special-fade' : ''}`}
+      style={{ backgroundColor: 'rgba(214, 15, 74, 0.93)' }}
+    >
+      <div className="special-slam text-center flex flex-col items-center">
+        <div
+          style={{ fontFamily: '"Space Mono", monospace', color: YELLOW }}
+          className="text-sm uppercase tracking-[0.4em] mb-4"
+        >
+          🍻 {t('game.gageAnnounce')}
+        </div>
+        {targetName && (
+          <div
+            style={{
+              fontFamily: '"Anton", sans-serif',
+              color: targetColor || '#FFF',
+              WebkitTextStroke: '3px #000',
+              paintOrder: 'stroke fill',
+            }}
+            className="text-6xl uppercase leading-none mb-5 break-words max-w-md"
+          >
+            {targetName}
+          </div>
+        )}
+        <div
+          style={{
+            fontFamily: '"Anton", sans-serif',
+            backgroundColor: YELLOW,
+            color: '#000',
+            boxShadow: '6px 6px 0 #000',
+            transform: 'rotate(1.5deg)',
+          }}
+          className="inline-block border-4 border-black px-5 py-4 text-2xl uppercase max-w-sm leading-tight"
+        >
+          {text}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Couche d'affichage des reactions : chaque reaction recente (< 3.5 s) monte
 // et s'estompe. Position horizontale deterministe (hash de la cle) → placee
 // pareil sur tous les ecrans. reactions = objet Firebase { key: {e, t} }.
@@ -455,6 +520,29 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
 
   const myHandCardIds = Object.keys(room.hands?.[playerId] || {});
   const pool = room.pool || {};
+
+  // Pioche VISIBLE : la carte neuve arrivait au milieu des anciennes sans
+  // aucun signe — les joueurs croyaient garder "toujours les memes cartes"
+  // (constat de soiree). On repere donc, a chaque changement de manche, les
+  // cartes absentes de la main precedente et on les fait arriver avec une
+  // animation de distribution (classe .card-draw). Diff purement local.
+  const prevHandRef = useRef({ round: room.round, ids: myHandCardIds });
+  const [freshCards, setFreshCards] = useState({});
+  useEffect(() => {
+    const prev = prevHandRef.current;
+    if (room.round !== prev.round) {
+      const before = new Set(prev.ids);
+      const fresh = myHandCardIds.filter((id) => !before.has(id));
+      // 1 a 2 cartes = pioche normale. Au-dela (manche Echange, reroll…),
+      // toute la main change : animer 7 cartes d'un coup serait illisible.
+      setFreshCards(
+        fresh.length > 0 && fresh.length <= 2
+          ? Object.fromEntries(fresh.map((id) => [id, true]))
+          : {}
+      );
+    }
+    prevHandRef.current = { round: room.round, ids: myHandCardIds };
+  });
 
   // Sorts (pouvoirs) actives par l'host + ce que j'ai deja consomme.
   const sorts = room.settings?.sorts || {};
@@ -1418,7 +1506,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                     transition: 'all 120ms',
                     minHeight: '100px',
                   }}
-                  className="border-4 border-black p-3 pt-5 text-center flex items-center justify-center relative"
+                  className={`border-4 border-black p-3 pt-5 text-center flex items-center justify-center relative${freshCards[cid] ? ' card-draw' : ''}`}
                 >
                   {/* Petit badge catégorie, discret en haut à droite */}
                   <span
@@ -2046,6 +2134,16 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   if (gage.targetId) {
                     return (
                       <div className="flex flex-col items-center gap-3">
+                        {/* Slam plein ecran APRES la roulette : le suspense
+                            d'abord, la sentence impossible a rater ensuite. */}
+                        {gageRouletteDone && (
+                          <GageAnnounce
+                            key={room.round}
+                            text={gage.text}
+                            targetName={playerById[gage.targetId]?.name}
+                            targetColor={colorHex(playerById[gage.targetId]?.color)}
+                          />
+                        )}
                         {!gageRouletteDone && (
                           <div
                             style={{ fontFamily: '"Space Mono", monospace' }}
@@ -2092,6 +2190,11 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   const voteConseq = voteMatch ? voteMatch[2] : null;
                   return (
                     <>
+                      {/* Slam plein ecran a l'arrivee sur le resultat (sauf
+                          jackpot, qui a deja son propre gros slam x4). */}
+                      {!jackpot && (
+                        <GageAnnounce key={room.round} text={gage.text} />
+                      )}
                       {/* Regle de VOTE : « VOTEZ POUR : » (jaune) au-dessus du
                           sujet, et la consequence (« boit 2 ») en pastille. */}
                       <div

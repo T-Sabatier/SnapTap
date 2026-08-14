@@ -79,6 +79,7 @@ export const fr = {
     winsTooltip: 'Victoires dans cette room',
     reactAria: 'Réagir {e}',
     jackpot: 'Jackpot',
+    gageAnnounce: 'À boire !',
     jackpotApero: 'Tout le monde boit 1 à la santé de',
     jackpotNormal: 'Félicitations',
     specials: {

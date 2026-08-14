@@ -79,6 +79,7 @@ export const en = {
     winsTooltip: 'Wins in this room',
     reactAria: 'React {e}',
     jackpot: 'Jackpot',
+    gageAnnounce: 'Drink up!',
     jackpotApero: 'Everyone drinks to',
     jackpotNormal: 'Congrats',
     specials: {
