@@ -7,14 +7,13 @@ import {
   setStoredName,
   getStoredParty,
   setStoredParty,
-  setStoredAperoUnlock,
   ROOM_TTL_MS,
   openExternal,
 } from '../utils';
 import { CATEGORIES, YELLOW, AMBER, PINK, APERO_ACCENT, MAX_PLAYERS, PLAYER_COLORS } from '../cards';
-import { useBilling, PRODUCT_APERO, PRODUCT_ULTRA } from '../purchases';
+import { useBilling, PRODUCT_ULTRA } from '../purchases';
 import { bumpStats } from '../stats';
-import { ChevronRight, Lock, X, Settings } from 'lucide-react';
+import { ChevronRight, X, Settings } from 'lucide-react';
 import { useT, useLang, LOCALES, SHOW_LANG_SWITCH } from '../i18n.jsx';
 import InstallButton from './InstallButton.jsx';
 import InstallCta from './InstallCta.jsx';
@@ -56,16 +55,13 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
   // pour éviter que le joueur clique par réflexe sur "Créer une partie".
   // Pas de modal si une erreur est déjà présente (room introuvable, kické…).
   const [showJoinModal, setShowJoinModal] = useState(!!invitedCode && !initialError);
-  // Preference "Mode Apero" (jeu a boire) + possession du mode (produit paye).
-  // Le mode ne s'active que si l'utilisateur le POSSEDE (aperoOwned). Tant que
-  // le billing n'est pas branche : verrouille, deblocable via bouton dev.
+  // Preference "Mode Apero" (jeu a boire). GRATUIT pour tous depuis le
+  // 13/08/2026 : simple interrupteur, plus aucune notion de possession.
   const [party, setParty] = useState(getStoredParty);
-  const [aperoTeaser, setAperoTeaser] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [shopError, setShopError] = useState('');
-  // Possession des packs : RevenueCat en natif, fallback web (flag/Firebase).
+  // Possession des packs : RevenueCat en natif, fallback web (Firebase).
   const {
-    apero: aperoOwned,
     ultra: ultraOwned,
     prices,
     billingAvailable,
@@ -73,8 +69,8 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
     purchase,
     restore,
   } = useBilling();
-  // Mode apero reellement actif = voulu ET possede.
-  const partyActive = party && aperoOwned;
+  // Mode apero actif = choisi via le switch (gratuit, aucun verrou).
+  const partyActive = party;
   // Le jeu de mots "SNAP ÉRO" (apéro) ne marche qu'en français. En anglais on
   // garde "SNAP TAP" (juste teinté couleur apéro), "Éro" n'y voulant rien dire.
   const aperoPun = partyActive && locale.startsWith('fr');
@@ -82,12 +78,6 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
     const v = !party;
     setParty(v);
     setStoredParty(v);
-  }
-  function unlockAperoForTest() {
-    setStoredAperoUnlock(true);
-    setAperoTeaser(false);
-    // Fallback web/dev : le hook re-lit le flag sur l'event focus.
-    window.dispatchEvent(new Event('focus'));
   }
   // Lance l'achat d'un pack (natif). Gere l'annulation et les erreurs.
   async function buyPack(productId) {
@@ -379,9 +369,9 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
         </div>
 
         {/* Switch Mode Apero (jeu a boire) — sur l'accueil pour la decouverte.
-            Pre-active le mode a la creation d'une partie ; change l'ambiance. */}
-        {aperoOwned ? (
-          // Mode possede : simple interrupteur On/Off.
+            Pre-active le mode a la creation d'une partie ; change l'ambiance.
+            GRATUIT pour tous : simple interrupteur On/Off. */}
+        {(
           <button
             onClick={toggleParty}
             className="w-full border-4 border-black p-4 mb-8 flex items-center justify-between active:translate-x-[2px] active:translate-y-[2px]"
@@ -414,42 +404,6 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
               }}
             >
               {party ? 'ON' : 'OFF'}
-            </div>
-          </button>
-        ) : (
-          // Mode NON possede : verrouille, affiche le prix, ouvre le teaser.
-          <button
-            onClick={() => setAperoTeaser(true)}
-            className="w-full border-4 border-black bg-white p-4 mb-8 flex items-center justify-between gap-3 active:translate-x-[2px] active:translate-y-[2px]"
-            style={{ boxShadow: '4px 4px 0 #000' }}
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <span
-                style={{ backgroundColor: PINK }}
-                className="shrink-0 w-8 h-8 border-2 border-black flex items-center justify-center"
-              >
-                <Lock size={16} strokeWidth={3.5} color="#FFF" />
-              </span>
-              <div className="text-left min-w-0">
-                <div
-                  style={{ fontFamily: '"Anton", sans-serif' }}
-                  className="text-2xl uppercase leading-none"
-                >
-                  {t('apero.name')}
-                </div>
-                <div
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                  className="text-[10px] uppercase tracking-widest mt-1 opacity-70"
-                >
-                  {t('apero.premiumSub')}
-                </div>
-              </div>
-            </div>
-            <div
-              className="border-2 border-black px-2.5 py-1.5 text-sm uppercase tracking-widest shrink-0"
-              style={{ fontFamily: '"Space Mono", monospace' }}
-            >
-              {prices[PRODUCT_APERO] || '…'}
             </div>
           </button>
         )}
@@ -739,89 +693,6 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
                 {t('home.joinInstead')}
               </span>
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Teaser Mode Apero (produit paye). En natif : achat reel (RevenueCat) ;
-          sur web : "Dispo dans l'app". + bouton dev pour debloquer et tester. */}
-      {aperoTeaser && (
-        <div
-          onClick={() => setAperoTeaser(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-6"
-          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative border-4 border-black bg-white w-full max-w-sm p-6"
-            style={{ boxShadow: '8px 8px 0 #000' }}
-          >
-            <button
-              onClick={() => setAperoTeaser(false)}
-              aria-label={t('common.close')}
-              className="absolute top-3 right-3 active:opacity-50"
-            >
-              <X size={24} strokeWidth={3} />
-            </button>
-            <div
-              style={{ fontFamily: '"Anton", sans-serif' }}
-              className="text-3xl uppercase leading-none mb-1 mt-1 text-center"
-            >
-              {t('apero.name')}
-            </div>
-            <div
-              style={{ fontFamily: '"Space Mono", monospace' }}
-              className="text-[10px] uppercase tracking-widest opacity-60 mb-4 text-center"
-            >
-              {t('apero.premiumTag')}
-            </div>
-            <p
-              className="text-sm mb-4"
-              dangerouslySetInnerHTML={{ __html: t('apero.teaserDesc') }}
-            />
-            <div className="border-t-2 border-black/10 pt-4 flex items-end justify-between gap-3">
-              <p
-                className="text-sm opacity-80 flex-1"
-                dangerouslySetInnerHTML={{ __html: t('apero.teaserHost') }}
-              />
-              <div
-                style={{ fontFamily: '"Anton", sans-serif' }}
-                className="text-3xl leading-none shrink-0"
-              >
-                {prices[PRODUCT_APERO] || '…'}
-              </div>
-            </div>
-            {billingAvailable ? (
-              <button
-                onClick={async () => {
-                  await buyPack(PRODUCT_APERO);
-                  setAperoTeaser(false);
-                }}
-                disabled={shopBusy}
-                className="mt-5 w-full border-4 border-black py-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-                style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
-              >
-                <span
-                  style={{ fontFamily: '"Anton", sans-serif' }}
-                  className="text-xl uppercase"
-                >
-                  {shopBusy ? '…' : t('shop.buy', { price: prices[PRODUCT_APERO] || '…' })}
-                </span>
-              </button>
-            ) : (
-              <div className="mt-5">
-                <InstallCta onNavigate={() => setAperoTeaser(false)} />
-              </div>
-            )}
-            {import.meta.env.DEV && (
-              <button
-                onClick={unlockAperoForTest}
-                className="mt-2 w-full border-2 border-black bg-white py-2 text-[10px] uppercase tracking-widest active:opacity-60"
-                style={{ fontFamily: '"Space Mono", monospace' }}
-              >
-                🔧 Activer pour tester (dev)
-              </button>
-            )}
           </div>
         </div>
       )}
