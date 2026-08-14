@@ -499,6 +499,85 @@ function DefiChrono({ text, chrono, isHost, onStart, onStop }) {
   );
 }
 
+// Choix J'AIME / J'AIME PAS du GAGNANT directement sur l'ecran resultat :
+// il devient boss de la manche suivante, son choix VALIDE le resultat ET
+// LANCE la manche (fusion valide par l'utilisateur des ex-etapes "l'hote
+// clique continuer" + ecran d'attente "X choisit" → ~15-25s gagnees par
+// manche). Garde-fous anti-enchainement ("si ca passe trop vite c'est
+// relou") : boutons affiches apres ~4.5s (le temps du slam defi/gage) et
+// GELES tant qu'un chrono tourne.
+function WinnerNextChoice({ chrono, busy, onPick }) {
+  const t = useT();
+  const [now, setNow] = useState(Date.now());
+  const [readyAt] = useState(() => Date.now() + 4500);
+  useEffect(() => {
+    const iv = setInterval(() => setNow(Date.now()), 400);
+    return () => clearInterval(iv);
+  }, []);
+  const chronoRunning =
+    chrono && now < chrono.start + chrono.secs * 1000 + 2500;
+  if (now < readyAt || chronoRunning) {
+    return (
+      <div
+        style={{ fontFamily: '"Space Mono", monospace' }}
+        className="text-[10px] uppercase tracking-widest text-center py-3 opacity-60"
+      >
+        {t('game.winnerGetReady')}
+      </div>
+    );
+  }
+  return (
+    <div className="max-w-xl mx-auto">
+      <div
+        style={{ fontFamily: '"Anton", sans-serif' }}
+        className="text-lg uppercase text-center mb-2 leading-none"
+      >
+        {t('game.yourTurnNext')}
+      </div>
+      <div className="flex gap-3">
+        <button
+          onClick={() => onPick('like')}
+          disabled={busy}
+          className="flex-1 border-4 border-black p-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 flex items-center justify-center gap-2"
+          style={{
+            backgroundColor: LIKE_GREEN,
+            color: '#000',
+            boxShadow: '5px 5px 0 #000',
+            transform: 'rotate(-1deg)',
+          }}
+        >
+          <span
+            style={{ fontFamily: '"Anton", sans-serif' }}
+            className="text-xl uppercase"
+          >
+            {t('game.like')}
+          </span>
+          <Heart size={24} fill="#000" strokeWidth={0} />
+        </button>
+        <button
+          onClick={() => onPick('dislike')}
+          disabled={busy}
+          className="flex-1 border-4 border-black p-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 flex items-center justify-center gap-2"
+          style={{
+            backgroundColor: DISLIKE_RED,
+            color: '#FFF',
+            boxShadow: '5px 5px 0 #000',
+            transform: 'rotate(1deg)',
+          }}
+        >
+          <span
+            style={{ fontFamily: '"Anton", sans-serif' }}
+            className="text-xl uppercase"
+          >
+            {t('game.dislike')}
+          </span>
+          <HeartCrack size={24} color="#FFF" strokeWidth={2.5} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // Compte a rebours 3-2-1 a l'arrivee de la revelation : un petit "roulement
 // de tambour" collectif avant de decouvrir les cartes posees (donne un beat
 // a chaque manche). Chaque client le joue localement (~1.5 s), pas besoin de
@@ -1178,6 +1257,82 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       }
 
       await update(ref(db, `rooms/${roomCode}`), updates);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // Le GAGNANT choisit J'aime/J'aime pas depuis l'ecran resultat : fait tout
+  // ce que faisaient continueAfterResult (score, defausse, pioche) PUIS
+  // bossChooseMode (mode, manche speciale, echange de mains, timer) en UNE
+  // seule ecriture → on saute l'ecran d'attente "X choisit". Le chemin
+  // continueAfterResult reste utilise pour la victoire finale (game_over) et
+  // en secours si le gagnant a quitte la partie.
+  async function winnerStartNextRound(m) {
+    if (busy || !room.winnerInfo) return;
+    if (room.winnerInfo.playerId !== playerId) return;
+    const gain =
+      1 * (room.vatout?.[playerId] ? 2 : 1) * (room.special === 'double' ? 2 : 1);
+    const newScore = (playerById[playerId]?.score || 0) + gain;
+    // Score gagnant : ce chemin ne gere pas la fin de partie (l'UI affiche
+    // alors le bouton classique de l'hote qui passe par continueAfterResult).
+    if (newScore >= (room.settings?.winningScore ?? WINNING_SCORE)) return;
+    setBusy(true);
+    try {
+      // Defausse des cartes jouees + pioche pour les non-boss de la manche
+      // finie (meme logique que continueAfterResult).
+      const playedCardIds = Object.values(playedObj);
+      let deck = toArray(room.deck);
+      let discard = [...toArray(room.discard), ...playedCardIds];
+      const hands = {};
+      Object.keys(room.players || {}).forEach((pid) => {
+        hands[pid] = { ...(room.hands?.[pid] || {}) };
+      });
+      const nonBossIds = players
+        .map((p) => p.id)
+        .filter((id) => id !== room.bossId);
+      nonBossIds.forEach((pid) => {
+        if (deck.length === 0 && discard.length > 0) {
+          deck = shuffle(discard);
+          discard = [];
+        }
+        if (deck.length > 0) hands[pid][deck.shift()] = true;
+      });
+      // Manche speciale de la manche qui DEMARRE (annonce plein ecran au
+      // moment ou l'ecran de pose s'ouvre, SpecialAnnounce y est deja rendu).
+      const special = rollSpecial();
+      // MANCHE ECHANGE : les mains des non-boss (je suis le nouveau boss)
+      // tournent d'un cran — meme logique que bossChooseMode.
+      if (special === 'swap') {
+        const nonBoss = Object.keys(room.players || {}).filter(
+          (id) => id !== playerId
+        );
+        if (nonBoss.length >= 2) {
+          const hs = nonBoss.map((id) => hands[id]);
+          nonBoss.forEach((id, i) => {
+            hands[id] = hs[(i + 1) % nonBoss.length];
+          });
+        }
+      }
+      await update(ref(db, `rooms/${roomCode}`), {
+        [`players/${playerId}/score`]: newScore,
+        vatout: null,
+        hands,
+        deck,
+        discard,
+        reactions: null,
+        chrono: null,
+        phase: 'play',
+        mode: m,
+        bossId: playerId,
+        round: (room.round || 1) + 1,
+        special,
+        played: null,
+        winnerInfo: null,
+        bossPick: null,
+        bets: null,
+        playStartedAt: Date.now(),
+      });
     } finally {
       setBusy(false);
     }
@@ -2784,31 +2939,49 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
           className="p-4 border-t-4 border-black"
           style={{ backgroundColor: baseColor }}
         >
-          {isHost ? (
-            <button
-              onClick={continueAfterResult}
-              disabled={busy}
-              className="w-full border-4 border-black py-4 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-              style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
-            >
-              <div className="flex items-center justify-center gap-3">
-                <span
-                  style={{ fontFamily: '"Anton", sans-serif' }}
-                  className="text-xl uppercase tracking-wide"
-                >
-                  {willWinGame
-                    ? t('game.seeWinner')
-                    : t('game.turnOf', { name: winnerP?.name })}
-                </span>
-                <ChevronRight size={24} />
+          {/* Fin de partie ou gagnant absent → chemin classique via l'hote.
+              Sinon : le GAGNANT lance lui-meme la manche suivante (J'aime /
+              J'aime pas directement ici, plus d'ecran d'attente). */}
+          {willWinGame || !winnerP ? (
+            isHost ? (
+              <button
+                onClick={continueAfterResult}
+                disabled={busy}
+                className="w-full border-4 border-black py-4 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+                style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
+              >
+                <div className="flex items-center justify-center gap-3">
+                  <span
+                    style={{ fontFamily: '"Anton", sans-serif' }}
+                    className="text-xl uppercase tracking-wide"
+                  >
+                    {willWinGame
+                      ? t('game.seeWinner')
+                      : t('game.turnOf', { name: winnerP?.name })}
+                  </span>
+                  <ChevronRight size={24} />
+                </div>
+              </button>
+            ) : (
+              <div
+                style={{ fontFamily: '"Space Mono", monospace' }}
+                className="text-[10px] uppercase tracking-widest text-center py-3 opacity-60"
+              >
+                {t('game.waitHostContinue')}
               </div>
-            </button>
+            )
+          ) : iAmWinner ? (
+            <WinnerNextChoice
+              chrono={room.chrono}
+              busy={busy}
+              onPick={winnerStartNextRound}
+            />
           ) : (
             <div
               style={{ fontFamily: '"Space Mono", monospace' }}
               className="text-[10px] uppercase tracking-widest text-center py-3 opacity-60"
             >
-              {t('game.waitHostContinue')}
+              {t('game.winnerWillStart', { name: winnerP?.name })}
             </div>
           )}
         </div>

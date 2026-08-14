@@ -98,6 +98,7 @@ const SCENARIOS = [
   { key: 'reveal-guest', label: 'Choix · joueur' },
   { key: 'result', label: 'Résultat' },
   { key: 'result-defi', label: 'Résultat · défi' },
+  { key: 'result-winner', label: 'Résultat · gagnant' },
   { key: 'game_over', label: 'Fin de partie' },
 ];
 
@@ -159,6 +160,11 @@ function buildScenario(key, mode, pick, apero, special, sorts, pool, players, la
       // Gagnante = Chloe (sam) avec un defi (c3) → roulette (hors boss/gagnant).
       // En mode NORMAL : defi fun CIBLE (roulette puis slam avec le prenom).
       return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c3', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c3', ...(apero ? {} : { defi: { text: 'Bataille de regard avec ton voisin de droite, le premier qui rit fait 5 pompes', targetId: 'jo' } }) } } };
+    case 'result-winner':
+      // JE suis le gagnant : boutons J'aime/J'aime pas en bas de l'ecran
+      // resultat (lancement direct de la manche suivante, sans ecran
+      // d'attente). Apparaissent apres ~4.5s (garde-fou anti-enchainement).
+      return { kind: 'game', room: { ...base, host: 'alex', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c20', jo: 'c5' }, winnerInfo: { playerId: 'me', cardId: 'c1' } } };
     case 'game_over':
       return { kind: 'game', room: { ...base, host: 'me', phase: 'game_over', bossId: 'jo' } };
     default:
