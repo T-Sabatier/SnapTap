@@ -147,7 +147,7 @@ function buildScenario(key, mode, pick, apero, special, sorts, pool, players, la
       // Gagnante = Chloe (sam) avec Pizza ananas (c5). Gagnant != boss.
       // En mode NORMAL (apero off) : defi fun collectif pour visualiser le
       // slam + l'encadre (winnerInfo.defi, comme le poserait le host).
-      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c5', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c5', ...(apero ? {} : { defi: { text: 'Tout le monde imite le gagnant pendant 5 secondes', targetId: null } }) } } };
+      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c5', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c5', ...(apero ? {} : { defi: { text: 'Silence total 20 secondes en se regardant : le premier qui rit fait 10 squats', targetId: null } }) } } };
     case 'result-defi':
       // Gagnante = Chloe (sam) avec un defi (c3) → roulette (hors boss/gagnant).
       // En mode NORMAL : defi fun CIBLE (roulette puis slam avec le prenom).

@@ -401,6 +401,79 @@ function GageAnnounce({ text, targetName, targetColor, kicker }) {
   );
 }
 
+// Duree (secondes) contenue dans un gage/defi, si >= 10 s : en dessous, un
+// chrono n'a pas de sens (demande utilisateur : "pas pour 5 secondes").
+function chronoSecs(text) {
+  const m = (text || '').match(/(\d+)\s*(?:secondes?|seconds?)/i);
+  const n = m ? parseInt(m[1], 10) : 0;
+  return n >= 10 ? n : 0;
+}
+
+// Chrono de gage/defi : quand le texte contient une duree >= 10 s, l'hote
+// voit un bouton "Lancer le chrono" ; le depart est ecrit dans la room
+// (rooms/$code/chrono = {start, secs}) → compte a rebours synchronise sur
+// tous les ecrans, puis "Temps ecoule !". Nettoye au passage de manche.
+function DefiChrono({ text, chrono, isHost, onStart }) {
+  const t = useT();
+  const secs = chronoSecs(text);
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    if (!chrono) return undefined;
+    const iv = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(iv);
+  }, [chrono]);
+  if (!secs) return null;
+  if (!chrono) {
+    if (!isHost) return null;
+    return (
+      <button
+        onClick={() => onStart(secs)}
+        className="mt-3 border-4 border-black px-4 py-2 active:translate-x-[2px] active:translate-y-[2px]"
+        style={{ backgroundColor: '#000', color: YELLOW, boxShadow: '4px 4px 0 #000' }}
+      >
+        <span
+          style={{ fontFamily: '"Anton", sans-serif' }}
+          className="text-lg uppercase"
+        >
+          ⏱ {t('game.chronoStart', { s: secs })}
+        </span>
+      </button>
+    );
+  }
+  const remain = Math.max(
+    0,
+    Math.ceil((chrono.start + chrono.secs * 1000 - now) / 1000)
+  );
+  if (remain <= 0) {
+    return (
+      <div
+        className="mt-3 border-4 border-black px-4 py-2 inline-block gage-pop"
+        style={{ backgroundColor: DISLIKE_RED, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
+      >
+        <span
+          style={{ fontFamily: '"Anton", sans-serif' }}
+          className="text-xl uppercase"
+        >
+          ⏱ {t('game.chronoUp')}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div
+      className="mt-3 border-4 border-black px-5 py-2 inline-block"
+      style={{ backgroundColor: '#000', color: remain <= 5 ? '#FF5252' : YELLOW, boxShadow: '4px 4px 0 #000' }}
+    >
+      <span
+        style={{ fontFamily: '"Anton", sans-serif' }}
+        className="text-3xl uppercase tabular-nums leading-none"
+      >
+        {remain}s
+      </span>
+    </div>
+  );
+}
+
 // Compte a rebours 3-2-1 a l'arrivee de la revelation : un petit "roulement
 // de tambour" collectif avant de decouvrir les cartes posees (donne un beat
 // a chaque manche). Chaque client le joue localement (~1.5 s), pas besoin de
@@ -962,6 +1035,13 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     }
   }
 
+  // Lance le chrono d'un gage/defi (host) : depart ecrit dans la room →
+  // compte a rebours synchronise sur tous les ecrans (voir DefiChrono).
+  const startChrono = (secs) =>
+    set(ref(db, `rooms/${roomCode}/chrono`), { start: Date.now(), secs }).catch(
+      () => {}
+    );
+
   // Reaction emoji ephemere (pendant la revelation). Se supprime toute seule.
   function sendReaction(e) {
     const r = push(ref(db, `rooms/${roomCode}/reactions`));
@@ -1003,6 +1083,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
         },
         phase: 'result',
         bossPick: null,
+        chrono: null,
       });
     } finally {
       setBusy(false);
@@ -1049,6 +1130,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       updates['deck'] = currentDeck;
       updates['discard'] = currentDiscard;
       updates['reactions'] = null; // on repart avec un ecran propre
+      updates['chrono'] = null; // chrono de gage/defi de la manche finie
 
       const targetScore = room.settings?.winningScore ?? WINNING_SCORE;
       if (winnerNewScore >= targetScore) {
@@ -1109,6 +1191,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
         bossPick: null,
         vatout: null,
         reactions: null,
+        chrono: null,
         bossId: randomBoss,
         round: 1,
         special: null,
@@ -1149,6 +1232,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
         mode: null,
         bossId: null,
         round: null,
+        chrono: null,
         players: playersReset,
       });
     } finally {
@@ -2404,6 +2488,14 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                             {gage.text}
                           </div>
                         )}
+                        {gageRouletteDone && (
+                          <DefiChrono
+                            text={gage.text}
+                            chrono={room.chrono}
+                            isHost={isHost}
+                            onStart={startChrono}
+                          />
+                        )}
                       </div>
                     );
                   }
@@ -2466,6 +2558,12 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                           ruleText
                         )}
                       </div>
+                      <DefiChrono
+                        text={gage.text}
+                        chrono={room.chrono}
+                        isHost={isHost}
+                        onStart={startChrono}
+                      />
                       <div
                         style={{ fontFamily: '"Space Mono", monospace', color: '#000' }}
                         className="text-base font-bold uppercase tracking-wide mt-5"
@@ -2602,6 +2700,14 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                           {defi.text}
                         </div>
                       )}
+                      {gageRouletteDone && (
+                        <DefiChrono
+                          text={defi.text}
+                          chrono={room.chrono}
+                          isHost={isHost}
+                          onStart={startChrono}
+                        />
+                      )}
                     </div>
                   );
                 }
@@ -2636,6 +2742,12 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       )}
                       {defiText}
                     </div>
+                    <DefiChrono
+                      text={defi.text}
+                      chrono={room.chrono}
+                      isHost={isHost}
+                      onStart={startChrono}
+                    />
                   </div>
                 );
               })()}
