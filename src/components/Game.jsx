@@ -506,39 +506,42 @@ function DefiChrono({ text, chrono, isHost, onStart, onStop }) {
 // manche). Garde-fous anti-enchainement ("si ca passe trop vite c'est
 // relou") : boutons affiches apres ~4.5s (le temps du slam defi/gage) et
 // GELES tant qu'un chrono tourne.
-function WinnerNextChoice({ chrono, busy, onPick }) {
+function WinnerNextChoice({ chrono, busy, onPick, hasAction }) {
   const t = useT();
   const [now, setNow] = useState(Date.now());
-  const [readyAt] = useState(() => Date.now() + 4500);
+  // Delai ADAPTATIF (decide avec l'utilisateur) : 4.5s si l'ecran n'a que le
+  // resultat a lire, 12s quand un defi/gage doit se JOUER a la table (sinon
+  // le gagnant zappe le moment fun). Chrono lance → gel jusqu'a sa fin.
+  const [readyAt] = useState(() => Date.now() + (hasAction ? 12000 : 4500));
   useEffect(() => {
-    const iv = setInterval(() => setNow(Date.now()), 400);
+    const iv = setInterval(() => setNow(Date.now()), 300);
     return () => clearInterval(iv);
   }, []);
   const chronoRunning =
     chrono && now < chrono.start + chrono.secs * 1000 + 2500;
-  if (now < readyAt || chronoRunning) {
-    return (
-      <div
-        style={{ fontFamily: '"Space Mono", monospace' }}
-        className="text-[10px] uppercase tracking-widest text-center py-3 opacity-60"
-      >
-        {t('game.winnerGetReady')}
-      </div>
-    );
-  }
+  const waitLeft = Math.max(0, Math.ceil((readyAt - now) / 1000));
+  const locked = waitLeft > 0 || chronoRunning || busy;
+  // Attente LISIBLE : boutons grises + compteur (le gagnant sait que ca
+  // vient, il n'a pas l'impression que c'est casse).
   return (
     <div className="max-w-xl mx-auto">
       <div
         style={{ fontFamily: '"Anton", sans-serif' }}
         className="text-lg uppercase text-center mb-2 leading-none"
       >
-        {t('game.yourTurnNext')}
+        {chronoRunning
+          ? t('game.winnerAfterChrono')
+          : waitLeft > 0
+            ? t('game.winnerReadyIn', { s: waitLeft })
+            : t('game.yourTurnNext')}
       </div>
-      <div className="flex gap-3">
+      <div
+        className="flex gap-3"
+        style={{ opacity: locked ? 0.35 : 1, transition: 'opacity 300ms' }}>
         <button
           onClick={() => onPick('like')}
-          disabled={busy}
-          className="flex-1 border-4 border-black p-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 flex items-center justify-center gap-2"
+          disabled={locked}
+          className="flex-1 border-4 border-black p-3 active:translate-x-[2px] active:translate-y-[2px] disabled:cursor-not-allowed flex items-center justify-center gap-2"
           style={{
             backgroundColor: LIKE_GREEN,
             color: '#000',
@@ -556,8 +559,8 @@ function WinnerNextChoice({ chrono, busy, onPick }) {
         </button>
         <button
           onClick={() => onPick('dislike')}
-          disabled={busy}
-          className="flex-1 border-4 border-black p-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 flex items-center justify-center gap-2"
+          disabled={locked}
+          className="flex-1 border-4 border-black p-3 active:translate-x-[2px] active:translate-y-[2px] disabled:cursor-not-allowed flex items-center justify-center gap-2"
           style={{
             backgroundColor: DISLIKE_RED,
             color: '#FFF',
@@ -2975,6 +2978,9 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
               chrono={room.chrono}
               busy={busy}
               onPick={winnerStartNextRound}
+              hasAction={
+                !!(room.winnerInfo.defi || (partyMode && room.winnerInfo.gage))
+              }
             />
           ) : (
             <div
