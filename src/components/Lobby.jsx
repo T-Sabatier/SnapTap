@@ -129,9 +129,11 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
     await set(ref(db, `rooms/${roomCode}/settings/sorts/${id}`), !sorts[id]);
   }
 
-  // Defis fun du mode normal : ON par defaut, l'hote peut couper pour une
-  // partie 100% points. Sans objet en Mode Apero (les gages font le show).
-  const defisOn = room.settings?.defis !== false;
+  // Defis fun du mode normal. OFF par defaut TANT QUE la fournee de textes
+  // n'est pas validee par l'utilisateur (regle : aucun contenu joueur en live
+  // sans validation) — repasser a `!== false` apres validation. L'hote peut
+  // l'activer au salon pour tester.
+  const defisOn = room.settings?.defis === true;
   async function toggleDefis() {
     if (!isHost) return;
     await set(ref(db, `rooms/${roomCode}/settings/defis`), !defisOn);

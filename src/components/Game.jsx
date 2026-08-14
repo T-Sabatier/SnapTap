@@ -985,7 +985,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       // DEFI FUN (mode normal uniquement) : fige ici par le host, comme le
       // gage. Tombe ~1 manche sur 2 (hash deterministe), sauf si l'hote a
       // coupe les defis au salon (settings.defis === false).
-      const defisOn = room.settings?.defis !== false;
+      // OFF par defaut tant que la fournee n'est pas validee (voir Lobby).
+      const defisOn = room.settings?.defis === true;
       const isDefiRound =
         hashStr(`${entry.cardId}_${room.round || 1}_defiroll`) % 2 === 0;
       const d =
