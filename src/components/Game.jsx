@@ -2607,14 +2607,11 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
             </>
           ) : (
             <>
+              {/* Mise en page COMPACTE (retour utilisateur : "trop de trucs
+                  écrits à l'écran") : la carte, le prénom et le +1 racontent
+                  l'histoire sans micro-labels, comme le résultat apéro. */}
               <div
-                style={{ fontFamily: '"Space Mono", monospace' }}
-                className="text-[10px] uppercase tracking-widest opacity-60 mb-2"
-              >
-                {t('game.chosenCard')}
-              </div>
-              <div
-                className="border-4 border-black p-6 mb-6 max-w-sm w-full relative"
+                className="border-4 border-black p-6 mb-5 max-w-sm w-full relative"
                 style={{
                   backgroundColor: '#FFF',
                   color: '#000',
@@ -2634,37 +2631,33 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                 </div>
               </div>
 
-              <div
-                style={{ fontFamily: '"Space Mono", monospace' }}
-                className="text-[10px] uppercase tracking-widest opacity-60 mb-3"
-              >
-                {t('game.playedBy')}
-              </div>
-              <div
-                style={{
-                  fontFamily: '"Anton", sans-serif',
-                  lineHeight: 1.05,
-                  fontSize: fitBig(winnerP?.name || ''),
-                  color: colorHex(winnerP?.color) || '#000',
-                  WebkitTextStroke: '5px #000',
-                  paintOrder: 'stroke fill',
-                  letterSpacing: '0.08em',
-                }}
-                className="uppercase mb-6 break-words"
-              >
-                {winnerP?.name || '?'}
-              </div>
-              <div
-                style={{
-                  fontFamily: '"Anton", sans-serif',
-                  backgroundColor: LIKE_GREEN,
-                  color: '#000',
-                  boxShadow: '4px 4px 0 #000',
-                  transform: 'rotate(3deg)',
-                }}
-                className="inline-block border-4 border-black px-3 py-2 text-2xl uppercase"
-              >
-                +{winnerGain} {winnerGain > 1 ? t('game.points') : t('game.point')}
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                <div
+                  style={{
+                    fontFamily: '"Anton", sans-serif',
+                    lineHeight: 1.05,
+                    fontSize: fitBig(winnerP?.name || ''),
+                    color: colorHex(winnerP?.color) || '#000',
+                    WebkitTextStroke: '5px #000',
+                    paintOrder: 'stroke fill',
+                    letterSpacing: '0.08em',
+                  }}
+                  className="uppercase break-words"
+                >
+                  {winnerP?.name || '?'}
+                </div>
+                <div
+                  style={{
+                    fontFamily: '"Anton", sans-serif',
+                    backgroundColor: LIKE_GREEN,
+                    color: '#000',
+                    boxShadow: '4px 4px 0 #000',
+                    transform: 'rotate(3deg)',
+                  }}
+                  className="inline-block border-4 border-black px-3 py-2 text-2xl uppercase shrink-0"
+                >
+                  +{winnerGain} {winnerGain > 1 ? t('game.points') : t('game.point')}
+                </div>
               </div>
               {winnerGain > 1 && !jackpot && (
                 <div
