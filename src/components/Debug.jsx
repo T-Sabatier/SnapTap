@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ref, set, onValue, remove } from 'firebase/database';
 import { db } from '../firebase';
 import { useLang } from '../i18n.jsx';
@@ -209,12 +209,43 @@ export default function Debug() {
   // Abonnement permanent a la room debug
   useEffect(() => {
     const r = ref(db, 'rooms/DEBG');
-    const unsub = onValue(r, (snap) => setLiveRoom(snap.val()));
+    const unsub = onValue(r, (snap) => {
+      if (drawSwapped.current) return; // simulation de pioche en cours
+      setLiveRoom(snap.val());
+    });
     return () => {
       unsub();
       remove(r).catch(() => {});
     };
   }, []);
+
+  // Simulation de PIOCHE (?draw=1, scene play-hand) : ~2s apres l'affichage
+  // de la main, on passe a la manche suivante avec c1 jouee et c8 piochee.
+  // Exerce le VRAI code de Game (diff main N vs N+1 → animation .card-draw
+  // sur la carte neuve), sans monter une partie a 3.
+  const drawParam = params.has('draw');
+  // Une fois le swap fait, on ignore les snapshots Firebase (une room DEBG
+  // d'une session precedente ecraserait la simulation).
+  const drawSwapped = useRef(false);
+  useEffect(() => {
+    if (!drawParam || key !== 'play-hand') return undefined;
+    const t = setTimeout(() => {
+      drawSwapped.current = true;
+      setLiveRoom((cur) => {
+        const r = cur || scenario.room;
+        const next = {
+          ...r,
+          round: (r.round || 3) + 1,
+          hands: { me: { ...MY_HAND_AFTER_PLAY, c8: true } },
+          played: null,
+        };
+        set(ref(db, 'rooms/DEBG'), next).catch(() => {});
+        return next;
+      });
+    }, 2000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawParam, key]);
 
   // (Re)seed la room a chaque changement de scenario / mode / choix boss / options
   useEffect(() => {
