@@ -129,6 +129,14 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
     await set(ref(db, `rooms/${roomCode}/settings/sorts/${id}`), !sorts[id]);
   }
 
+  // Defis fun du mode normal : ON par defaut, l'hote peut couper pour une
+  // partie 100% points. Sans objet en Mode Apero (les gages font le show).
+  const defisOn = room.settings?.defis !== false;
+  async function toggleDefis() {
+    if (!isHost) return;
+    await set(ref(db, `rooms/${roomCode}/settings/defis`), !defisOn);
+  }
+
   const winningScore = room.settings?.winningScore ?? 5;
   const SCORE_OPTIONS = [3, 5, 7, 10, 12, 15];
 
@@ -166,9 +174,9 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
     const poolObj = Object.fromEntries(
       shuffled.map((c) => [
         c.id,
-        // g = regle a boire du Mode Apero (optionnelle), affichee a l'ecran
-        // resultat quand cette carte est choisie.
-        { t: c.t, cat: c.cat, spicy: !!c.spicy, ...(c.g ? { g: c.g } : {}) },
+        // g = regle a boire du Mode Apero (optionnelle), f = defi fun du mode
+        // normal (optionnel), affiches a l'ecran resultat pour cette carte.
+        { t: c.t, cat: c.cat, spicy: !!c.spicy, ...(c.g ? { g: c.g } : {}), ...(c.f ? { f: c.f } : {}) },
       ])
     );
 
@@ -755,6 +763,63 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
               );
             })}
           </div>
+        </div>
+        )}
+
+        {/* Defis fun du mode normal (sans alcool) : mimes, duels, tours de
+            table... ~1 manche sur 2. Cache en Mode Apero (les gages font le
+            show la-bas). ON par defaut. */}
+        {isHost && !partyMode && (
+        <div className="mb-8">
+          <div
+            style={{ fontFamily: '"Anton", sans-serif' }}
+            className="text-2xl uppercase mb-1"
+          >
+            {t('lobby.defis')}
+          </div>
+          <div
+            style={{ fontFamily: '"Space Mono", monospace' }}
+            className="text-[10px] uppercase tracking-widest mb-3 opacity-70"
+          >
+            {t('lobby.defisHint')}
+          </div>
+          <button
+            onClick={toggleDefis}
+            style={{
+              backgroundColor: defisOn ? '#000' : '#FFF',
+              color: defisOn ? '#FFF' : '#000',
+              boxShadow: defisOn ? '4px 4px 0 #000' : '2px 2px 0 #000',
+              transition: 'all 100ms',
+              opacity: defisOn ? 1 : 0.55,
+            }}
+            className="w-full border-4 border-black px-3 py-3 text-left flex items-center gap-3 active:translate-x-[2px] active:translate-y-[2px]"
+          >
+            <span className="text-2xl shrink-0">🎯</span>
+            <div className="min-w-0 flex-1">
+              <div
+                style={{ fontFamily: '"Anton", sans-serif' }}
+                className="uppercase text-lg leading-none"
+              >
+                {t('lobby.defisName')}
+              </div>
+              <div
+                style={{ fontFamily: '"Space Mono", monospace' }}
+                className="text-[9px] uppercase tracking-widest opacity-70 mt-1"
+              >
+                {t('lobby.defisDesc')}
+              </div>
+            </div>
+            <div
+              className="shrink-0 border-2 px-2 py-1 text-[10px] uppercase tracking-widest"
+              style={{
+                fontFamily: '"Space Mono", monospace',
+                borderColor: defisOn ? YELLOW : '#000',
+                color: defisOn ? YELLOW : '#000',
+              }}
+            >
+              {defisOn ? 'ON' : 'OFF'}
+            </div>
+          </button>
         </div>
         )}
 

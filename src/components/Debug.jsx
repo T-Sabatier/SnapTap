@@ -145,10 +145,13 @@ function buildScenario(key, mode, pick, apero, special, sorts, pool, players, la
       return { kind: 'game', room: { ...base, phase: 'reveal', bossId: 'alex', mode, hands: { me: MY_HAND_AFTER_PLAY }, played: { me: 'c1', sam: 'c20', jo: 'c5' }, bossPick: pick ? 'c20' : null } };
     case 'result':
       // Gagnante = Chloe (sam) avec Pizza ananas (c5). Gagnant != boss.
-      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c5', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c5' } } };
+      // En mode NORMAL (apero off) : defi fun collectif pour visualiser le
+      // slam + l'encadre (winnerInfo.defi, comme le poserait le host).
+      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c5', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c5', ...(apero ? {} : { defi: { text: 'Tout le monde imite le gagnant pendant 5 secondes', targetId: null } }) } } };
     case 'result-defi':
       // Gagnante = Chloe (sam) avec un defi (c3) → roulette (hors boss/gagnant).
-      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c3', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c3' } } };
+      // En mode NORMAL : defi fun CIBLE (roulette puis slam avec le prenom).
+      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c3', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c3', ...(apero ? {} : { defi: { text: 'Bataille de regard avec ton voisin de droite, le premier qui rit fait 5 pompes', targetId: 'jo' } }) } } };
     case 'game_over':
       return { kind: 'game', room: { ...base, host: 'me', phase: 'game_over', bossId: 'jo' } };
     default:

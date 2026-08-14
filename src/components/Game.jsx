@@ -61,6 +61,98 @@ const GENERIC_GAGES = {
   ],
 };
 
+// Mode normal — DEFIS FUN sans alcool (fournee validee 15/08/2026) : la ou
+// l'apero a la gorgee comme consequence, ici le defi EST le spectacle. 5
+// formats inspires de la grammaire Picolo (les formats, jamais leurs textes) :
+// action instantanee, regle persistante (piege differe), duel, tour de table,
+// vote/respiration. Meme convention que les gages : '@' = defi individuel
+// (roulette). Tombe ~1 manche sur 2 (tirage deterministe cote host), toggle
+// "Defis" au salon. Une carte peut porter son defi dedie (champ `f`, comme
+// `g` pour les gages) ; sinon tirage dans ce pool.
+const GENERIC_DEFIS = {
+  fr: [
+    // Actions ciblees (roulette)
+    '@Mime un film, la table devine (30 secondes max)',
+    '@Imite quelqu\'un de la table jusqu\'à ce qu\'on devine qui',
+    '@Imite un animal, la table devine lequel',
+    '@Ton meilleur pas de danse, maintenant',
+    '@Chante un refrain que tout le monde connaît',
+    '@Fais rire la table en 20 secondes',
+    '@Parle avec un accent jusqu\'à la fin de la prochaine manche',
+    '@Fais 10 squats maintenant',
+    '@Tiens la planche 20 secondes',
+    '@Traverse la pièce en marchant comme un mannequin',
+    '@Refais ta tête de photo d\'identité, la table note sur 10',
+    '@Raconte le dernier film que tu as vu en 15 secondes chrono',
+    '@Invente une pub de 15 secondes pour l\'objet le plus proche de toi',
+    '@Mime ton dernier week-end, la table devine ce que tu as fait',
+    '@Imite le prof ou le patron le plus marquant de ta vie',
+    '@Montre la dernière photo de ta galerie',
+    '@Dis le prénom de ton premier crush',
+    '@Raconte ton pire rencard en 20 secondes',
+    // Regles persistantes (piege differe)
+    '@Interdit de dire oui et non jusqu\'à ton prochain point',
+    '@Jusqu\'à la fin de la prochaine manche, termine toutes tes phrases par "chef"',
+    '@Interdit de prononcer les prénoms de la table jusqu\'à ton prochain point',
+    'Personne ne croise les bras jusqu\'à la fin de la prochaine manche, le premier qui craque raconte sa dernière honte',
+    // Duels (le designe + son voisin de droite)
+    '@Bataille de regard avec ton voisin de droite, le premier qui rit fait 5 pompes',
+    '@Pierre-feuille-ciseaux en 3 manches contre ton voisin de droite, le perdant imite un animal',
+    '@Concours de grimaces avec ton voisin de droite, la table élit le pire',
+    // Tours de table a categorie
+    'Chacun cite un film d\'horreur, le premier qui sèche mime sa propre mort',
+    'Chacun cite une capitale, le premier qui sèche chante un refrain',
+    'Chacun donne un mot qui rime avec "apéro", le premier qui sèche fait 10 squats',
+    // Rapidite
+    'Le dernier à lever la main mime un animal choisi par la table',
+    'Le dernier à toucher son nez raconte sa dernière honte',
+    'Le dernier à se lever fait 5 pompes',
+    // Collectifs
+    'Tout le monde imite le gagnant pendant 5 secondes',
+    'Tout le monde prend sa meilleure pose, le gagnant élit la pire',
+    // Respirations (votes)
+    'Vote : qui survivrait le plus longtemps dans un film d\'horreur',
+    'Vote : qui est le plus susceptible de devenir célèbre',
+  ],
+  en: [
+    '@Act out a movie, the table guesses (30 seconds max)',
+    '@Impersonate someone at the table until they guess who',
+    '@Act like an animal, the table guesses which one',
+    '@Your best dance move, right now',
+    '@Sing a chorus everyone knows',
+    '@Make the table laugh in 20 seconds',
+    '@Speak with an accent until the end of next round',
+    '@Do 10 squats right now',
+    '@Hold a plank for 20 seconds',
+    '@Walk across the room like a runway model',
+    '@Recreate your ID photo face, the table rates it out of 10',
+    '@Summarize the last movie you watched in 15 seconds flat',
+    '@Invent a 15-second ad for the closest object to you',
+    '@Mime your last weekend, the table guesses what you did',
+    '@Impersonate the most memorable teacher or boss you ever had',
+    '@Show the last photo in your camera roll',
+    '@Say the name of your first crush',
+    '@Tell your worst date story in 20 seconds',
+    '@No saying yes or no until your next point',
+    '@Until the end of next round, end every sentence with "chief"',
+    '@No saying anyone\'s name at the table until your next point',
+    'Nobody crosses their arms until the end of next round, first to slip shares their latest embarrassing moment',
+    '@Staring contest with the player on your right, first to laugh does 5 push-ups',
+    '@Rock-paper-scissors, best of 3, against the player on your right, loser acts like an animal',
+    '@Funny face contest with the player on your right, the table picks the worst one',
+    'Everyone names a horror movie, first to run dry mimes their own death',
+    'Everyone names a capital city, first to run dry sings a chorus',
+    'Everyone says a word that rhymes with "party", first to run dry does 10 squats',
+    'Last to raise their hand acts like an animal chosen by the table',
+    'Last to touch their nose shares their latest embarrassing moment',
+    'Last to stand up does 5 push-ups',
+    'Everyone impersonates the winner for 5 seconds',
+    'Everyone strikes their best pose, the winner picks the worst',
+    'Vote: who would survive the longest in a horror movie',
+    'Vote: most likely to become famous',
+  ],
+};
+
 function hashStr(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
@@ -250,7 +342,7 @@ function JackpotAnnounce({ apero, winnerName }) {
 // pas noir — a valider en test). ~4 s (le temps de lire une phrase) puis se
 // fond ; la regle reste affichee sur l'ecran resultat en dessous.
 // Pour un DEFI cible, montee seulement APRES la roulette, avec le prenom.
-function GageAnnounce({ text, targetName, targetColor }) {
+function GageAnnounce({ text, targetName, targetColor, kicker }) {
   const t = useT();
   const [phase, setPhase] = useState('in'); // 'in' → 'out' → hidden
   // Mode capture (?cap) : on fige l'annonce a l'ecran pour la screener.
@@ -277,7 +369,7 @@ function GageAnnounce({ text, targetName, targetColor }) {
           style={{ fontFamily: '"Space Mono", monospace', color: YELLOW }}
           className="text-sm uppercase tracking-[0.4em] mb-4"
         >
-          🍻 {t('game.gageAnnounce')}
+          {kicker || `🍻 ${t('game.gageAnnounce')}`}
         </div>
         {targetName && (
           <div
@@ -512,6 +604,25 @@ function gageOf(card, cardId, round, playersObj, excludeIds = [], lang) {
     .sort();
   const targetId = ids.length
     ? ids[hashStr(`${cardId}_${round}_cible`) % ids.length]
+    : null;
+  return { text: text.slice(1), targetId };
+}
+
+// DEFI FUN du mode normal : meme mecanique que gageOf (defi dedie de la
+// carte via le champ `f`, sinon pool generique ; '@' = cible via roulette,
+// gagnant et boss exclus). Sels de hash distincts de ceux des gages.
+function defiOf(card, cardId, round, playersObj, excludeIds = [], lang) {
+  let text = card?.f;
+  if (!text) {
+    const pool = GENERIC_DEFIS[lang && lang.startsWith('en') ? 'en' : 'fr'];
+    text = pool[hashStr(`${cardId}_${round}_defi`) % pool.length];
+  }
+  if (!text.startsWith('@')) return { text, targetId: null };
+  const ids = Object.keys(playersObj || {})
+    .filter((id) => !excludeIds.includes(id))
+    .sort();
+  const targetId = ids.length
+    ? ids[hashStr(`${cardId}_${round}_defi_cible`) % ids.length]
     : null;
   return { text: text.slice(1), targetId };
 }
@@ -871,12 +982,23 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       const wCard = (room.pool || {})[entry.cardId];
       const excluded = [entry.playerId, room.bossId];
       const g = gageOf(wCard, entry.cardId, room.round || 1, room.players, excluded, room.settings?.lang);
+      // DEFI FUN (mode normal uniquement) : fige ici par le host, comme le
+      // gage. Tombe ~1 manche sur 2 (hash deterministe), sauf si l'hote a
+      // coupe les defis au salon (settings.defis === false).
+      const defisOn = room.settings?.defis !== false;
+      const isDefiRound =
+        hashStr(`${entry.cardId}_${room.round || 1}_defiroll`) % 2 === 0;
+      const d =
+        !partyMode && defisOn && isDefiRound
+          ? defiOf(wCard, entry.cardId, room.round || 1, room.players, excluded, room.settings?.lang)
+          : null;
       await update(ref(db, `rooms/${roomCode}`), {
         winnerInfo: {
           playerId: entry.playerId,
           cardId: entry.cardId,
           // Firebase ignore les cles null : targetId absent = defi non cible.
           gage: { text: g.text, targetId: g.targetId ?? null },
+          defi: d ? { text: d.text, targetId: d.targetId ?? null } : null,
         },
         phase: 'result',
         bossPick: null,
@@ -2429,6 +2551,93 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                   🔥 {t('game.x2Success')}
                 </div>
               )}
+
+              {/* ---- DEFI FUN (mode normal, ~1 manche sur 2) : le pendant
+                  sans alcool des gages apero. Fige par le host dans
+                  winnerInfo.defi. Cible ('@') → roulette puis slam ; sinon
+                  slam a l'arrivee (sauf jackpot, qui a deja le sien). ---- */}
+              {room.winnerInfo.defi && (() => {
+                const defi = room.winnerInfo.defi;
+                const excluded = [room.winnerInfo.playerId, room.bossId];
+                const eligible = players.filter((p) => !excluded.includes(p.id));
+                const defiKicker = `🎯 ${t('game.defiAnnounce')}`;
+                if (defi.targetId) {
+                  return (
+                    <div className="w-full border-t-4 border-black/15 pt-6 mt-8 flex flex-col items-center gap-3">
+                      {gageRouletteDone && (
+                        <GageAnnounce
+                          key={room.round}
+                          kicker={defiKicker}
+                          text={defi.text}
+                          targetName={playerById[defi.targetId]?.name}
+                          targetColor={colorHex(playerById[defi.targetId]?.color)}
+                        />
+                      )}
+                      {!gageRouletteDone && (
+                        <div
+                          style={{ fontFamily: '"Space Mono", monospace' }}
+                          className="text-[11px] uppercase tracking-widest opacity-70 mb-2"
+                        >
+                          {t('game.whoGetsIt')}
+                        </div>
+                      )}
+                      <GageRoulette
+                        players={eligible}
+                        targetId={defi.targetId}
+                        onDone={() => setGageRouletteDone(true)}
+                      />
+                      {gageRouletteDone && (
+                        <div
+                          style={{
+                            fontFamily: '"Anton", sans-serif',
+                            backgroundColor: PINK,
+                            color: '#FFF',
+                            boxShadow: '6px 6px 0 #000',
+                            transform: 'rotate(1deg)',
+                            lineHeight: 1.1,
+                          }}
+                          className="inline-block border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm gage-pop"
+                        >
+                          {defi.text}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                const isVote = /^vote\s*:/i.test(defi.text);
+                const defiText = isVote
+                  ? defi.text.replace(/^vote\s*:\s*/i, '')
+                  : defi.text;
+                return (
+                  <div className="w-full border-t-4 border-black/15 pt-6 mt-8 flex flex-col items-center gap-2">
+                    {!jackpot && (
+                      <GageAnnounce
+                        key={room.round}
+                        kicker={defiKicker}
+                        text={defi.text}
+                      />
+                    )}
+                    <div
+                      style={{
+                        fontFamily: '"Anton", sans-serif',
+                        backgroundColor: PINK,
+                        color: '#FFF',
+                        boxShadow: '6px 6px 0 #000',
+                        transform: 'rotate(1deg)',
+                        lineHeight: 1.15,
+                      }}
+                      className="inline-block border-4 border-black px-6 py-5 text-2xl uppercase max-w-sm"
+                    >
+                      {isVote && (
+                        <span style={{ color: YELLOW }} className="block mb-1">
+                          {t('game.voteFor')}
+                        </span>
+                      )}
+                      {defiText}
+                    </div>
+                  </div>
+                );
+              })()}
             </>
           )}
         </div>
