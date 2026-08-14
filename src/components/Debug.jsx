@@ -105,7 +105,14 @@ const noop = () => {};
 
 function buildScenario(key, mode, pick, apero, special, sorts, pool, players, lang) {
   const base = {
-    host: null,
+    // createdAt + host OBLIGATOIRES : les regles RTDB (.validate) refusent
+    // toute room sans eux → sans ca, le seed de DEBG echouait en silence et
+    // tout ce qui passe par Firebase dans la demo (chrono, sorts) ecrivait
+    // dans le vide. Host par defaut = alex (pas moi : les ecrans "joueur"
+    // ne doivent pas avoir les pouvoirs host) ; les scenes qui ont besoin
+    // que JE sois host l'ecrasent (result, game_over, lobby-host).
+    createdAt: Date.now(),
+    host: 'alex',
     round: 3,
     pool: pool,
     deck: DECK,
