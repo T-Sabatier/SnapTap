@@ -108,7 +108,7 @@ const GENERIC_DEFIS = {
     'Tout le monde montre son fond d\'écran, vote pour le pire',
     'Silence total 20 secondes en se regardant : le premier qui rit fait 10 squats',
     'Tour de table : chacun sort son excuse bidon pour annuler une soirée, le gagnant élit la plus minable',
-    'Tour de table : chacun cite un red flag en rencard, le premier qui sèche avoue le sien',
+    'Tour de table : chacun cite un red flag en rencard, le premier qui sèche fait 10 squats',
     'Tout le monde imite le gagnant pendant 5 secondes',
     // Votes qui piquent
     'Vote : qui a le plus de chances de finir au poste pour un truc débile',
@@ -147,7 +147,7 @@ const GENERIC_DEFIS = {
     'Everyone shows their wallpaper, vote for the worst',
     'Total silence for 20 seconds staring at each other: first to laugh does 10 squats',
     'Round the table: everyone gives their go-to fake excuse to cancel plans, the winner picks the lamest',
-    'Round the table: everyone names a dating red flag, first to run dry confesses their own',
+    'Round the table: everyone names a dating red flag, first to run dry does 10 squats',
     'Everyone impersonates the winner for 5 seconds',
     'Vote: most likely to end up at the police station for something stupid',
     'Vote: who sends 4-minute voice messages that say nothing',
