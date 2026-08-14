@@ -37,8 +37,8 @@ Bouffe, Ciné, Musique, Voyages, Boulot, Absurde... des catégories pour toutes 
 ⚡ MANCHES SPÉCIALES ET RÉACTIONS
 Manche double, manche chrono, manche échange : des twists surgissent pour pimenter la partie. Et chacun réagit en direct pendant la révélation.
 
-🍻 MODE APÉRO (jeu à boire)
-Transforme la partie en jeu à boire : chaque carte choisie déclenche une règle liée à son sujet, des défis, des votes. Le boss et le gagnant ne boivent jamais, c'est la récompense. Alcool à consommer avec modération, une boisson sans alcool est préférable.
+🍻 MODE APÉRO (jeu à boire), INCLUS GRATUITEMENT
+Transforme la partie en jeu à boire, sans rien payer : chaque carte choisie déclenche une règle liée à son sujet, des défis, des votes. Le boss et le gagnant ne boivent jamais, c'est la récompense. Alcool à consommer avec modération, une boisson sans alcool est préférable.
 
 🏆 COMPTEUR DE VICTOIRES
 Enchaîne les revanches, le trophée compte les victoires de la soirée.

@@ -38,8 +38,8 @@ Food, Movies, Music, Travel, Work, Absurd... categories for every mood, switched
 ⚡ SPECIAL ROUNDS & REACTIONS
 Double round, timed round, swap round: twists pop up to spice things up. And everyone reacts live during the reveal.
 
-🍻 PARTY MODE (drinking game)
-Turn the game into a drinking game: every chosen card triggers a rule tied to its subject, plus challenges and votes. The boss and the winner never drink, that's the reward. Please drink responsibly, a non-alcoholic drink works just as well.
+🍻 PARTY MODE (drinking game), INCLUDED FOR FREE
+Turn the game into a drinking game at no cost: every chosen card triggers a rule tied to its subject, plus challenges and votes. The boss and the winner never drink, that's the reward. Please drink responsibly, a non-alcoholic drink works just as well.
 
 🏆 WIN COUNTER
 Run the rematches, the trophy tracks the night's wins.
