@@ -1636,7 +1636,9 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     if (isBoss) {
       return (
         <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
-          <SpecialAnnounce key={room.round} special={room.special} />
+          {/* Pas de SpecialAnnounce ici : il joue au debut de la phase de
+              POSE (l'ecran boss_choose est saute par la manche acceleree, et
+              quand on y passe encore, l'annonce jouerait en double). */}
           <TopBar right={t('game.roundLabel', { n: room.round || 1 })} />
           <Scoreboard />
           <SpecialBanner special={room.special} />
@@ -1757,7 +1759,6 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     // Non-boss waiting
     return (
       <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
-        <SpecialAnnounce key={room.round} special={room.special} />
         <TopBar right={t('game.roundLabel', { n: room.round || 1 })} />
         <Scoreboard />
         <SpecialBanner special={room.special} />
@@ -1800,6 +1801,9 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       // Boss waits while others play
       return (
         <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+          {/* Annonce de manche speciale ICI (debut reel de la manche) : la
+              manche acceleree saute l'ecran boss_choose ou elle vivait. */}
+          <SpecialAnnounce key={room.round} special={room.special} />
           <TopBar right={`${playedCount}/${nonBossCount}`} />
           <Scoreboard />
           <div className="flex-1 flex flex-col items-center justify-center px-4 text-center max-w-xl mx-auto w-full">
@@ -1901,6 +1905,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     const isLike = room.mode === 'like';
     return (
       <div key={room.phase} style={baseWrap} className={`text-black flex flex-col ${baseClass}`}>
+        <SpecialAnnounce key={room.round} special={room.special} />
         <TopBar right={`${playedCount}/${nonBossCount}`} />
         <Scoreboard />
         <SpecialBanner special={room.special} />
