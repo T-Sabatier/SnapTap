@@ -544,6 +544,14 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     prevHandRef.current = { round: room.round, ids: myHandCardIds };
   });
 
+  // La carte fraichement piochee s'affiche EN PREMIER dans la main (demande
+  // utilisateur) : "ca fait genre il y a du changement" — meme sans voir
+  // l'animation, la main a visiblement bouge. Ordre stable toute la manche.
+  const orderedHandIds = [
+    ...myHandCardIds.filter((id) => freshCards[id]),
+    ...myHandCardIds.filter((id) => !freshCards[id]),
+  ];
+
   // Sorts (pouvoirs) actives par l'host + ce que j'ai deja consomme.
   const sorts = room.settings?.sorts || {};
   const myUsed = room.players?.[playerId]?.sortsUsed || {};
@@ -1489,7 +1497,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
 
         <div className="flex-1 px-4 overflow-y-auto pb-32">
           <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto">
-            {myHandCardIds.map((cid) => {
+            {orderedHandIds.map((cid) => {
               const card = pool[cid];
               if (!card) return null;
               const isSel = selectedCard === cid;
