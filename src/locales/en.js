@@ -150,6 +150,7 @@ export const en = {
     kingOfNight: 'King/Queen of the night 🍻',
     champOfDay: 'Champion of the day',
     backToLobby: 'Back to lobby',
+    replay: 'Play again!',
     point: 'point',
     points: 'points',
     x2Success: 'x2 hit!',

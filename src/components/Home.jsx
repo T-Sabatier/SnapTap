@@ -157,6 +157,9 @@ export default function Home({ playerId, onJoin, initialError, hideDevLink }) {
       settings: {
         cats: defaultCats,
         winningScore: 5,
+        // Timer par tour ACTIF par defaut (30s) : la cause n1 des manches qui
+        // trainent est le joueur qui hesite. L'hote peut le couper au salon.
+        turnTimer: 30,
         // Langue de la partie (celle de l'hôte) : tout le salon l'adopte.
         lang: locale,
         sorts: { reroll: false, espion: false, vatout: false },

@@ -22,6 +22,7 @@ import {
   colorFg,
 } from '../cards';
 import { useT } from '../i18n.jsx';
+import { bumpStats } from '../stats';
 
 const CAT_EMOJI = Object.fromEntries(
   CATEGORIES.map((c) => [c.id, c.emoji])
@@ -303,6 +304,53 @@ function GageAnnounce({ text, targetName, targetColor }) {
         >
           {text}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Compte a rebours 3-2-1 a l'arrivee de la revelation : un petit "roulement
+// de tambour" collectif avant de decouvrir les cartes posees (donne un beat
+// a chaque manche). Chaque client le joue localement (~1.5 s), pas besoin de
+// synchro : tout le monde arrive sur la revelation au meme moment.
+function RevealCountdown() {
+  // Mode capture (?cap) : pas de compte a rebours (il masquerait l'ecran).
+  const skip =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('cap');
+  const [count, setCount] = useState(skip ? 0 : 3);
+  useEffect(() => {
+    if (skip) return undefined;
+    const iv = setInterval(() => {
+      setCount((c) => {
+        if (c <= 1) {
+          clearInterval(iv);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 500);
+    return () => clearInterval(iv);
+  }, [skip]);
+  if (count <= 0) return null;
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0,0,0,0.88)' }}
+    >
+      <div
+        key={count}
+        className="special-slam"
+        style={{
+          fontFamily: '"Anton", sans-serif',
+          color: YELLOW,
+          WebkitTextStroke: '4px #000',
+          paintOrder: 'stroke fill',
+          fontSize: '9rem',
+          lineHeight: 1,
+        }}
+      >
+        {count}
       </div>
     </div>
   );
@@ -897,6 +945,57 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       }
 
       await update(ref(db, `rooms/${roomCode}`), updates);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // "On rejoue !" : relance une partie IMMEDIATEMENT avec les memes reglages,
+  // sans repasser par le salon (entre deux parties, c'est la que les groupes
+  // decrochent). Le pool de la room est reutilise tel quel (memes categories),
+  // simplement remelange et redistribue. Le compteur de victoires survit.
+  async function replayGame() {
+    if (!isHost || busy) return;
+    setBusy(true);
+    try {
+      const ids = shuffle(Object.keys(room.pool || {}));
+      let cursor = 0;
+      const handsObj = {};
+      const playersReset = {};
+      players.forEach((p) => {
+        handsObj[p.id] = Object.fromEntries(
+          ids.slice(cursor, cursor + HAND_SIZE).map((c) => [c, true])
+        );
+        cursor += HAND_SIZE;
+        playersReset[p.id] = {
+          name: p.name,
+          score: 0,
+          joinedAt: p.joinedAt,
+          ...(p.color ? { color: p.color } : {}),
+        };
+      });
+      const randomBoss = players[Math.floor(Math.random() * players.length)].id;
+      await update(ref(db, `rooms/${roomCode}`), {
+        phase: 'boss_choose',
+        hands: handsObj,
+        deck: ids.slice(cursor),
+        discard: null,
+        played: null,
+        winnerInfo: null,
+        mode: null,
+        bossPick: null,
+        vatout: null,
+        reactions: null,
+        bossId: randomBoss,
+        round: 1,
+        special: null,
+        players: playersReset,
+      });
+      bumpStats({
+        gamesStarted: 1,
+        playersTotal: players.length,
+        ...(partyMode ? { partyStarted: 1 } : {}),
+      });
     } finally {
       setBusy(false);
     }
@@ -1726,6 +1825,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     if (isBoss) {
       return (
         <div key={room.phase} style={baseWrap} className={`relative text-black flex flex-col ${baseClass}`}>
+          <RevealCountdown key={room.round} />
           <ReactionsLayer reactions={room.reactions} />
           <TopBar right={t('game.cardsCount', { n: playedEntries.length })} />
           <Scoreboard />
@@ -1836,6 +1936,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     const modeColor = revealIsLike ? LIKE_GREEN : DISLIKE_RED;
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a' }} className="relative text-white flex flex-col">
+        <RevealCountdown key={room.round} />
         <ReactionsLayer reactions={room.reactions} />
         <TopBar right={t('game.cardsCount', { n: playedEntries.length })} />
         <Scoreboard />
@@ -2476,19 +2577,34 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
           </div>
 
           {isHost ? (
-            <button
-              onClick={backToLobby}
-              disabled={busy}
-              className="border-4 border-black py-3 px-6 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-              style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
-            >
-              <span
-                style={{ fontFamily: '"Anton", sans-serif' }}
-                className="text-lg uppercase"
+            <div className="flex flex-col items-center gap-3">
+              <button
+                onClick={replayGame}
+                disabled={busy}
+                className="border-4 border-black py-4 px-8 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+                style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
               >
-                {t('game.backToLobby')}
-              </span>
-            </button>
+                <span
+                  style={{ fontFamily: '"Anton", sans-serif' }}
+                  className="text-2xl uppercase"
+                >
+                  🔁 {t('game.replay')}
+                </span>
+              </button>
+              <button
+                onClick={backToLobby}
+                disabled={busy}
+                className="border-4 border-black py-2.5 px-5 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+                style={{ backgroundColor: '#FFF', color: '#000', boxShadow: '4px 4px 0 #000' }}
+              >
+                <span
+                  style={{ fontFamily: '"Anton", sans-serif' }}
+                  className="text-base uppercase"
+                >
+                  {t('game.backToLobby')}
+                </span>
+              </button>
+            </div>
           ) : (
             <div
               style={{ fontFamily: '"Space Mono", monospace' }}
