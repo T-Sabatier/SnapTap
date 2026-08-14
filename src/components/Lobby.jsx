@@ -129,12 +129,19 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
     await set(ref(db, `rooms/${roomCode}/settings/sorts/${id}`), !sorts[id]);
   }
 
-  // Defis fun du mode normal : ON par defaut (fournee finale validee le
-  // 16/08/2026), l'hote peut couper pour une partie 100% points.
-  const defisOn = room.settings?.defis !== false;
-  async function toggleDefis() {
+  // Defis fun du mode normal — 3 positions (demande utilisateur) :
+  // 'off' | 'some' (1 manche sur 2, DEFAUT) | 'all' (chaque manche).
+  // Retro-compat : false = off, true/absent = some.
+  const defisRaw = room.settings?.defis;
+  const defisMode =
+    defisRaw === false || defisRaw === 'off'
+      ? 'off'
+      : defisRaw === 'all'
+        ? 'all'
+        : 'some';
+  async function pickDefisMode(mode) {
     if (!isHost) return;
-    await set(ref(db, `rooms/${roomCode}/settings/defis`), !defisOn);
+    await set(ref(db, `rooms/${roomCode}/settings/defis`), mode);
   }
 
   const winningScore = room.settings?.winningScore ?? 5;
@@ -783,43 +790,34 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
           >
             {t('lobby.defisHint')}
           </div>
-          <button
-            onClick={toggleDefis}
-            style={{
-              backgroundColor: defisOn ? '#000' : '#FFF',
-              color: defisOn ? '#FFF' : '#000',
-              boxShadow: defisOn ? '4px 4px 0 #000' : '2px 2px 0 #000',
-              transition: 'all 100ms',
-              opacity: defisOn ? 1 : 0.55,
-            }}
-            className="w-full border-4 border-black px-3 py-3 text-left flex items-center gap-3 active:translate-x-[2px] active:translate-y-[2px]"
-          >
-            <span className="text-2xl shrink-0">🎯</span>
-            <div className="min-w-0 flex-1">
-              <div
-                style={{ fontFamily: '"Anton", sans-serif' }}
-                className="uppercase text-lg leading-none"
-              >
-                {t('lobby.defisName')}
-              </div>
-              <div
-                style={{ fontFamily: '"Space Mono", monospace' }}
-                className="text-[9px] uppercase tracking-widest opacity-70 mt-1"
-              >
-                {t('lobby.defisDesc')}
-              </div>
-            </div>
-            <div
-              className="shrink-0 border-2 px-2 py-1 text-[10px] uppercase tracking-widest"
-              style={{
-                fontFamily: '"Space Mono", monospace',
-                borderColor: defisOn ? YELLOW : '#000',
-                color: defisOn ? YELLOW : '#000',
-              }}
-            >
-              {defisOn ? 'ON' : 'OFF'}
-            </div>
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'off', label: 'Off' },
+              { id: 'some', label: t('lobby.defisSome') },
+              { id: 'all', label: t('lobby.defisAll') },
+            ].map((o) => {
+              const selected = defisMode === o.id;
+              return (
+                <button
+                  key={o.id}
+                  onClick={() => pickDefisMode(o.id)}
+                  style={{
+                    backgroundColor: selected ? '#000' : '#FFF',
+                    color: selected ? YELLOW : '#000',
+                    boxShadow: '4px 4px 0 #000',
+                  }}
+                  className="border-4 border-black px-4 py-2 active:translate-x-[2px] active:translate-y-[2px]"
+                >
+                  <span
+                    style={{ fontFamily: '"Anton", sans-serif' }}
+                    className="uppercase text-lg leading-none"
+                  >
+                    {o.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
         )}
 

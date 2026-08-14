@@ -1144,12 +1144,20 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       // DEFI FUN (mode normal uniquement) : fige ici par le host, comme le
       // gage. Tombe ~1 manche sur 2 (hash deterministe), sauf si l'hote a
       // coupe les defis au salon (settings.defis === false).
-      // ON par defaut (fournee validee 16/08), coupable au salon.
-      const defisOn = room.settings?.defis !== false;
+      // 3 positions (reglage salon) : 'off' | 'some' (1 manche sur 2,
+      // defaut) | 'all' (chaque manche). Retro-compat : false=off, true=some.
+      const defisRaw = room.settings?.defis;
+      const defisMode =
+        defisRaw === false || defisRaw === 'off'
+          ? 'off'
+          : defisRaw === 'all'
+            ? 'all'
+            : 'some';
       const isDefiRound =
+        defisMode === 'all' ||
         hashStr(`${entry.cardId}_${room.round || 1}_defiroll`) % 2 === 0;
       const d =
-        !partyMode && defisOn && isDefiRound
+        !partyMode && defisMode !== 'off' && isDefiRound
           ? defiOf(wCard, entry.cardId, room.round || 1, room.players, excluded, room.settings?.lang)
           : null;
       await update(ref(db, `rooms/${roomCode}`), {

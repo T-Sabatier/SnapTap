@@ -193,9 +193,9 @@ export const en = {
     spells: 'Spells',
     spellsHint: 'Special powers · 1 use each per player',
     defis: 'Challenges',
-    defisHint: 'No drinks needed: mimes, duels, table rounds... about every other round',
-    defisName: 'Fun challenges',
-    defisDesc: 'A challenge drops at the end of the round',
+    defisHint: 'No drinks needed: dilemmas, duels, votes... at the end of rounds',
+    defisSome: 'Every other round',
+    defisAll: 'Every round',
     aperoRules: [
       '• Each chosen card triggers <b>a drinking rule</b>',
       '• It shows at the end of the round, <b>apply it</b>',

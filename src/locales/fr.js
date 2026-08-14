@@ -193,9 +193,9 @@ export const fr = {
     spells: 'Sorts',
     spellsHint: 'Pouvoirs spéciaux · 1 usage chacun par joueur',
     defis: 'Défis',
-    defisHint: 'Sans alcool : mimes, duels, tours de table... environ 1 manche sur 2',
-    defisName: 'Défis fun',
-    defisDesc: 'Un défi tombe à la fin de la manche',
+    defisHint: 'Sans alcool : dilemmes, duels, votes... à la fin des manches',
+    defisSome: '1 manche sur 2',
+    defisAll: 'Chaque manche',
     aperoRules: [
       '• Chaque carte choisie déclenche <b>une règle à boire</b>',
       "• Elle s'affiche à la fin de la manche, <b>appliquez-la</b>",
