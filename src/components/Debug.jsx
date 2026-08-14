@@ -265,6 +265,10 @@ export default function Debug() {
       remove(ref(db, 'rooms/DEBG')).catch(() => {});
       return;
     }
+    // ?chrono=1 : chrono deja lance (demo/capture du modal plein ecran).
+    if (params.has('chrono') && sc.room) {
+      sc.room.chrono = { start: Date.now(), secs: 20 };
+    }
     setLiveRoom(sc.room); // optimiste, evite le flash
     set(ref(db, 'rooms/DEBG'), sc.room).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -147,6 +147,7 @@ export const fr = {
     whoGetsIt: "Qui s'y colle ?",
     chronoStart: 'Lancer le chrono ({s} s)',
     chronoUp: 'Temps écoulé !',
+    chronoStop: 'Hôte : touche pour arrêter',
     bossWinnerNoDrink: 'Le boss et le gagnant ne boivent pas',
     chosenCard: 'Carte choisie',
     waitHostContinue: 'En attente du host pour continuer…',

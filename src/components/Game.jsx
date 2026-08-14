@@ -413,7 +413,7 @@ function chronoSecs(text) {
 // voit un bouton "Lancer le chrono" ; le depart est ecrit dans la room
 // (rooms/$code/chrono = {start, secs}) → compte a rebours synchronise sur
 // tous les ecrans, puis "Temps ecoule !". Nettoye au passage de manche.
-function DefiChrono({ text, chrono, isHost, onStart }) {
+function DefiChrono({ text, chrono, isHost, onStart, onStop }) {
   const t = useT();
   const secs = chronoSecs(text);
   const [now, setNow] = useState(Date.now());
@@ -440,36 +440,61 @@ function DefiChrono({ text, chrono, isHost, onStart }) {
       </button>
     );
   }
-  const remain = Math.max(
-    0,
-    Math.ceil((chrono.start + chrono.secs * 1000 - now) / 1000)
-  );
-  if (remain <= 0) {
-    return (
-      <div
-        className="mt-3 border-4 border-black px-4 py-2 inline-block gage-pop"
-        style={{ backgroundColor: DISLIKE_RED, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
-      >
-        <span
-          style={{ fontFamily: '"Anton", sans-serif' }}
-          className="text-xl uppercase"
-        >
-          ⏱ {t('game.chronoUp')}
-        </span>
-      </div>
-    );
-  }
+  // MODAL plein ecran (demande utilisateur) : toute la table doit voir le
+  // decompte. Le defi est rappele en haut, les secondes battent en enorme,
+  // rouges sous 5 s, slam "Temps ecoule !" a zero puis fermeture auto.
+  // L'hote peut toucher l'ecran pour arreter en avance (defi plie avant).
+  const end = chrono.start + chrono.secs * 1000;
+  const remain = Math.max(0, Math.ceil((end - now) / 1000));
+  if (now > end + 2500) return null; // "temps ecoule" reste ~2.5s puis rend la main
   return (
     <div
-      className="mt-3 border-4 border-black px-5 py-2 inline-block"
-      style={{ backgroundColor: '#000', color: remain <= 5 ? '#FF5252' : YELLOW, boxShadow: '4px 4px 0 #000' }}
+      className="fixed inset-0 z-[60] flex flex-col items-center justify-center p-6"
+      style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}
+      onClick={isHost ? onStop : undefined}
     >
-      <span
-        style={{ fontFamily: '"Anton", sans-serif' }}
-        className="text-3xl uppercase tabular-nums leading-none"
+      <div
+        style={{ fontFamily: '"Space Mono", monospace', color: YELLOW }}
+        className="text-xs uppercase tracking-[0.3em] mb-6 text-center max-w-sm leading-relaxed"
       >
-        {remain}s
-      </span>
+        {text}
+      </div>
+      {remain > 0 ? (
+        <div
+          key={remain}
+          className="gage-pop"
+          style={{
+            fontFamily: '"Anton", sans-serif',
+            color: remain <= 5 ? '#FF5252' : YELLOW,
+            WebkitTextStroke: '4px #000',
+            paintOrder: 'stroke fill',
+            fontSize: '10rem',
+            lineHeight: 1,
+          }}
+        >
+          {remain}
+        </div>
+      ) : (
+        <div
+          className="special-slam border-4 border-black px-6 py-4"
+          style={{
+            backgroundColor: DISLIKE_RED,
+            color: '#FFF',
+            boxShadow: '6px 6px 0 #000',
+            fontFamily: '"Anton", sans-serif',
+          }}
+        >
+          <span className="text-4xl uppercase">⏱ {t('game.chronoUp')}</span>
+        </div>
+      )}
+      {isHost && remain > 0 && (
+        <div
+          style={{ fontFamily: '"Space Mono", monospace', color: '#FFF' }}
+          className="text-[10px] uppercase tracking-widest opacity-50 mt-8"
+        >
+          {t('game.chronoStop')}
+        </div>
+      )}
     </div>
   );
 }
@@ -1041,6 +1066,9 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
     set(ref(db, `rooms/${roomCode}/chrono`), { start: Date.now(), secs }).catch(
       () => {}
     );
+  // Arret anticipe par l'hote (tap sur le modal du chrono).
+  const stopChrono = () =>
+    set(ref(db, `rooms/${roomCode}/chrono`), null).catch(() => {});
 
   // Reaction emoji ephemere (pendant la revelation). Se supprime toute seule.
   function sendReaction(e) {
@@ -2494,6 +2522,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                             chrono={room.chrono}
                             isHost={isHost}
                             onStart={startChrono}
+                            onStop={stopChrono}
                           />
                         )}
                       </div>
@@ -2563,6 +2592,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                         chrono={room.chrono}
                         isHost={isHost}
                         onStart={startChrono}
+                        onStop={stopChrono}
                       />
                       <div
                         style={{ fontFamily: '"Space Mono", monospace', color: '#000' }}
@@ -2706,6 +2736,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                           chrono={room.chrono}
                           isHost={isHost}
                           onStart={startChrono}
+                          onStop={stopChrono}
                         />
                       )}
                     </div>
@@ -2747,6 +2778,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
                       chrono={room.chrono}
                       isHost={isHost}
                       onStart={startChrono}
+                      onStop={stopChrono}
                     />
                   </div>
                 );

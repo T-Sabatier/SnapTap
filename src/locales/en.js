@@ -147,6 +147,7 @@ export const en = {
     whoGetsIt: "Who's up?",
     chronoStart: 'Start the timer ({s}s)',
     chronoUp: "Time's up!",
+    chronoStop: 'Host: tap to stop',
     bossWinnerNoDrink: "The boss and the winner don't drink",
     chosenCard: 'Chosen card',
     waitHostContinue: 'Waiting for the host to continue…',
