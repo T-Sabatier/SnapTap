@@ -69,87 +69,91 @@ const GENERIC_GAGES = {
 // (roulette). Tombe ~1 manche sur 2 (tirage deterministe cote host), toggle
 // "Defis" au salon. Une carte peut porter son defi dedie (champ `f`, comme
 // `g` pour les gages) ; sinon tirage dans ce pool.
+// FOURNÉE FINALE validée le 16/08/2026 ("on peut se les tenter"), règles
+// d'écriture actées avec l'utilisateur : JAMAIS un défi "un seul truc" —
+// chaque défi ciblé est un DILEMME (X ou Y), le reste est une interaction
+// (duel, piège, tour de table, vote). Enjeu personnel, pas de culture G.
 const GENERIC_DEFIS = {
   fr: [
-    // Actions ciblees (roulette)
-    '@Mime un film, la table devine (30 secondes max)',
-    '@Imite quelqu\'un de la table jusqu\'à ce qu\'on devine qui',
-    '@Imite un animal, la table devine lequel',
-    '@Ton meilleur pas de danse, maintenant',
-    '@Chante un refrain que tout le monde connaît',
-    '@Fais rire la table en 20 secondes',
-    '@Parle avec un accent jusqu\'à la fin de la prochaine manche',
-    '@Fais 10 squats maintenant',
-    '@Tiens la planche 20 secondes',
-    '@Traverse la pièce en marchant comme un mannequin',
-    '@Refais ta tête de photo d\'identité, la table note sur 10',
-    '@Raconte le dernier film que tu as vu en 15 secondes chrono',
-    '@Invente une pub de 15 secondes pour l\'objet le plus proche de toi',
-    '@Mime ton dernier week-end, la table devine ce que tu as fait',
-    '@Imite le prof ou le patron le plus marquant de ta vie',
-    '@Montre la dernière photo de ta galerie',
-    '@Dis le prénom de ton premier crush',
-    '@Raconte ton pire rencard en 20 secondes',
-    // Regles persistantes (piege differe)
-    '@Interdit de dire oui et non jusqu\'à ton prochain point',
-    '@Jusqu\'à la fin de la prochaine manche, termine toutes tes phrases par "chef"',
-    '@Interdit de prononcer les prénoms de la table jusqu\'à ton prochain point',
-    'Personne ne croise les bras jusqu\'à la fin de la prochaine manche, le premier qui craque raconte sa dernière honte',
+    // Dilemmes (deux portes)
+    '@Montre la photo la plus gênante de ta galerie, ou la table choisit une pose que tu tiens 30 secondes',
+    '@Avoue un truc que personne ici ne sait sur toi, ou fais 20 squats',
+    '@Révèle ton temps d\'écran de la semaine, ou raconte ta dernière honte',
+    '@Dis qui de la table tu appellerais pour cacher un corps, ou désigne qui te balancerait à la police',
+    '@Désigne qui de la table tu sacrifierais en premier dans un film d\'horreur, ou qui s\'en sortirait tout seul',
+    '@Dis à qui de la table tu confierais ton tel déverrouillé, et à qui jamais',
+    '@Ton crush célébrité le plus honteux, ou chante ton refrain le plus honteux',
+    '@Le truc le plus bizarre que tu fais quand t\'es seul, ou imite un joueur de la table jusqu\'à ce qu\'on devine qui',
+    '@Raconte ton pire message envoyé au mauvais destinataire, ou éternue de la façon la plus dramatique possible',
+    '@Danse 15 secondes sans musique dans le silence total, ou avoue la dernière fois que t\'as fait semblant d\'être malade',
+    '@Cours sur place au ralenti avec bruitages, ou fais un discours de ministre sur l\'objet le plus proche de toi',
+    '@Chante le générique d\'une sitcom, ou fais 10 pompes',
     // Duels (le designe + son voisin de droite)
-    '@Bataille de regard avec ton voisin de droite, le premier qui rit fait 5 pompes',
-    '@Pierre-feuille-ciseaux en 3 manches contre ton voisin de droite, le perdant imite un animal',
+    '@Bataille de regard avec ton voisin de droite, le premier qui rit fait 10 squats',
+    '@Pierre-feuille-ciseaux en 3 manches contre ton voisin de droite, le perdant imite un animal choisi par la table',
     '@Concours de grimaces avec ton voisin de droite, la table élit le pire',
-    // Tours de table a categorie
-    'Chacun cite un film d\'horreur, le premier qui sèche mime sa propre mort',
-    'Chacun cite une capitale, le premier qui sèche chante un refrain',
-    'Chacun donne un mot qui rime avec "apéro", le premier qui sèche fait 10 squats',
-    // Rapidite
-    'Le dernier à lever la main mime un animal choisi par la table',
-    'Le dernier à toucher son nez raconte sa dernière honte',
-    'Le dernier à se lever fait 5 pompes',
-    // Collectifs
+    '@Bras de fer de pouces contre ton voisin de droite, le perdant fait 10 squats',
+    '@Ni oui ni non : ton voisin de droite t\'interroge pendant 30 secondes, tu craques = 10 squats',
+    '@Équilibre sur une jambe face à ton voisin de droite : le premier qui pose le pied fait 10 pompes, la table peut vous déconcentrer',
+    '@Battle de air guitar avec ton voisin de droite, la table vote',
+    '@Concours de blagues nulles avec ton voisin de droite, la table élit la pire',
+    'Les deux voisins du gagnant se font un compliment appuyé les yeux dans les yeux, le premier qui rit fait 10 pompes',
+    // Pieges persistants
+    '@Jusqu\'à ton prochain point : parle de toi à la 3e personne',
+    '@Jusqu\'à la fin de la prochaine manche : chuchote tout ce que tu dis',
+    '@Avant chaque phrase, dis "excellente question" jusqu\'à ton prochain point',
+    '@Interdit de dire oui et non jusqu\'à ton prochain point',
+    'Le prochain de la table qui dit "non" fait 10 squats',
+    // Chaos collectif
+    'Tout le monde montre son fond d\'écran, vote pour le pire',
+    'Silence total 20 secondes en se regardant : le premier qui rit fait 10 squats',
+    'Tour de table : chacun sort son excuse bidon pour annuler une soirée, le gagnant élit la plus minable',
+    'Tour de table : chacun cite un red flag en rencard, le premier qui sèche avoue le sien',
     'Tout le monde imite le gagnant pendant 5 secondes',
-    'Tout le monde prend sa meilleure pose, le gagnant élit la pire',
-    // Respirations (votes)
-    'Vote : qui survivrait le plus longtemps dans un film d\'horreur',
-    'Vote : qui est le plus susceptible de devenir célèbre',
+    // Votes qui piquent
+    'Vote : qui a le plus de chances de finir au poste pour un truc débile',
+    'Vote : qui envoie des vocaux de 4 minutes pour rien dire',
+    'Vote : qui stalke le plus ses ex sur Insta',
+    'Vote : qui dit "on verra" et ne vient jamais',
+    'Vote : qui serait éliminé en premier dans Koh-Lanta',
   ],
   en: [
-    '@Act out a movie, the table guesses (30 seconds max)',
-    '@Impersonate someone at the table until they guess who',
-    '@Act like an animal, the table guesses which one',
-    '@Your best dance move, right now',
-    '@Sing a chorus everyone knows',
-    '@Make the table laugh in 20 seconds',
-    '@Speak with an accent until the end of next round',
-    '@Do 10 squats right now',
-    '@Hold a plank for 20 seconds',
-    '@Walk across the room like a runway model',
-    '@Recreate your ID photo face, the table rates it out of 10',
-    '@Summarize the last movie you watched in 15 seconds flat',
-    '@Invent a 15-second ad for the closest object to you',
-    '@Mime your last weekend, the table guesses what you did',
-    '@Impersonate the most memorable teacher or boss you ever had',
-    '@Show the last photo in your camera roll',
-    '@Say the name of your first crush',
-    '@Tell your worst date story in 20 seconds',
+    '@Show the most embarrassing photo in your camera roll, or the table picks a pose you hold for 30 seconds',
+    '@Confess something nobody here knows about you, or do 20 squats',
+    '@Reveal this week\'s screen time, or share your latest embarrassing moment',
+    '@Say who at the table you\'d call to hide a body, or point at who would turn you in',
+    '@Pick who at the table you\'d sacrifice first in a horror movie, or who would make it out alone',
+    '@Say who at the table you\'d trust with your unlocked phone, and who never',
+    '@Your most shameful celebrity crush, or sing your most shameful chorus',
+    '@The weirdest thing you do when you\'re alone, or impersonate someone at the table until they guess who',
+    '@Tell about your worst text sent to the wrong person, or sneeze as dramatically as possible',
+    '@Dance for 15 seconds with no music in total silence, or confess the last time you faked being sick',
+    '@Run in place in slow motion with sound effects, or give a minister\'s speech about the closest object to you',
+    '@Sing a sitcom theme song, or do 10 push-ups',
+    '@Staring contest with the player on your right, first to laugh does 10 squats',
+    '@Rock-paper-scissors, best of 3, against the player on your right, loser acts like an animal picked by the table',
+    '@Funny face contest with the player on your right, the table picks the worst',
+    '@Thumb war against the player on your right, loser does 10 squats',
+    '@No yes, no no: the player on your right grills you for 30 seconds, you slip = 10 squats',
+    '@One-leg balance face-off with the player on your right: first foot down does 10 push-ups, the table may distract you',
+    '@Air guitar battle with the player on your right, the table votes',
+    '@Bad joke contest with the player on your right, the table picks the worst one',
+    'The winner\'s two neighbors give each other a heartfelt compliment while keeping eye contact, first to laugh does 10 push-ups',
+    '@Until your next point: talk about yourself in the third person',
+    '@Until the end of next round: whisper everything you say',
+    '@Say "excellent question" before every sentence until your next point',
     '@No saying yes or no until your next point',
-    '@Until the end of next round, end every sentence with "chief"',
-    '@No saying anyone\'s name at the table until your next point',
-    'Nobody crosses their arms until the end of next round, first to slip shares their latest embarrassing moment',
-    '@Staring contest with the player on your right, first to laugh does 5 push-ups',
-    '@Rock-paper-scissors, best of 3, against the player on your right, loser acts like an animal',
-    '@Funny face contest with the player on your right, the table picks the worst one',
-    'Everyone names a horror movie, first to run dry mimes their own death',
-    'Everyone names a capital city, first to run dry sings a chorus',
-    'Everyone says a word that rhymes with "party", first to run dry does 10 squats',
-    'Last to raise their hand acts like an animal chosen by the table',
-    'Last to touch their nose shares their latest embarrassing moment',
-    'Last to stand up does 5 push-ups',
+    'Next person at the table to say "no" does 10 squats',
+    'Everyone shows their wallpaper, vote for the worst',
+    'Total silence for 20 seconds staring at each other: first to laugh does 10 squats',
+    'Round the table: everyone gives their go-to fake excuse to cancel plans, the winner picks the lamest',
+    'Round the table: everyone names a dating red flag, first to run dry confesses their own',
     'Everyone impersonates the winner for 5 seconds',
-    'Everyone strikes their best pose, the winner picks the worst',
-    'Vote: who would survive the longest in a horror movie',
-    'Vote: most likely to become famous',
+    'Vote: most likely to end up at the police station for something stupid',
+    'Vote: who sends 4-minute voice messages that say nothing',
+    'Vote: who stalks their exes the most on Insta',
+    'Vote: who says "we\'ll see" and never shows up',
+    'Vote: who would be voted out first on a survival show',
   ],
 };
 
@@ -1140,8 +1144,8 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
       // DEFI FUN (mode normal uniquement) : fige ici par le host, comme le
       // gage. Tombe ~1 manche sur 2 (hash deterministe), sauf si l'hote a
       // coupe les defis au salon (settings.defis === false).
-      // OFF par defaut tant que la fournee n'est pas validee (voir Lobby).
-      const defisOn = room.settings?.defis === true;
+      // ON par defaut (fournee validee 16/08), coupable au salon.
+      const defisOn = room.settings?.defis !== false;
       const isDefiRound =
         hashStr(`${entry.cardId}_${room.round || 1}_defiroll`) % 2 === 0;
       const d =

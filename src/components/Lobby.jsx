@@ -129,11 +129,9 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
     await set(ref(db, `rooms/${roomCode}/settings/sorts/${id}`), !sorts[id]);
   }
 
-  // Defis fun du mode normal. OFF par defaut TANT QUE la fournee de textes
-  // n'est pas validee par l'utilisateur (regle : aucun contenu joueur en live
-  // sans validation) — repasser a `!== false` apres validation. L'hote peut
-  // l'activer au salon pour tester.
-  const defisOn = room.settings?.defis === true;
+  // Defis fun du mode normal : ON par defaut (fournee finale validee le
+  // 16/08/2026), l'hote peut couper pour une partie 100% points.
+  const defisOn = room.settings?.defis !== false;
   async function toggleDefis() {
     if (!isHost) return;
     await set(ref(db, `rooms/${roomCode}/settings/defis`), !defisOn);
