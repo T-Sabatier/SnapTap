@@ -27,7 +27,8 @@ const vCode = (gradle.match(/versionCode\s+(\d+)/) || [])[1] || '0';
 // UN SEUL dossier : snap-tap-store/Versions/, fichier nommé à la suite des
 // autres (snap-tap-v<name>-vc<code>.aab). Celui à uploader = le + haut vc.
 const src = join(root, 'android', 'app', 'build', 'outputs', 'bundle', 'release', 'app-release.aab');
-const versionsDir = 'C:/Users/Valky/Desktop/snap-tap-store/Versions';
+// (01/09/2026 : dossier déménagé par l'utilisateur dans "Snaptap Ressources")
+const versionsDir = 'C:/Users/Valky/Desktop/Snaptap Ressources/snap-tap-store/Versions';
 mkdirSync(versionsDir, { recursive: true });
 
 const archive = join(versionsDir, `snap-tap-v${vName}-vc${vCode}.aab`);
