@@ -15,12 +15,15 @@ import Game from './Game.jsx';
 // ============================================================
 
 const POOL = {
-  // g = regle a boire (Mode Apero). c1 = collective, c3 = defi (@).
-  c1: { t: 'Dua Lipa', cat: 'musique', spicy: false, g: "Ceux qui l'ont dans une playlist boivent 2" },
+  // g = regle a boire (Mode Apero), reprise TELLE QUELLE de GAGES.md (regle
+  // editoriale : jamais de gage invente dans les captures marketing).
+  // NB : plus d'exemple de defi individuel (@) dans le pool — le vrai gage
+  // de la Guêpe est collectif ; la roulette se demo via result-defi (normal).
+  c1: { t: 'Dua Lipa', cat: 'musique', spicy: false, g: "Ceux qui l'ont dans une playlist boivent 2 gorgées" },
   c2: { t: 'Tokyo', cat: 'voyages', spicy: false },
-  c3: { t: 'Guêpe à l\'apéro', cat: 'nature', spicy: false, g: '@Chasse une guêpe imaginaire ou bois 2' },
-  c4: { t: 'Raclette', cat: 'bouffe', spicy: false },
-  c5: { t: 'Pizza ananas', cat: 'bouffe', spicy: false, g: 'Team ananas boit 1, les puristes boivent 2' },
+  c3: { t: 'Guêpe à l\'apéro', cat: 'nature', spicy: false, g: 'Tout le monde protège son verre et boit 1 gorgée' },
+  c4: { t: 'Raclette', cat: 'bouffe', spicy: false, g: 'Le dernier à avoir mangé une raclette boit 2 gorgées' },
+  c5: { t: 'Pizza ananas', cat: 'bouffe', spicy: false, g: "Les défenseurs de l'ananas boivent 2 gorgées, fièrement" },
   c6: { t: 'Appeler ton ex', cat: 'bourre', spicy: false },
   c7: { t: 'Chaussettes-claquettes', cat: 'mode', spicy: false },
   c8: { t: 'Sushis', cat: 'bouffe', spicy: false },
@@ -55,11 +58,11 @@ const PLAYERS = {
 // aux decks US et UK (pas dans les 59 overrides UK) → mêmes screenshots valables
 // pour les deux marchés. Mêmes ids que POOL/PLAYERS.
 const EN_POOL = {
-  c1: { t: 'Beyoncé', cat: 'musique', spicy: false, g: 'Anyone with her in a playlist drinks 2' },
+  c1: { t: 'Beyoncé', cat: 'musique', spicy: false, g: 'Anyone with her in a playlist drinks 2 sips' },
   c2: { t: 'Tokyo', cat: 'voyages', spicy: false },
-  c3: { t: 'A wasp at the picnic', cat: 'nature', spicy: false, g: '@Swat an imaginary wasp or drink 2' },
+  c3: { t: 'A wasp at the picnic', cat: 'nature', spicy: false, g: '@Swat an imaginary wasp or drink 2 sips' },
   c4: { t: 'Sushi', cat: 'bouffe', spicy: false },
-  c5: { t: 'Pineapple on pizza', cat: 'bouffe', spicy: false, g: 'Team pineapple drinks 1, purists drink 2' },
+  c5: { t: 'Pineapple on pizza', cat: 'bouffe', spicy: false, g: 'Team pineapple drinks 1 sip, purists drink 2 sips' },
   c6: { t: 'Texting your ex', cat: 'bourre', spicy: false },
   c7: { t: 'Socks with sandals', cat: 'mode', spicy: false },
   c8: { t: 'Ramen', cat: 'bouffe', spicy: false },
@@ -155,11 +158,11 @@ function buildScenario(key, mode, pick, apero, special, sorts, pool, players, la
       // Gagnante = Chloe (sam) avec Pizza ananas (c5). Gagnant != boss.
       // En mode NORMAL (apero off) : defi fun collectif pour visualiser le
       // slam + l'encadre (winnerInfo.defi, comme le poserait le host).
-      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c5', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c5', ...(apero ? {} : { defi: { text: 'Silence total 20 secondes en se regardant : le premier qui rit fait 10 squats', targetId: null } }) } } };
+      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c5', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c5', ...(apero ? {} : { defi: { text: 'Vote : qui envoie des vocaux de 4 minutes pour rien dire', targetId: null } }) } } };
     case 'result-defi':
       // Gagnante = Chloe (sam) avec un defi (c3) → roulette (hors boss/gagnant).
       // En mode NORMAL : defi fun CIBLE (roulette puis slam avec le prenom).
-      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c3', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c3', ...(apero ? {} : { defi: { text: 'Bataille de regard avec ton voisin de droite, le premier qui rit fait 5 pompes', targetId: 'jo' } }) } } };
+      return { kind: 'game', room: { ...base, host: 'me', phase: 'result', bossId: 'alex', mode, played: { me: 'c1', sam: 'c3', jo: 'c20' }, winnerInfo: { playerId: 'sam', cardId: 'c3', ...(apero ? {} : { defi: { text: 'Bataille de regard avec ton voisin de droite, le premier qui rit raconte sa dernière honte', targetId: 'jo' } }) } } };
     case 'result-winner':
       // JE suis le gagnant : boutons J'aime/J'aime pas en bas de l'ecran
       // resultat (lancement direct de la manche suivante, sans ecran
@@ -188,7 +191,7 @@ export default function Debug() {
   const POOL_ACTIVE = safeMode
     ? {
         ...basePool,
-        c1: { t: 'Kebab à 3h du mat', cat: 'bouffe', spicy: false, g: 'Ceux qui ont déjà craqué boivent 2' },
+        c1: { t: 'Kebab à 3h du mat', cat: 'bouffe', spicy: false, g: 'Team kebab boit 1 gorgée, team tacos boit 2 gorgées' },
         c10: { t: 'Marathon', cat: 'sport', spicy: false },
         c12: { t: 'Karaoké', cat: 'musique', spicy: false },
       }
@@ -205,6 +208,10 @@ export default function Debug() {
       : new URLSearchParams();
   const sceneParam = params.get('scene');
   const capParam = params.has('cap');
+  // ?shot=1 : rendu propre comme ?cap, mais SANS figer les annonces (les
+  // slams gage/defi se jouent puis disparaissent → capture de l'ecran
+  // resultat "apres slam", impossible avec cap qui fige tout).
+  const shotParam = params.has('shot');
 
   const [key, setKey] = useState(
     sceneParam && SCENARIOS.some((s) => s.key === sceneParam) ? sceneParam : 'play-hand'
@@ -302,7 +309,7 @@ export default function Debug() {
 
   // Pendant la capture : uniquement l'ecran, plein, sans rien de debug.
   // ?cap=1 dans l'URL → mode capture permanent (pilotage headless).
-  if (capturing || capParam) {
+  if (capturing || capParam || shotParam) {
     return <div>{renderScreen()}</div>;
   }
 
