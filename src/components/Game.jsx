@@ -8,6 +8,7 @@ import {
   fitCard,
   fitBig,
   NAME_STYLE,
+  DEFIS_ENABLED,
 } from '../utils';
 import {
   WINNING_SCORE,
@@ -1155,7 +1156,7 @@ export default function Game({ room, roomCode, playerId, onLeave }) {
         defisMode === 'all' ||
         hashStr(`${entry.cardId}_${room.round || 1}_defiroll`) % 2 === 0;
       const d =
-        !partyMode && defisMode !== 'off' && isDefiRound
+        DEFIS_ENABLED && !partyMode && defisMode !== 'off' && isDefiRound
           ? defiOf(wCard, entry.cardId, room.round || 1, room.players, excluded, room.settings?.lang)
           : null;
       await update(ref(db, `rooms/${roomCode}`), {

@@ -9,6 +9,13 @@ export const PUBLIC_URL = 'https://www.snaptapparty.com';
 export const PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.snaptap.game';
 
+// ⏸️ DÉFIS DU MODE NORMAL COUPÉS (01/09/2026, décision utilisateur : la
+// fournée de 35 ne convient pas en l'état, refonte à venir). Le moteur
+// (GENERIC_DEFIS, roulette, slam, réglage salon) reste en place : repasser
+// à true quand la nouvelle liste est validée. Coupe l'attribution côté
+// host (Game.jsx) ET le réglage au salon (Lobby.jsx).
+export const DEFIS_ENABLED = false;
+
 // Ouvre une URL externe : sur l'app native via le navigateur système
 // (@capacitor/browser) car les liens target="_blank" ne s'ouvrent pas dans la
 // webview ; sur le web via un nouvel onglet.

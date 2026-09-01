@@ -1,7 +1,7 @@
 import { ref, set, remove, update } from 'firebase/database';
 import { Capacitor } from '@capacitor/core';
 import { db } from '../firebase';
-import { shuffle, getStoredName, setStoredName, PUBLIC_URL, NAME_STYLE } from '../utils';
+import { shuffle, getStoredName, setStoredName, PUBLIC_URL, NAME_STYLE, DEFIS_ENABLED } from '../utils';
 import { HAND_SIZE, YELLOW, AMBER, PINK, PLAYER_COLORS, SORTS, PACKS, colorHex, colorFg } from '../cards';
 import { subscribeCards } from '../cardsStore';
 import { subscribeCategories } from '../categoriesStore';
@@ -775,8 +775,9 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
 
         {/* Defis fun du mode normal (sans alcool) : mimes, duels, tours de
             table... ~1 manche sur 2. Cache en Mode Apero (les gages font le
-            show la-bas). ON par defaut. */}
-        {isHost && !partyMode && (
+            show la-bas). ON par defaut. COUPE tant que DEFIS_ENABLED=false
+            (refonte de la liste en cours). */}
+        {DEFIS_ENABLED && isHost && !partyMode && (
         <div className="mb-8">
           <div
             style={{ fontFamily: '"Anton", sans-serif' }}
