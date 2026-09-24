@@ -446,15 +446,20 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
       const isMin = minority === side;
       return (
         <div
-          className={`flex-1 min-w-0 flex flex-col items-center pt-6 pb-12 px-2${side === 'n' ? ' border-l-4 border-black' : ''}`}
+          className={`flex-1 min-w-0 flex flex-col items-center pb-12${side === 'n' ? ' border-l-4 border-black' : ''}`}
           style={{ backgroundColor: color, color: '#FFF' }}
         >
-          <div style={ANTON} className="text-5xl uppercase leading-none mb-7">
+          {/* Bandeau d'en-tête assombri + trait noir : OUI/NON ne se
+              confond plus avec les pseudos (retour utilisateur). */}
+          <div
+            style={{ ...ANTON, backgroundColor: 'rgba(0,0,0,0.28)' }}
+            className="w-full text-center text-4xl uppercase leading-none pt-3 pb-2.5 border-b-4 border-black mb-6"
+          >
             {side === 'y' ? t('debats.yes') : t('debats.no')}
           </div>
           {list.length ? (
             list.map((p) => (
-              <div key={p.id} className="flex flex-col items-center mb-4 max-w-full">
+              <div key={p.id} className="flex flex-col items-center mb-4 max-w-full px-2">
                 <span
                   style={{
                     ...ANTON,
