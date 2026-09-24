@@ -12,6 +12,7 @@ import {
 import Home from './components/Home.jsx';
 import Lobby from './components/Lobby.jsx';
 import Game from './components/Game.jsx';
+import Debats from './components/Debats.jsx';
 import Announcement from './components/Announcement.jsx';
 import Admin from './components/Admin.jsx';
 import Debug from './components/Debug.jsx';
@@ -222,6 +223,10 @@ function GameApp() {
   } else if (room.phase === 'lobby') {
     screen = (
       <Lobby room={room} roomCode={roomCode} playerId={playerId} onLeave={leaveRoom} />
+    );
+  } else if (String(room.phase).startsWith('debat_')) {
+    screen = (
+      <Debats room={room} roomCode={roomCode} playerId={playerId} onLeave={leaveRoom} />
     );
   } else {
     screen = (

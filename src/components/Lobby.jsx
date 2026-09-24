@@ -14,6 +14,12 @@ import { useState, useEffect } from 'react';
 import InstallButton from './InstallButton.jsx';
 import InstallNudge from './InstallNudge.jsx';
 import InstallCta from './InstallCta.jsx';
+import {
+  debatsAvailable,
+  pickDebatQuestions,
+  DEBATS_COUNTS,
+  DEBATS_DEFAULT_COUNT,
+} from '../debats';
 
 export default function Lobby({ room, roomCode, playerId, onLeave }) {
   const t = useT();
@@ -114,7 +120,59 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
   const totalAvailable = playableCards.filter((c) => cats[c.cat]).length;
   const enoughPlayers = players.length >= 3;
   const enoughCards = totalAvailable >= players.length * HAND_SIZE + 8;
-  const canStart = enoughPlayers && enoughCards && playableCards.length > 0 && allNamed;
+  // MODE DÉBATS : proposé seulement en français (deck FR) et, tant que
+  // l'achat n'est pas branché, seulement sur la preview / en dev.
+  const showDebats =
+    debatsAvailable() && String(room.settings?.lang || 'fr').startsWith('fr');
+  const isDebats = showDebats && room.settings?.game === 'debats';
+  const debatsDeck = room.settings?.debatsDeck === 'adult' ? 'adult' : 'soft';
+  const debatsCount = room.settings?.debatsCount || DEBATS_DEFAULT_COUNT;
+  const [ageConfirm, setAgeConfirm] = useState(false);
+  const canStart = isDebats
+    ? enoughPlayers && allNamed
+    : enoughPlayers && enoughCards && playableCards.length > 0 && allNamed;
+
+  async function pickGame(mode) {
+    if (!isHost) return;
+    await set(ref(db, `rooms/${roomCode}/settings/game`), mode);
+  }
+  async function pickDebatsDeck(deck) {
+    if (!isHost) return;
+    await set(ref(db, `rooms/${roomCode}/settings/debatsDeck`), deck);
+  }
+  async function pickDebatsCount(n) {
+    if (!isHost) return;
+    await set(ref(db, `rooms/${roomCode}/settings/debatsCount`), n);
+  }
+
+  async function startDebats() {
+    const playersUpdate = {};
+    const usedColors = new Set(players.filter((p) => p.color).map((p) => p.color));
+    const freeColors = shuffle(
+      PLAYER_COLORS.filter((c) => !usedColors.has(c.id)).map((c) => c.id)
+    );
+    let colorCursor = 0;
+    players.forEach((p) => {
+      playersUpdate[p.id] = {
+        name: p.name,
+        score: 0,
+        joinedAt: p.joinedAt,
+        color: p.color || freeColors[colorCursor++] || PLAYER_COLORS[0].id,
+      };
+    });
+    await update(ref(db, `rooms/${roomCode}`), {
+      phase: 'debat_vote',
+      players: playersUpdate,
+      debats: { qs: pickDebatQuestions(debatsDeck, debatsCount), i: 0, gid: Date.now() },
+    });
+    bumpStats({
+      gamesStarted: 1,
+      debatsStarted: 1,
+      playersTotal: players.length,
+      ...(debatsDeck === 'adult' ? { debatsAdult: 1 } : {}),
+      ...(partyMode ? { partyStarted: 1 } : {}),
+    });
+  }
 
   async function toggleCat(id) {
     if (!isHost) return;
@@ -175,6 +233,10 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
 
   async function startGame() {
     if (!isHost || !canStart) return;
+    if (isDebats) {
+      await startDebats();
+      return;
+    }
 
     const enabled = playableCards.filter((c) => cats[c.cat]);
     const shuffled = shuffle(enabled).map((c, i) => ({ ...c, id: `c${i}` }));
@@ -533,7 +595,163 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
           </div>
         </div>
 
-        {isHost && (
+        {/* MODE DE JEU : Classique / Débats (hôte). */}
+        {isHost && showDebats && (
+        <div className="mb-8">
+          <div
+            style={{ fontFamily: '"Anton", sans-serif' }}
+            className="text-2xl uppercase mb-3"
+          >
+            {t('debats.gameMode')}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { id: 'classic', label: t('debats.classic'), desc: t('debats.classicDesc') },
+              { id: 'debats', label: t('debats.name'), desc: t('debats.desc') },
+            ].map((o) => {
+              const selected = (o.id === 'debats') === isDebats;
+              return (
+                <button
+                  key={o.id}
+                  onClick={() => pickGame(o.id)}
+                  style={{
+                    backgroundColor: selected ? '#000' : '#FFF',
+                    color: selected ? YELLOW : '#000',
+                    boxShadow: '4px 4px 0 #000',
+                  }}
+                  className="border-4 border-black px-3 py-3 text-left active:translate-x-[2px] active:translate-y-[2px]"
+                >
+                  <div
+                    style={{ fontFamily: '"Anton", sans-serif' }}
+                    className="uppercase text-2xl leading-none"
+                  >
+                    {o.label}
+                  </div>
+                  <div
+                    style={{ fontFamily: '"Space Mono", monospace' }}
+                    className="text-[9px] uppercase tracking-widest mt-1.5 opacity-80 leading-snug"
+                  >
+                    {o.desc}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        )}
+
+        {isHost && isDebats && (
+        <div className="mb-8">
+          <div
+            style={{ fontFamily: '"Anton", sans-serif' }}
+            className="text-2xl uppercase mb-3"
+          >
+            {t('debats.option')}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { id: 'soft', label: t('debats.soft'), desc: t('debats.softDesc') },
+              { id: 'adult', label: `${t('debats.adult')} 🔞`, desc: t('debats.adultDesc') },
+            ].map((o) => {
+              const selected = debatsDeck === o.id;
+              const adult = o.id === 'adult';
+              return (
+                <button
+                  key={o.id}
+                  onClick={() => (adult && !selected ? setAgeConfirm(true) : pickDebatsDeck(o.id))}
+                  style={{
+                    backgroundColor: selected ? (adult ? PINK : '#000') : '#FFF',
+                    color: selected ? (adult ? '#FFF' : YELLOW) : '#000',
+                    boxShadow: '4px 4px 0 #000',
+                  }}
+                  className="border-4 border-black px-3 py-3 text-left active:translate-x-[2px] active:translate-y-[2px]"
+                >
+                  <div
+                    style={{ fontFamily: '"Anton", sans-serif' }}
+                    className="uppercase text-2xl leading-none"
+                  >
+                    {o.label}
+                  </div>
+                  <div
+                    style={{ fontFamily: '"Space Mono", monospace' }}
+                    className="text-[9px] uppercase tracking-widest mt-1.5 opacity-80 leading-snug"
+                  >
+                    {o.desc}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        )}
+
+        {isHost && isDebats && (
+        <div className="mb-8">
+          <div
+            style={{ fontFamily: '"Anton", sans-serif' }}
+            className="text-2xl uppercase mb-1"
+          >
+            {t('debats.count')}
+          </div>
+          <div
+            style={{ fontFamily: '"Space Mono", monospace' }}
+            className="text-[10px] uppercase tracking-widest mb-3 opacity-70"
+          >
+            {t('debats.countHint', { n: debatsCount })}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {DEBATS_COUNTS.map((n) => {
+              const selected = debatsCount === n;
+              return (
+                <button
+                  key={n}
+                  onClick={() => pickDebatsCount(n)}
+                  style={{
+                    backgroundColor: selected ? '#000' : '#FFF',
+                    color: selected ? YELLOW : '#000',
+                    boxShadow: '4px 4px 0 #000',
+                    minWidth: 56,
+                  }}
+                  className="border-4 border-black px-4 py-2 active:translate-x-[2px] active:translate-y-[2px]"
+                >
+                  <span
+                    style={{ fontFamily: '"Anton", sans-serif' }}
+                    className="uppercase text-2xl leading-none"
+                  >
+                    {n}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        )}
+
+        {/* Règles du mode Débats : visibles par TOUS (les invités voient
+            aussi quel mode l'hôte a choisi). */}
+        {isDebats && (
+        <div
+          className="border-4 border-black p-4 mb-8"
+          style={{ backgroundColor: '#000', color: '#FFF', boxShadow: `6px 6px 0 ${PINK}` }}
+        >
+          <div
+            style={{ fontFamily: '"Anton", sans-serif', color: YELLOW }}
+            className="text-2xl uppercase mb-2"
+          >
+            {t('debats.guestBanner', {
+              option: debatsDeck === 'adult' ? t('debats.adult') : t('debats.soft'),
+            })}
+          </div>
+          <ul className="text-sm leading-relaxed space-y-1">
+            {t('debats.rules').map((r, i) => (
+              <li key={i} dangerouslySetInnerHTML={{ __html: r }} />
+            ))}
+            {partyMode && <li dangerouslySetInnerHTML={{ __html: t('debats.rulesApero') }} />}
+          </ul>
+        </div>
+        )}
+
+        {isHost && !isDebats && (
         <div className="mb-8">
           <div
             style={{ fontFamily: '"Anton", sans-serif' }}
@@ -578,7 +796,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
         </div>
         )}
 
-        {isHost && (
+        {isHost && !isDebats && (
         <div className="mb-8">
           <div
             style={{ fontFamily: '"Anton", sans-serif' }}
@@ -624,7 +842,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
         </div>
         )}
 
-        {isHost && (
+        {isHost && !isDebats && (
         <div className="mb-8">
           <div
             style={{ fontFamily: '"Anton", sans-serif' }}
@@ -710,7 +928,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
         </div>
         )}
 
-        {isHost && (
+        {isHost && !isDebats && (
         <div className="mb-8">
           <div
             style={{ fontFamily: '"Anton", sans-serif' }}
@@ -824,7 +1042,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
 
         {/* Regles du Mode Apero — en bas, au-dessus de "Telecharger l'app".
             Visibles par TOUS quand le mode est actif. Pliable (bouton titre). */}
-        {partyMode && (
+        {partyMode && !isDebats && (
         <div
           className="border-4 border-black p-4 mb-6"
           style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
@@ -883,7 +1101,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   {t('lobby.need3')}
                 </div>
               )}
-              {enoughPlayers && !enoughCards && (
+              {!isDebats && enoughPlayers && !enoughCards && (
                 <div
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest mb-2 text-center"
@@ -891,7 +1109,7 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
                   {t('lobby.notEnoughCards')}
                 </div>
               )}
-              {enoughPlayers && enoughCards && !allNamed && (
+              {enoughPlayers && (enoughCards || isDebats) && !allNamed && (
                 <div
                   style={{ fontFamily: '"Space Mono", monospace' }}
                   className="text-[10px] uppercase tracking-widest mb-2 text-center"
@@ -919,6 +1137,53 @@ export default function Lobby({ room, roomCode, playerId, onLeave }) {
           )}
         </div>
       </div>
+
+      {/* Confirmation d'âge avant l'option Adulte du mode Débats. */}
+      {ageConfirm && (
+        <div
+          onClick={() => setAgeConfirm(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="border-4 border-black bg-white w-full max-w-sm p-6"
+            style={{ boxShadow: '8px 8px 0 #000' }}
+          >
+            <div
+              style={{ fontFamily: '"Anton", sans-serif' }}
+              className="text-3xl uppercase leading-none mb-3 text-center"
+            >
+              🔞 {t('debats.ageTitle')}
+            </div>
+            <p
+              className="text-sm mb-5 text-center"
+              dangerouslySetInnerHTML={{ __html: t('debats.ageText') }}
+            />
+            <button
+              onClick={() => {
+                pickDebatsDeck('adult');
+                setAgeConfirm(false);
+              }}
+              className="w-full border-4 border-black py-3 mb-3 active:translate-x-[2px] active:translate-y-[2px]"
+              style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '4px 4px 0 #000' }}
+            >
+              <span style={{ fontFamily: '"Anton", sans-serif' }} className="text-xl uppercase">
+                {t('debats.ageYes')}
+              </span>
+            </button>
+            <button
+              onClick={() => setAgeConfirm(false)}
+              className="w-full border-4 border-black py-2 bg-white active:translate-x-[2px] active:translate-y-[2px]"
+              style={{ boxShadow: '3px 3px 0 #000' }}
+            >
+              <span style={{ fontFamily: '"Anton", sans-serif' }} className="text-lg uppercase">
+                {t('debats.ageNo')}
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Teaser pack premium (tap sur une categorie verrouillee). En natif :
           achat reel (RevenueCat) ; sur web : "Dispo dans l'app". */}
