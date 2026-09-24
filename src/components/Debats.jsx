@@ -445,20 +445,23 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
       const isMin = minority === side;
       return (
         <div
-          className="flex-1 border-4 border-black min-w-0 px-3 pt-4 pb-5 flex flex-col items-center"
+          className="flex-1 border-4 border-black min-w-0 px-3 pt-0 pb-5 flex flex-col items-center"
           style={{
             backgroundColor: color,
             color: '#FFF',
-            minHeight: 200,
+            minHeight: 170,
             boxShadow: isMin ? `7px 7px 0 ${th.hi}` : `5px 5px 0 ${th.shadow}`,
             transform: isMin ? `rotate(${side === 'y' ? -2 : 2}deg)` : 'none',
           }}
         >
-          <div style={ANTON} className="text-4xl uppercase leading-none">
+          {/* Étiquette noire qui chevauche le bord, façon "Débattez !" (le
+              gros titre + "2 votes" faisait moche). Le nombre de votes se
+              voit aux prénoms. */}
+          <div
+            style={{ ...ANTON, backgroundColor: '#000', color: '#FFF', transform: `rotate(${side === 'y' ? -4 : 4}deg)` }}
+            className="-mt-8 mb-5 border-4 border-black px-4 pt-1.5 pb-1 text-3xl uppercase leading-none"
+          >
             {side === 'y' ? t('debats.yes') : t('debats.no')}
-          </div>
-          <div style={MONO} className="text-[10px] uppercase tracking-widest opacity-80 mt-1 mb-4">
-            {list.length} {list.length > 1 ? 'votes' : 'vote'}
           </div>
           <div className="flex flex-col items-center gap-3 w-full">
             {list.length ? (
@@ -489,7 +492,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         <div style={ANTON} className="text-xl uppercase leading-tight text-center opacity-80 mb-5 px-2">
           {nbsp(q.t)}
         </div>
-        <div className="flex gap-4 mb-7 items-start">
+        <div className="flex gap-4 mb-7 mt-9 items-start">
           {col('y', yes, th.yes)}
           {col('n', no, th.no)}
         </div>
