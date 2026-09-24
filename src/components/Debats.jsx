@@ -31,6 +31,10 @@ function questionSize(text) {
   return '1.45rem';
 }
 
+// Espace insécable avant « ? » : le point d'interrogation ne se retrouve
+// jamais seul sur la dernière ligne.
+const nbsp = (text) => text.replace(/ ?/g, '00A0?');
+
 function NameChip({ p }) {
   const bg = colorHex(p?.color) || '#FFF';
   return (
@@ -129,7 +133,10 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
           text: '#FFF',
           panel: '#45102A',
           panelText: '#FFF',
-          shadow: PINK,
+          // Ombres NOIRES : le rose néon sur fond framboise faisait bizarre
+          // (retour utilisateur) ; le blanc marque la minorité.
+          shadow: '#000',
+          hi: '#FFF',
           yes: PINK,
           no: '#5B1A8C',
           bar: '#5A0F30',
@@ -143,6 +150,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
           panel: '#FFF',
           panelText: '#000',
           shadow: '#000',
+          hi: PINK,
           yes: LIKE_GREEN,
           no: DISLIKE_RED,
           bar: bg,
@@ -428,7 +436,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
       return (
         <div
           className="flex-1 border-4 border-black min-w-0"
-          style={{ ...panel, boxShadow: isMin ? `6px 6px 0 ${PINK}` : `4px 4px 0 ${th.shadow === PINK ? '#000' : th.shadow}` }}
+          style={{ ...panel, boxShadow: isMin ? `6px 6px 0 ${th.hi}` : `4px 4px 0 ${th.shadow}` }}
         >
           <div style={{ ...ANTON, backgroundColor: color, color: '#FFF' }} className="border-b-4 border-black text-center text-3xl uppercase py-2">
             {side === 'y' ? t('debats.yes') : t('debats.no')}
@@ -459,7 +467,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
           style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}
         >
           <div style={ANTON} className="text-2xl uppercase leading-tight">
-            {q.t}
+            {nbsp(q.t)}
           </div>
         </div>
         <div className="flex gap-3 mb-4">
@@ -547,7 +555,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         style={{ ...panel, boxShadow: `8px 8px 0 ${th.shadow}` }}
       >
         <div style={{ ...ANTON, fontSize: questionSize(q.t) }} className="uppercase leading-tight">
-          {q.t}
+          {nbsp(q.t)}
         </div>
       </div>
       <div className="flex gap-4 mb-4">
