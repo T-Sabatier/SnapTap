@@ -122,17 +122,17 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
   const th =
     deck === 'adult'
       ? {
-          page: '#12030A',
+          page: '#5A0F30',
           pageImg:
-            'radial-gradient(120% 70% at 50% -10%, #7A1440 0%, #3A0820 45%, #12030A 100%)',
+            'radial-gradient(130% 80% at 50% 0%, #C2336F 0%, #8A1C4C 50%, #5A0F30 100%)',
           pageClass: '',
           text: '#FFF',
-          panel: '#2A0916',
+          panel: '#45102A',
           panelText: '#FFF',
           shadow: PINK,
           yes: PINK,
           no: '#5B1A8C',
-          bar: '#1A040E',
+          bar: '#5A0F30',
           debate: { bg: PINK, fg: '#FFF', shadow: '#000' },
         }
       : {
