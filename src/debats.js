@@ -427,8 +427,8 @@ const GAGES = [
   ['Rime à chaque phrase.', 'show', 1],
 ].map(([t, kind, durable]) => ({ t, kind, ...(durable ? { durable: 1 } : {}) }));
 
-// Temps de vote de la table (ms).
-export const GAGE_VOTE_MS = 15000;
+// Temps de vote de la table (ms) : 20 s (15 s jugé un peu court).
+export const GAGE_VOTE_MS = 20000;
 
 // 3 gages au hasard : 1 calme garanti + 2 autres, mélangés.
 export function pickGageOptions() {

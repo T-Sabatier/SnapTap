@@ -264,6 +264,7 @@ export const en = {
     lobbyConfirm: 'Back to the lobby? The game ends for everyone.',
     waitHost: 'Waiting for the host…',
     gageBtn: 'The dare!',
+    gageSoon: 'Dare vote coming up…',
     gageTitle: 'Vote for the dare!',
     gageWait: 'The table decides your fate…',
     gageVoted: '{n}/{total} voted',

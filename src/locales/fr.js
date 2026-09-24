@@ -264,6 +264,7 @@ export const fr = {
     lobbyConfirm: "Retour au salon ? La partie s'arrête pour tout le monde.",
     waitHost: "En attente de l'hôte…",
     gageBtn: 'Le gage !',
+    gageSoon: 'Le vote du gage arrive…',
     gageTitle: 'Votez son gage !',
     gageWait: 'La table choisit ton sort…',
     gageVoted: '{n}/{total} ont voté',

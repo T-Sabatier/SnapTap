@@ -349,6 +349,15 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
     }
   }
 
+  // Dès qu'il y a un mouton noir (Normal), le vote du gage s'enchaîne tout
+  // seul à la fin du slam (demande utilisateur : plus de bouton "Le gage !").
+  useEffect(() => {
+    if (room.phase !== 'debat_reveal' || !isDriver || !needGage) return undefined;
+    const id = setTimeout(startGage, MOUTON_SLAM.end);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room.phase, isDriver, needGage, i]);
+
   async function castGageVote(k) {
     if (room.phase !== 'debat_gage' || gWho.includes(playerId)) return;
     await set(ref(db, `rooms/${roomCode}/debats/gvotes/${playerId}`), k);
@@ -644,16 +653,20 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         )}
         <div className="fixed bottom-0 left-0 right-0 p-4 border-t-4" style={{ backgroundColor: th.bar, borderColor: th.shadow }}>
           <div className="max-w-md mx-auto">
-            {isDriver ? (
+            {needGage ? (
+              <div style={MONO} className="text-center text-[10px] uppercase tracking-widest opacity-70 py-3">
+                {t('debats.gageSoon')}
+              </div>
+            ) : isDriver ? (
               <button
-                onClick={needGage ? startGage : next}
+                onClick={next}
                 disabled={!canNext || busy}
                 className="w-full border-4 border-black py-4 disabled:opacity-40 active:translate-x-[2px] active:translate-y-[2px]"
                 style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
               >
                 <span className="flex items-center justify-center gap-3">
                   <span style={ANTON} className="text-2xl uppercase">
-                    {needGage ? t('debats.gageBtn') : i + 1 >= n ? t('debats.finish') : t('debats.next')}
+                    {i + 1 >= n ? t('debats.finish') : t('debats.next')}
                   </span>
                   <ChevronRight size={28} />
                 </span>
