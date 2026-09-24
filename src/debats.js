@@ -368,3 +368,72 @@ export function pickDebatQuestions(deck, n) {
   const { out } = arrange(drawFresh(DEBATS_SOFT, n + 4, 'soft'), { maxIci: 1 });
   return out.slice(0, n).map(({ t, tone }) => ({ t, tone }));
 }
+
+// ---------- Gages du MOUTON NOIR (mode Normal, sans alcool) ----------
+// Validés par l'utilisateur le 24/09/2026. La TABLE vote parmi 3 gages tirés
+// au hasard, dont toujours au moins 1 calme (pour les timides).
+// Format : [texte, 'calme' | 'show', durable?]. Durable = règle qui tient
+// jusqu'au prochain mouton noir.
+const GAGES = [
+  ['10 squats.', 'calme'],
+  ['La planche, 20 secondes.', 'calme'],
+  ['10 pompes.', 'calme'],
+  ['Danse 10 secondes sans musique.', 'show'],
+  ['Chaise contre le mur, 20 secondes.', 'calme'],
+  ['3 tours sur toi-même, puis marche droit.', 'calme'],
+  ["Tiens sur un pied jusqu'à la prochaine question.", 'calme'],
+  ['Chante un refrain.', 'show'],
+  ['Mime un film, la table devine.', 'show'],
+  ["Imite quelqu'un ici, la table devine qui.", 'show'],
+  ["Ton meilleur cri d'animal.", 'show'],
+  ['Rappe ta journée en 4 phrases.', 'show'],
+  ['Fais une pub pour ton voisin de droite.', 'show'],
+  ['Présente la météo comme à la télé.', 'show'],
+  ['Discours de mariage pour 2 joueurs.', 'show'],
+  ['Présente-toi comme dans une télé-réalité.', 'show'],
+  ['Raconte ta pire honte.', 'show'],
+  ['Raconte ton pire date.', 'show'],
+  ['Avoue ton plaisir coupable.', 'show'],
+  ['Dis ta pire habitude.', 'show'],
+  ['Raconte ton plus gros mensonge.', 'show'],
+  ['Un compliment à chaque joueur.', 'calme'],
+  ["Déclaration d'amour à ton voisin de droite.", 'show'],
+  ['Dis ce que tu préfères chez ton voisin de gauche.', 'show'],
+  ['Serre la main de tout le monde, très sérieusement.', 'calme'],
+  ['Câlin au joueur de ton choix.', 'show'],
+  ['Regarde ton voisin dans les yeux 20 s sans rire.', 'calme'],
+  ['Reste sérieux, la table essaie de te faire rire.', 'show'],
+  ["Fais rire quelqu'un en 10 secondes.", 'show'],
+  ['La table te pose une question, tu réponds.', 'show'],
+  ['La table te choisit un surnom pour la partie.', 'calme'],
+  ['Ton voisin de droite te coiffe.', 'show'],
+  ['La table choisit ta pose pour une photo.', 'show'],
+  ['Échange ta place avec qui tu veux.', 'calme'],
+  ["Montre ton fond d'écran.", 'calme'],
+  ['Montre ta dernière photo.', 'calme'],
+  ['5 capitales en 10 secondes.', 'calme'],
+  ["L'alphabet à l'envers jusqu'à M.", 'calme'],
+  ['Parle avec un accent.', 'show', 1],
+  ['Parle de toi à la 3ᵉ personne.', 'show', 1],
+  ['Interdit de dire « oui » ou « non » à voix haute.', 'calme', 1],
+  ['Finis chaque phrase par « mon capitaine ».', 'show', 1],
+  ['Interdit de montrer tes dents.', 'calme', 1],
+  ['Lève la main avant de parler.', 'calme', 1],
+  ['Vouvoie tout le monde.', 'calme', 1],
+  ['Parle en chuchotant.', 'calme', 1],
+  ['Appelle tout le monde « chef ».', 'calme', 1],
+  ['Interdit de dire les prénoms.', 'calme', 1],
+  ['Parle comme un robot.', 'show', 1],
+  ['Rime à chaque phrase.', 'show', 1],
+].map(([t, kind, durable]) => ({ t, kind, ...(durable ? { durable: 1 } : {}) }));
+
+// Temps de vote de la table (ms).
+export const GAGE_VOTE_MS = 15000;
+
+// 3 gages au hasard : 1 calme garanti + 2 autres, mélangés.
+export function pickGageOptions() {
+  const calm = shuffled(GAGES.filter((g) => g.kind === 'calme'));
+  const first = calm[0];
+  const rest = shuffled(GAGES.filter((g) => g !== first)).slice(0, 2);
+  return shuffled([first, ...rest]);
+}

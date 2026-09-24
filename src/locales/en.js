@@ -263,6 +263,12 @@ export const en = {
     lobbyBtn: 'Lobby',
     lobbyConfirm: 'Back to the lobby? The game ends for everyone.',
     waitHost: 'Waiting for the host…',
+    gageBtn: 'The dare!',
+    gageTitle: 'Vote for the dare!',
+    gageWait: 'The table decides your fate…',
+    gageVoted: '{n}/{total} voted',
+    gageKicker: '🐑 Black sheep dare',
+    untilNext: 'Until the next black sheep',
   },
   spells: {
     rerollDesc: 'Discard your hand and draw 7 new cards',

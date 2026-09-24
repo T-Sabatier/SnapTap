@@ -4,7 +4,13 @@ import { LogOut, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { db } from '../firebase';
 import { toArray } from '../utils';
 import { YELLOW, AMBER, PINK, LIKE_GREEN, DISLIKE_RED, colorHex, colorFg } from '../cards';
-import { MOUTON_AT, DEBATS_DEFAULT_COUNT, pickDebatQuestions } from '../debats';
+import {
+  MOUTON_AT,
+  DEBATS_DEFAULT_COUNT,
+  GAGE_VOTE_MS,
+  pickDebatQuestions,
+  pickGageOptions,
+} from '../debats';
 import { useT } from '../i18n.jsx';
 import { bumpStats } from '../stats';
 
@@ -14,6 +20,10 @@ import { bumpStats } from '../stats';
 // plein écran, 2 gorgées en Apéro, juste le titre en Normal) et retour à 0.
 //
 // Phases : debat_vote → debat_reveal → (question suivante | debat_end).
+// En Normal (sans alcool), un mouton noir déclenche en plus :
+// debat_reveal → debat_gage (la TABLE vote parmi 3 gages, 15 s) →
+// debat_gage_result → question suivante. Les gages "durables" restent
+// affichés (debats.rule) jusqu'au prochain mouton noir.
 // État dans room.debats : { qs: [{t, tone}], i, votes: {pid: 'y'|'n'},
 // marks: {pid: n}, totals: {pid: n}, reveal: {yes, no, minority, moutons} }.
 // L'hôte "pilote" (révélation auto, question suivante) ; s'il est parti,
@@ -30,6 +40,8 @@ function questionSize(text) {
   if (len < 46) return '1.75rem';
   return '1.45rem';
 }
+
+const moutonCountOf = (d) => toArray(d.reveal?.moutons).length;
 
 // Espace insécable avant « ? » : le point d'interrogation ne se retrouve
 // jamais seul sur la dernière ligne.
@@ -220,6 +232,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         'debats/reveal': { yes, no, minority, moutons },
         'debats/marks': nextMarks,
         'debats/totals': nextTotals,
+        ...(moutons.length ? { 'debats/rule': null } : {}),
       });
     } catch {
       revealedFor.current = '';
@@ -239,13 +252,20 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
     setBusy(true);
     try {
       if (i + 1 >= n) {
-        await update(ref(db, `rooms/${roomCode}`), { phase: 'debat_end', 'debats/votes': null });
+        await update(ref(db, `rooms/${roomCode}`), {
+          phase: 'debat_end',
+          'debats/votes': null,
+          'debats/gage': null,
+          'debats/gvotes': null,
+        });
       } else {
         await update(ref(db, `rooms/${roomCode}`), {
           phase: 'debat_vote',
           'debats/i': i + 1,
           'debats/votes': null,
           'debats/reveal': null,
+          'debats/gage': null,
+          'debats/gvotes': null,
         });
       }
     } finally {
@@ -302,15 +322,85 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
     }
   }
 
+  // ---------- Gage du mouton noir (Normal) : la table vote ----------
+  const gage = d.gage || null;
+  const gOpts = toArray(gage?.opts);
+  const gWho = toArray(gage?.who);
+  const gVotes = d.gvotes || {};
+  const gVoters = players.filter((p) => !gWho.includes(p.id));
+  const gVotedCount = gVoters.filter((p) => gVotes[p.id] != null).length;
+  const needGage = moutonCountOf(d) > 0 && !partyMode;
+
+  async function startGage() {
+    if (!isDriver || busy) return;
+    setBusy(true);
+    try {
+      await update(ref(db, `rooms/${roomCode}`), {
+        phase: 'debat_gage',
+        'debats/gage': {
+          opts: pickGageOptions(),
+          who: toArray(d.reveal?.moutons),
+          ends: Date.now() + GAGE_VOTE_MS,
+        },
+        'debats/gvotes': null,
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function castGageVote(k) {
+    if (room.phase !== 'debat_gage' || gWho.includes(playerId)) return;
+    await set(ref(db, `rooms/${roomCode}/debats/gvotes/${playerId}`), k);
+  }
+
+  // Dépouillement : le plus de voix gagne ; égalité (ou aucun vote) → tirage.
+  const resolvedFor = useRef('');
+  async function resolveGage() {
+    const key = `${d.gid || ''}:${i}`;
+    if (!isDriver || room.phase !== 'debat_gage' || resolvedFor.current === key) return;
+    resolvedFor.current = key;
+    const counts = gOpts.map((_, k) => gVoters.filter((p) => gVotes[p.id] === k).length);
+    const best = Math.max(0, ...counts);
+    const top = counts.map((c, k) => (c === best ? k : -1)).filter((k) => k >= 0);
+    const win = top[Math.floor(Math.random() * top.length)] ?? 0;
+    const chosen = gOpts[win];
+    try {
+      await update(ref(db, `rooms/${roomCode}`), {
+        phase: 'debat_gage_result',
+        'debats/gage/win': win,
+        ...(chosen?.durable ? { 'debats/rule': { who: gWho, t: chosen.t } } : {}),
+      });
+    } catch {
+      resolvedFor.current = '';
+    }
+  }
+
+  // Tout le monde a voté → dépouillement ; sinon à la fin du chrono.
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    if (room.phase !== 'debat_gage') return undefined;
+    const id = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(id);
+  }, [room.phase]);
+  const gageLeft = Math.max(0, Math.ceil(((gage?.ends || 0) - now) / 1000));
+  useEffect(() => {
+    if (room.phase !== 'debat_gage' || !isDriver) return;
+    const allIn = gVoters.length > 0 && gVotedCount >= gVoters.length;
+    if (allIn || gageLeft <= 0) resolveGage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room.phase, isDriver, gVotedCount, gageLeft]);
+
   // Bouton "suivante" grisé 2.5 s après la révélation : on lit les camps
   // (et on commence à débattre) avant de pouvoir enchaîner. S'il y a un
   // mouton noir, grisé jusqu'à la fin de son slam.
   const [canNext, setCanNext] = useState(false);
   const moutonCount = toArray(d.reveal?.moutons).length;
   useEffect(() => {
-    if (room.phase !== 'debat_reveal') return undefined;
+    if (room.phase !== 'debat_reveal' && room.phase !== 'debat_gage_result') return undefined;
     setCanNext(false);
-    const id = setTimeout(() => setCanNext(true), moutonCount ? MOUTON_SLAM.end : 2500);
+    const wait = room.phase === 'debat_gage_result' ? 2000 : moutonCount ? MOUTON_SLAM.end : 2500;
+    const id = setTimeout(() => setCanNext(true), wait);
     return () => clearTimeout(id);
   }, [room.phase, i, moutonCount]);
 
@@ -556,14 +646,14 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
           <div className="max-w-md mx-auto">
             {isDriver ? (
               <button
-                onClick={next}
+                onClick={needGage ? startGage : next}
                 disabled={!canNext || busy}
                 className="w-full border-4 border-black py-4 disabled:opacity-40 active:translate-x-[2px] active:translate-y-[2px]"
                 style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
               >
                 <span className="flex items-center justify-center gap-3">
                   <span style={ANTON} className="text-2xl uppercase">
-                    {i + 1 >= n ? t('debats.finish') : t('debats.next')}
+                    {needGage ? t('debats.gageBtn') : i + 1 >= n ? t('debats.finish') : t('debats.next')}
                   </span>
                   <ChevronRight size={28} />
                 </span>
@@ -575,6 +665,142 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
             )}
           </div>
         </div>
+      </>
+    );
+  }
+
+  const names = (ids) =>
+    ids
+      .map((id) => byId[id]?.name)
+      .filter(Boolean)
+      .join(' & ');
+  const bottomBar = (content) => (
+    <div className="fixed bottom-0 left-0 right-0 p-4 border-t-4" style={{ backgroundColor: th.bar, borderColor: th.shadow }}>
+      <div className="max-w-md mx-auto">{content}</div>
+    </div>
+  );
+  const nextButton = bottomBar(
+    isDriver ? (
+      <button
+        onClick={next}
+        disabled={!canNext || busy}
+        className="w-full border-4 border-black py-4 disabled:opacity-40 active:translate-x-[2px] active:translate-y-[2px]"
+        style={{ backgroundColor: PINK, color: '#FFF', boxShadow: '6px 6px 0 #000' }}
+      >
+        <span className="flex items-center justify-center gap-3">
+          <span style={ANTON} className="text-2xl uppercase">
+            {i + 1 >= n ? t('debats.finish') : t('debats.next')}
+          </span>
+          <ChevronRight size={28} />
+        </span>
+      </button>
+    ) : (
+      <div style={MONO} className="text-center text-[10px] uppercase tracking-widest opacity-60 py-3">
+        {t('debats.waitNext', { name: driverName })}
+      </div>
+    )
+  );
+  const sticker = (p, size = 'text-5xl') => (
+    <span
+      key={p.id}
+      style={{
+        ...ANTON,
+        color: colorHex(p.color) || '#FFF',
+        WebkitTextStroke: '0.1em #000',
+        paintOrder: 'stroke fill',
+        letterSpacing: '0.05em',
+      }}
+      className={`${size} uppercase leading-tight text-center break-all`}
+    >
+      {p.name}
+    </span>
+  );
+
+  // ===== GAGE : la table vote =====
+  if (room.phase === 'debat_gage') {
+    const iAmMouton = gWho.includes(playerId);
+    const myPick = gVotes[playerId];
+    return wrap(
+      <>
+        <div className="text-center mb-5">
+          <div style={{ ...MONO }} className="text-xs uppercase tracking-[0.3em] mb-2">
+            {t('debats.moutonKicker')}
+          </div>
+          <div className="flex flex-wrap justify-center gap-x-3">
+            {gWho.map((id) => byId[id]).filter(Boolean).map((p) => sticker(p))}
+          </div>
+          <div style={ANTON} className="text-2xl uppercase mt-3">
+            {iAmMouton ? t('debats.gageWait') : t('debats.gageTitle')}
+          </div>
+        </div>
+        <div className="flex flex-col gap-4 mb-6">
+          {gOpts.map((g, k) => {
+            const mine = myPick === k;
+            return (
+              <button
+                key={k}
+                onClick={() => castGageVote(k)}
+                disabled={iAmMouton}
+                className="border-4 border-black px-4 py-4 text-left flex items-center gap-3 active:translate-x-[2px] active:translate-y-[2px]"
+                style={{
+                  ...(mine ? { backgroundColor: PINK, color: '#FFF' } : panel),
+                  boxShadow: mine ? '0 0 0 #000' : `5px 5px 0 ${th.shadow}`,
+                  transform: mine ? 'translate(4px, 4px)' : 'none',
+                  opacity: myPick != null && !mine ? 0.55 : 1,
+                  transition: 'all 120ms',
+                }}
+              >
+                <span className="text-2xl shrink-0">{g.kind === 'calme' ? '🙂' : '🎭'}</span>
+                <span style={ANTON} className="text-xl uppercase leading-tight flex-1">
+                  {g.t}
+                  {g.durable && (
+                    <span style={MONO} className="block text-[9px] tracking-widest opacity-70 mt-1">
+                      {t('debats.untilNext')}
+                    </span>
+                  )}
+                </span>
+                {mine && <Check size={26} strokeWidth={4} className="shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-between" style={MONO}>
+          <span className="text-[10px] uppercase tracking-widest">
+            {t('debats.gageVoted', { n: gVotedCount, total: gVoters.length })}
+          </span>
+          <span style={ANTON} className="text-3xl leading-none">
+            {gageLeft}s
+          </span>
+        </div>
+      </>
+    );
+  }
+
+  // ===== GAGE : résultat =====
+  if (room.phase === 'debat_gage_result') {
+    const chosen = gOpts[gage?.win ?? 0];
+    return wrap(
+      <>
+        <div className="special-slam text-center flex flex-col items-center pt-6">
+          <div style={{ ...MONO }} className="text-xs uppercase tracking-[0.3em] mb-3">
+            {t('debats.gageKicker')}
+          </div>
+          <div className="flex flex-wrap justify-center gap-x-3 mb-5">
+            {gWho.map((id) => byId[id]).filter(Boolean).map((p) => sticker(p, 'text-6xl'))}
+          </div>
+          <div
+            style={{ ...ANTON, backgroundColor: deck === 'adult' ? YELLOW : '#FFF', color: '#000', boxShadow: `6px 6px 0 ${th.shadow === '#000' ? PINK : th.shadow}`, transform: 'rotate(1.5deg)' }}
+            className="inline-block border-4 border-black px-5 py-4 text-3xl uppercase max-w-sm leading-tight"
+          >
+            {chosen?.t}
+          </div>
+          {chosen?.durable && (
+            <div style={MONO} className="text-xs uppercase tracking-widest mt-5">
+              ⏳ {t('debats.untilNext')}
+            </div>
+          )}
+        </div>
+        {nextButton}
       </>
     );
   }
@@ -632,6 +858,17 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
           </span>
         ))}
       </div>
+      {d.rule && (
+        <div
+          className="border-4 border-black px-3 py-2 mb-4 flex items-center gap-2"
+          style={{ backgroundColor: YELLOW, color: '#000' }}
+        >
+          <span className="text-lg">⏳</span>
+          <span style={ANTON} className="uppercase text-sm leading-tight">
+            {names(toArray(d.rule.who))} : {d.rule.t}
+          </span>
+        </div>
+      )}
       <div className="flex items-center justify-between border-t-4 pt-3" style={{ borderColor: th.text }}>
         <span style={MONO} className="text-[10px] uppercase tracking-widest">
           {t('debats.marks')}

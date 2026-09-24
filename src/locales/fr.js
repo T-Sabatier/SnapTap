@@ -263,6 +263,12 @@ export const fr = {
     lobbyBtn: 'Salon',
     lobbyConfirm: "Retour au salon ? La partie s'arrête pour tout le monde.",
     waitHost: "En attente de l'hôte…",
+    gageBtn: 'Le gage !',
+    gageTitle: 'Votez son gage !',
+    gageWait: 'La table choisit ton sort…',
+    gageVoted: '{n}/{total} ont voté',
+    gageKicker: '🐑 Gage du mouton noir',
+    untilNext: "Jusqu'au prochain mouton noir",
   },
   spells: {
     rerollDesc: 'Rejette ta main et repioche 7 cartes',
