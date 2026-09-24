@@ -260,6 +260,8 @@ export const en = {
     times: '{n} times in the minority',
     replay: 'Play again!',
     backToLobby: 'Back to lobby',
+    lobbyBtn: 'Lobby',
+    lobbyConfirm: 'Back to the lobby? The game ends for everyone.',
     waitHost: 'Waiting for the host…',
   },
   spells: {

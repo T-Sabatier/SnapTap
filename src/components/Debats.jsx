@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ref, update, remove, set } from 'firebase/database';
-import { LogOut, ChevronRight, Check } from 'lucide-react';
+import { LogOut, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { db } from '../firebase';
 import { toArray } from '../utils';
 import { YELLOW, AMBER, PINK, LIKE_GREEN, DISLIKE_RED, colorHex, colorFg } from '../cards';
@@ -268,8 +268,9 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
     }
   }
 
-  async function backToLobby() {
+  async function backToLobby(ask) {
     if (!isDriver || busy) return;
+    if (ask && !confirm(t('debats.lobbyConfirm'))) return;
     setBusy(true);
     try {
       await update(ref(db, `rooms/${roomCode}`), { phase: 'lobby', debats: null });
@@ -316,12 +317,23 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
   // ---------- Rendu ----------
   const topBar = (
     <div className="flex items-center justify-between mb-5">
-      <button onClick={leave} className="flex items-center gap-1.5">
-        <LogOut size={18} />
-        <span style={MONO} className="text-[10px] uppercase tracking-widest">
-          {t('common.leave')}
-        </span>
-      </button>
+      {/* L'hôte ramène toute la table au salon (demande utilisateur) ; les
+          invités gardent "Quitter". */}
+      {isDriver ? (
+        <button onClick={() => backToLobby(true)} className="flex items-center gap-1">
+          <ChevronLeft size={20} strokeWidth={3} />
+          <span style={MONO} className="text-[10px] uppercase tracking-widest">
+            {t('debats.lobbyBtn')}
+          </span>
+        </button>
+      ) : (
+        <button onClick={leave} className="flex items-center gap-1.5">
+          <LogOut size={18} />
+          <span style={MONO} className="text-[10px] uppercase tracking-widest">
+            {t('common.leave')}
+          </span>
+        </button>
+      )}
       <div
         style={{ ...ANTON, backgroundColor: deck === 'adult' ? PINK : '#000', color: deck === 'adult' ? '#FFF' : YELLOW }}
         className="border-2 border-black px-2 py-1 uppercase text-sm leading-none"
@@ -409,7 +421,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
               </span>
             </button>
             <button
-              onClick={backToLobby}
+              onClick={() => backToLobby(false)}
               disabled={busy}
               className="w-full border-4 border-black py-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
               style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}

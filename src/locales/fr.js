@@ -260,6 +260,8 @@ export const fr = {
     times: '{n} fois minoritaire',
     replay: 'On rejoue !',
     backToLobby: 'Retour au salon',
+    lobbyBtn: 'Salon',
+    lobbyConfirm: "Retour au salon ? La partie s'arrête pour tout le monde.",
     waitHost: "En attente de l'hôte…",
   },
   spells: {
