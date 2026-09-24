@@ -438,49 +438,47 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
     const moutons = toArray(r.moutons).map((id) => byId[id]).filter(Boolean);
     const minority = r.minority || null;
     const unanimous = !minority && (yes.length === 0 || no.length === 0);
-    // Chaque camp = une grande carte de SA couleur (plus de panneau sombre
-    // + en-tête : "trop serré"). Prénoms empilés en gros ; la minorité est
-    // inclinée avec l'ombre blanche et ses marques sous chaque prénom.
-    const col = (side, list, color) => {
+    // ÉCRAN COUPÉ EN DEUX (choix utilisateur parmi 3 maquettes) : une moitié
+    // pleine hauteur par camp, sans cadre ni carte ; prénoms écrits en gros
+    // directement dessus, en autocollant (couleur du joueur + contour noir).
+    // Minorité : ses marques 🐑 sous chaque prénom.
+    const half = (side, list, color) => {
       const isMin = minority === side;
       return (
         <div
-          className="flex-1 border-4 border-black min-w-0 px-3 pt-0 pb-5 flex flex-col items-center"
-          style={{
-            backgroundColor: color,
-            color: '#FFF',
-            minHeight: 170,
-            boxShadow: isMin ? `7px 7px 0 ${th.hi}` : `5px 5px 0 ${th.shadow}`,
-            transform: isMin ? `rotate(${side === 'y' ? -2 : 2}deg)` : 'none',
-          }}
+          className={`flex-1 min-w-0 flex flex-col items-center pt-6 pb-12 px-2${side === 'n' ? ' border-l-4 border-black' : ''}`}
+          style={{ backgroundColor: color, color: '#FFF' }}
         >
-          {/* Étiquette noire qui chevauche le bord, façon "Débattez !" (le
-              gros titre + "2 votes" faisait moche). Le nombre de votes se
-              voit aux prénoms. */}
-          <div
-            style={{ ...ANTON, backgroundColor: '#000', color: '#FFF', transform: `rotate(${side === 'y' ? -4 : 4}deg)` }}
-            className="-mt-8 mb-5 border-4 border-black px-4 pt-1.5 pb-1 text-3xl uppercase leading-none"
-          >
+          <div style={ANTON} className="text-5xl uppercase leading-none mb-7">
             {side === 'y' ? t('debats.yes') : t('debats.no')}
           </div>
-          <div className="flex flex-col items-center gap-3 w-full">
-            {list.length ? (
-              list.map((p) => (
-                <div key={p.id} className="flex flex-col items-center gap-1.5 max-w-full">
-                  <NameChip p={p} big />
-                  {isMin && (
-                    <span className="text-base leading-none">
-                      <Marks n={marks[p.id] || 0} />
-                    </span>
-                  )}
-                </div>
-              ))
-            ) : (
-              <span style={MONO} className="text-[10px] uppercase tracking-widest opacity-60 mt-4">
-                {t('debats.nobody')}
-              </span>
-            )}
-          </div>
+          {list.length ? (
+            list.map((p) => (
+              <div key={p.id} className="flex flex-col items-center mb-4 max-w-full">
+                <span
+                  style={{
+                    ...ANTON,
+                    color: colorHex(p.color) || '#FFF',
+                    WebkitTextStroke: '0.1em #000',
+                    paintOrder: 'stroke fill',
+                    letterSpacing: '0.05em',
+                  }}
+                  className="text-3xl uppercase leading-tight text-center break-all"
+                >
+                  {p.name}
+                </span>
+                {isMin && (
+                  <span className="text-base leading-none mt-1">
+                    <Marks n={marks[p.id] || 0} />
+                  </span>
+                )}
+              </div>
+            ))
+          ) : (
+            <span style={MONO} className="text-[10px] uppercase tracking-widest opacity-70">
+              {t('debats.nobody')}
+            </span>
+          )}
         </div>
       );
     };
@@ -489,12 +487,26 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         {moutons.length > 0 && <MoutonAnnounce key={i} moutons={moutons} apero={partyMode} />}
         {/* Écran épuré (retour "un peu fouillis") : la question en rappel
             discret, les deux camps, et c'est tout. */}
-        <div style={ANTON} className="text-xl uppercase leading-tight text-center opacity-80 mb-5 px-2">
+        <div style={ANTON} className="text-xl uppercase leading-tight text-center opacity-80 mb-4 px-2">
           {nbsp(q.t)}
         </div>
-        <div className="flex gap-4 mb-7 mt-9 items-start">
-          {col('y', yes, th.yes)}
-          {col('n', no, th.no)}
+        <div
+          className="-mx-5 relative flex border-y-4 border-black mb-12"
+          style={{ minHeight: moutons.length ? 'max(240px, calc(100vh - 400px))' : 'max(260px, calc(100vh - 310px))' }}
+        >
+          {half('y', yes, th.yes)}
+          {half('n', no, th.no)}
+          <div
+            className="absolute left-1/2 bottom-0 z-10"
+            style={{ transform: 'translate(-50%, 50%)' }}
+          >
+            <span
+              style={{ ...ANTON, backgroundColor: th.debate.bg, color: th.debate.fg, transform: 'rotate(-2deg)', boxShadow: `5px 5px 0 ${th.debate.shadow}` }}
+              className="inline-block border-4 border-black px-5 py-2 text-3xl uppercase whitespace-nowrap"
+            >
+              {t('debats.debate')}
+            </span>
+          </div>
         </div>
         {!minority && (
           <div style={MONO} className="text-center text-xs uppercase tracking-widest mb-4">
@@ -523,14 +535,6 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
             </span>
           </div>
         )}
-        <div className="text-center mt-2">
-          <span
-            style={{ ...ANTON, backgroundColor: th.debate.bg, color: th.debate.fg, transform: 'rotate(-2deg)', boxShadow: `5px 5px 0 ${th.debate.shadow}` }}
-            className="inline-block border-4 border-black px-5 py-2 text-3xl uppercase"
-          >
-            {t('debats.debate')}
-          </span>
-        </div>
         <div className="fixed bottom-0 left-0 right-0 p-4 border-t-4" style={{ backgroundColor: th.bar, borderColor: th.shadow }}>
           <div className="max-w-md mx-auto">
             {isDriver ? (
