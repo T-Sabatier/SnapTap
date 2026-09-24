@@ -59,15 +59,20 @@ function Marks({ n }) {
   );
 }
 
+// Timing du slam (ms après la révélation). Le bouton "suivante" reste grisé
+// jusqu'à la fin : sinon l'hôte enchaînait et le slam disparaissait avant
+// que la table l'ait vu (retour utilisateur).
+const MOUTON_SLAM = { in: 1200, out: 4800, end: 5200 };
+
 // Slam plein écran du MOUTON NOIR, un peu après la révélation (on lit
 // d'abord les camps, puis le slam tombe : une info à la fois).
 function MoutonAnnounce({ moutons, apero }) {
   const t = useT();
   const [phase, setPhase] = useState('wait');
   useEffect(() => {
-    const t0 = setTimeout(() => setPhase('in'), 1500);
-    const t1 = setTimeout(() => setPhase('out'), 5200);
-    const t2 = setTimeout(() => setPhase('hidden'), 5600);
+    const t0 = setTimeout(() => setPhase('in'), MOUTON_SLAM.in);
+    const t1 = setTimeout(() => setPhase('out'), MOUTON_SLAM.out);
+    const t2 = setTimeout(() => setPhase('hidden'), MOUTON_SLAM.end);
     return () => {
       clearTimeout(t0);
       clearTimeout(t1);
@@ -297,14 +302,16 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
   }
 
   // Bouton "suivante" grisé 2.5 s après la révélation : on lit les camps
-  // (et on commence à débattre) avant de pouvoir enchaîner.
+  // (et on commence à débattre) avant de pouvoir enchaîner. S'il y a un
+  // mouton noir, grisé jusqu'à la fin de son slam.
   const [canNext, setCanNext] = useState(false);
+  const moutonCount = toArray(d.reveal?.moutons).length;
   useEffect(() => {
     if (room.phase !== 'debat_reveal') return undefined;
     setCanNext(false);
-    const id = setTimeout(() => setCanNext(true), 2500);
+    const id = setTimeout(() => setCanNext(true), moutonCount ? MOUTON_SLAM.end : 2500);
     return () => clearTimeout(id);
-  }, [room.phase, i]);
+  }, [room.phase, i, moutonCount]);
 
   // ---------- Rendu ----------
   const topBar = (
@@ -477,6 +484,28 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         {!minority && (
           <div style={MONO} className="text-center text-xs uppercase tracking-widest mb-4">
             {unanimous ? t('debats.unanimous') : t('debats.tie')}
+          </div>
+        )}
+        {/* Le mouton noir reste affiché après le slam : ceux qui l'ont raté
+            voient qui prend (et combien de gorgées en Apéro). */}
+        {moutons.length > 0 && (
+          <div
+            className="border-4 border-black p-3 mb-5 flex items-center gap-3 flex-wrap justify-center"
+            style={{ backgroundColor: '#000', color: '#FFF', boxShadow: `4px 4px 0 ${th.shadow === '#000' ? PINK : th.shadow}` }}
+          >
+            <span style={{ ...MONO, color: YELLOW }} className="text-xs uppercase tracking-widest">
+              {t('debats.moutonKicker')}
+            </span>
+            {moutons.map((p) => (
+              <NameChip key={p.id} p={p} />
+            ))}
+            <span style={ANTON} className="text-xl uppercase">
+              {partyMode
+                ? moutons.length > 1
+                  ? t('debats.moutonAperoMany')
+                  : t('debats.moutonApero')
+                : t('debats.moutonNormal')}
+            </span>
           </div>
         )}
         <div className="text-center mb-6">
