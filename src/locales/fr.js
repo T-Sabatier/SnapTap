@@ -267,6 +267,7 @@ export const fr = {
     gageSoon: 'Le vote du gage arrive…',
     gageTitle: 'Votez son gage !',
     gageWait: 'La table choisit ton sort…',
+    gageNoPeek: 'Interdit de regarder les écrans des autres 👀',
     gageVoted: '{n}/{total} ont voté',
     gageKicker: '🐑 Gage du mouton noir',
     untilNext: "Jusqu'au prochain mouton noir",

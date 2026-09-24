@@ -267,6 +267,7 @@ export const en = {
     gageSoon: 'Dare vote coming up…',
     gageTitle: 'Vote for the dare!',
     gageWait: 'The table decides your fate…',
+    gageNoPeek: "No peeking at other people's screens 👀",
     gageVoted: '{n}/{total} voted',
     gageKicker: '🐑 Black sheep dare',
     untilNext: 'Until the next black sheep',

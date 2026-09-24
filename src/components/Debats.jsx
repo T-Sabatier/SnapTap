@@ -733,6 +733,35 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
   if (room.phase === 'debat_gage') {
     const iAmMouton = gWho.includes(playerId);
     const myPick = gVotes[playerId];
+    // Le mouton noir ne voit PAS les propositions (surprise au verdict) :
+    // écran d'attente animé, juste l'avancée du vote et le chrono.
+    if (iAmMouton) {
+      return wrap(
+        <div className="text-center flex flex-col items-center pt-4">
+          <div className="sheep-wobble text-[7rem] leading-none mb-6">🐑</div>
+          <div style={ANTON} className="text-4xl uppercase leading-tight mb-2">
+            {t('debats.gageWait')}
+          </div>
+          <div style={MONO} className="text-xs uppercase tracking-widest opacity-80 mb-8">
+            {t('debats.gageNoPeek')}
+          </div>
+          <div
+            className="border-4 border-black px-6 py-4 mb-6 dot-blink"
+            style={{ ...panel, boxShadow: `5px 5px 0 ${th.shadow}` }}
+          >
+            <span style={ANTON} className="text-5xl">●</span>
+            <span style={ANTON} className="text-5xl mx-3">●</span>
+            <span style={ANTON} className="text-5xl">●</span>
+          </div>
+          <div style={MONO} className="text-[10px] uppercase tracking-widest mb-1">
+            {t('debats.gageVoted', { n: gVotedCount, total: gVoters.length })}
+          </div>
+          <div style={ANTON} className="text-4xl leading-none">
+            {gageLeft}s
+          </div>
+        </div>
+      );
+    }
     return wrap(
       <>
         <div className="text-center mb-5">
