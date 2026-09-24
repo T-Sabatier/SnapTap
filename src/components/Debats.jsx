@@ -116,6 +116,39 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
   const partyMode = !!room.settings?.partyMode;
   const bg = partyMode ? AMBER : YELLOW;
   const deck = room.settings?.debatsDeck === 'adult' ? 'adult' : 'soft';
+  // Ambiance ADULTE (demande utilisateur : "un truc plus sensuel") : nuit
+  // bordeaux, lueurs rose néon, OUI rose / NON aubergine. Le Soft garde le
+  // jaune (ou l'ambre bière en Apéro).
+  const th =
+    deck === 'adult'
+      ? {
+          page: '#12030A',
+          pageImg:
+            'radial-gradient(120% 70% at 50% -10%, #7A1440 0%, #3A0820 45%, #12030A 100%)',
+          pageClass: '',
+          text: '#FFF',
+          panel: '#2A0916',
+          panelText: '#FFF',
+          shadow: PINK,
+          yes: PINK,
+          no: '#5B1A8C',
+          bar: '#1A040E',
+          debate: { bg: PINK, fg: '#FFF', shadow: '#000' },
+        }
+      : {
+          page: bg,
+          pageImg: undefined,
+          pageClass: partyMode ? 'apero-bg' : '',
+          text: '#000',
+          panel: '#FFF',
+          panelText: '#000',
+          shadow: '#000',
+          yes: LIKE_GREEN,
+          no: DISLIKE_RED,
+          bar: bg,
+          debate: { bg: '#000', fg: YELLOW, shadow: PINK },
+        };
+  const panel = { backgroundColor: th.panel, color: th.panelText };
   const players = Object.entries(room.players || {})
     .map(([id, p]) => ({ id, ...p }))
     .sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
@@ -287,7 +320,16 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
   );
 
   const wrap = (children) => (
-    <div style={{ backgroundColor: bg, minHeight: '100vh' }} className={`text-black${partyMode ? ' apero-bg' : ''}`}>
+    <div
+      style={{
+        backgroundColor: th.page,
+        backgroundImage: th.pageImg,
+        backgroundAttachment: 'fixed',
+        color: th.text,
+        minHeight: '100vh',
+      }}
+      className={th.pageClass}
+    >
       <div className="max-w-md mx-auto px-5 py-6 pb-32">
         {topBar}
         {children}
@@ -309,12 +351,12 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         </h1>
         {[
           { label: t('debats.mostMouton'), list: most, v: max, bgc: '#000', fg: '#FFF' },
-          { label: t('debats.leastMouton'), list: least, v: min, bgc: '#FFF', fg: '#000' },
+          { label: t('debats.leastMouton'), list: least, v: min, bgc: th.panel, fg: th.panelText },
         ].map((b) => (
           <div
             key={b.label}
             className="border-4 border-black p-4 mb-4"
-            style={{ backgroundColor: b.bgc, color: b.fg, boxShadow: '6px 6px 0 #000' }}
+            style={{ backgroundColor: b.bgc, color: b.fg, boxShadow: `6px 6px 0 ${th.shadow}` }}
           >
             <div style={MONO} className="text-[10px] uppercase tracking-widest opacity-80 mb-2">
               {b.label}
@@ -329,7 +371,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
             </div>
           </div>
         ))}
-        <div className="border-4 border-black bg-white p-4 mb-6" style={{ boxShadow: '4px 4px 0 #000' }}>
+        <div className="border-4 border-black p-4 mb-6" style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}>
           {ranked.map((p) => (
             <div key={p.id} className="flex items-center justify-between py-1.5">
               <NameChip p={p} />
@@ -354,8 +396,8 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
             <button
               onClick={backToLobby}
               disabled={busy}
-              className="w-full border-4 border-black py-3 bg-white active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
-              style={{ boxShadow: '4px 4px 0 #000' }}
+              className="w-full border-4 border-black py-3 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+              style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}
             >
               <span style={ANTON} className="text-xl uppercase">
                 {t('debats.backToLobby')}
@@ -385,8 +427,8 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
       const isMin = minority === side;
       return (
         <div
-          className="flex-1 border-4 border-black bg-white min-w-0"
-          style={{ boxShadow: isMin ? `6px 6px 0 ${PINK}` : '4px 4px 0 #000' }}
+          className="flex-1 border-4 border-black min-w-0"
+          style={{ ...panel, boxShadow: isMin ? `6px 6px 0 ${PINK}` : `4px 4px 0 ${th.shadow === PINK ? '#000' : th.shadow}` }}
         >
           <div style={{ ...ANTON, backgroundColor: color, color: '#FFF' }} className="border-b-4 border-black text-center text-3xl uppercase py-2">
             {side === 'y' ? t('debats.yes') : t('debats.no')}
@@ -413,16 +455,16 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
       <>
         {moutons.length > 0 && <MoutonAnnounce key={i} moutons={moutons} apero={partyMode} />}
         <div
-          className="border-4 border-black bg-white px-4 py-5 mb-5 text-center"
-          style={{ boxShadow: '4px 4px 0 #000' }}
+          className="border-4 border-black px-4 py-5 mb-5 text-center"
+          style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}
         >
           <div style={ANTON} className="text-2xl uppercase leading-tight">
             {q.t}
           </div>
         </div>
         <div className="flex gap-3 mb-4">
-          {col('y', yes, LIKE_GREEN)}
-          {col('n', no, DISLIKE_RED)}
+          {col('y', yes, th.yes)}
+          {col('n', no, th.no)}
         </div>
         {!minority && (
           <div style={MONO} className="text-center text-xs uppercase tracking-widest mb-4">
@@ -431,13 +473,13 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         )}
         <div className="text-center mb-6">
           <span
-            style={{ ...ANTON, backgroundColor: '#000', color: YELLOW, transform: 'rotate(-2deg)', boxShadow: `5px 5px 0 ${PINK}` }}
+            style={{ ...ANTON, backgroundColor: th.debate.bg, color: th.debate.fg, transform: 'rotate(-2deg)', boxShadow: `5px 5px 0 ${th.debate.shadow}` }}
             className="inline-block border-4 border-black px-5 py-2 text-3xl uppercase"
           >
             {t('debats.debate')}
           </span>
         </div>
-        <div className="border-4 border-black bg-white p-3" style={{ boxShadow: '4px 4px 0 #000' }}>
+        <div className="border-4 border-black p-3" style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}>
           {players.map((p) => (
             <div key={p.id} className="flex items-center justify-between py-1">
               <NameChip p={p} />
@@ -445,7 +487,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
             </div>
           ))}
         </div>
-        <div className="fixed bottom-0 left-0 right-0 p-4 border-t-4 border-black" style={{ backgroundColor: bg }}>
+        <div className="fixed bottom-0 left-0 right-0 p-4 border-t-4" style={{ backgroundColor: th.bar, borderColor: th.shadow }}>
           <div className="max-w-md mx-auto">
             {isDriver ? (
               <button
@@ -483,9 +525,9 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         style={{
           // Le bouton non choisi passe en blanc (pas en transparence : le
           // rouge délavé sur fond jaune virait à l'orange).
-          backgroundColor: myVote && !mine ? '#FFF' : color,
-          color: myVote && !mine ? 'rgba(0,0,0,0.35)' : '#FFF',
-          boxShadow: mine ? '0 0 0 #000' : '6px 6px 0 #000',
+          backgroundColor: myVote && !mine ? th.panel : color,
+          color: myVote && !mine ? (th.text === '#FFF' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.35)') : '#FFF',
+          boxShadow: mine ? '0 0 0 #000' : `6px 6px 0 ${th.shadow}`,
           transform: mine ? 'translate(4px, 4px)' : 'none',
           transition: 'all 120ms',
         }}
@@ -501,16 +543,16 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
     <>
       <div
         key={i}
-        className="special-slam border-4 border-black bg-white px-5 py-10 mb-8 text-center flex items-center justify-center min-h-[220px]"
-        style={{ boxShadow: '8px 8px 0 #000' }}
+        className="special-slam border-4 border-black px-5 py-10 mb-8 text-center flex items-center justify-center min-h-[220px]"
+        style={{ ...panel, boxShadow: `8px 8px 0 ${th.shadow}` }}
       >
         <div style={{ ...ANTON, fontSize: questionSize(q.t) }} className="uppercase leading-tight">
           {q.t}
         </div>
       </div>
       <div className="flex gap-4 mb-4">
-        {voteBtn('y', t('debats.yes'), LIKE_GREEN)}
-        {voteBtn('n', t('debats.no'), DISLIKE_RED)}
+        {voteBtn('y', t('debats.yes'), th.yes)}
+        {voteBtn('n', t('debats.no'), th.no)}
       </div>
       <div style={MONO} className="text-center text-[10px] uppercase tracking-widest opacity-70 mb-6 h-4">
         {myVote ? t('debats.changeVote') : ''}
@@ -525,7 +567,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
           </span>
         ))}
       </div>
-      <div className="flex items-center justify-between border-t-4 border-black pt-3">
+      <div className="flex items-center justify-between border-t-4 pt-3" style={{ borderColor: th.text }}>
         <span style={MONO} className="text-[10px] uppercase tracking-widest">
           {t('debats.marks')}
         </span>
@@ -536,8 +578,8 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
       {isDriver && !allVoted && votedCount >= 2 && (
         <button
           onClick={reveal}
-          className="mt-6 w-full border-4 border-black py-3 bg-white active:translate-x-[2px] active:translate-y-[2px]"
-          style={{ boxShadow: '4px 4px 0 #000' }}
+          className="mt-6 w-full border-4 border-black py-3 active:translate-x-[2px] active:translate-y-[2px]"
+          style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}
         >
           <span style={ANTON} className="text-lg uppercase">
             {t('debats.revealNow')}
