@@ -33,7 +33,7 @@ function questionSize(text) {
 
 // Espace insécable avant « ? » : le point d'interrogation ne se retrouve
 // jamais seul sur la dernière ligne.
-const nbsp = (text) => text.replace(/ ?/g, '00A0?');
+const nbsp = (text) => text.replace(/ \?/g, ' ?');
 
 function NameChip({ p }) {
   const bg = colorHex(p?.color) || '#FFF';
