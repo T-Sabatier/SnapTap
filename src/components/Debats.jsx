@@ -449,14 +449,22 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
             {side === 'y' ? t('debats.yes') : t('debats.no')}
             <span className="ml-2 text-xl opacity-90">{list.length}</span>
           </div>
-          {isMin && (
-            <div style={{ ...MONO, backgroundColor: PINK, color: '#FFF' }} className="text-center text-[10px] uppercase tracking-widest py-1 border-b-4 border-black">
-              {t('debats.minority')}
-            </div>
-          )}
           <div className="p-3 flex flex-wrap gap-2 justify-center min-h-[64px]">
             {list.length ? (
-              list.map((p) => <NameChip key={p.id} p={p} />)
+              // Minorité : les marques s'affichent sous le prénom (l'info
+              // utile au moment où on la prend, sans panneau à part).
+              list.map((p) =>
+                isMin ? (
+                  <div key={p.id} className="flex flex-col items-center gap-1">
+                    <NameChip p={p} />
+                    <span className="text-sm leading-none">
+                      <Marks n={marks[p.id] || 0} />
+                    </span>
+                  </div>
+                ) : (
+                  <NameChip key={p.id} p={p} />
+                )
+              )
             ) : (
               <span style={MONO} className="text-[10px] uppercase tracking-widest opacity-40 self-center">
                 {t('debats.nobody')}
@@ -469,15 +477,12 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
     return wrap(
       <>
         {moutons.length > 0 && <MoutonAnnounce key={i} moutons={moutons} apero={partyMode} />}
-        <div
-          className="border-4 border-black px-4 py-5 mb-5 text-center"
-          style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}
-        >
-          <div style={ANTON} className="text-2xl uppercase leading-tight">
-            {nbsp(q.t)}
-          </div>
+        {/* Écran épuré (retour "un peu fouillis") : la question en rappel
+            discret, les deux camps, et c'est tout. */}
+        <div style={ANTON} className="text-xl uppercase leading-tight text-center opacity-80 mb-5 px-2">
+          {nbsp(q.t)}
         </div>
-        <div className="flex gap-3 mb-4">
+        <div className="flex gap-3 mb-6">
           {col('y', yes, th.yes)}
           {col('n', no, th.no)}
         </div>
@@ -508,21 +513,13 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
             </span>
           </div>
         )}
-        <div className="text-center mb-6">
+        <div className="text-center mt-2">
           <span
             style={{ ...ANTON, backgroundColor: th.debate.bg, color: th.debate.fg, transform: 'rotate(-2deg)', boxShadow: `5px 5px 0 ${th.debate.shadow}` }}
             className="inline-block border-4 border-black px-5 py-2 text-3xl uppercase"
           >
             {t('debats.debate')}
           </span>
-        </div>
-        <div className="border-4 border-black p-3" style={{ ...panel, boxShadow: `4px 4px 0 ${th.shadow}` }}>
-          {players.map((p) => (
-            <div key={p.id} className="flex items-center justify-between py-1">
-              <NameChip p={p} />
-              <Marks n={marks[p.id] || 0} />
-            </div>
-          ))}
         </div>
         <div className="fixed bottom-0 left-0 right-0 p-4 border-t-4" style={{ backgroundColor: th.bar, borderColor: th.shadow }}>
           <div className="max-w-md mx-auto">
