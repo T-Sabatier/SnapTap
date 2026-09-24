@@ -35,12 +35,12 @@ function questionSize(text) {
 // jamais seul sur la dernière ligne.
 const nbsp = (text) => text.replace(/ \?/g, ' ?');
 
-function NameChip({ p }) {
+function NameChip({ p, big }) {
   const bg = colorHex(p?.color) || '#FFF';
   return (
     <span
-      className="inline-block border-2 border-black px-2 py-1 uppercase text-sm leading-none"
-      style={{ ...ANTON, backgroundColor: bg, color: colorFg(p?.color), boxShadow: '2px 2px 0 #000' }}
+      className={`inline-flex items-center justify-center border-2 border-black uppercase leading-none ${big ? 'px-3 pt-2 pb-1.5 text-xl' : 'px-2 pt-1.5 pb-1 text-sm'}`}
+      style={{ ...ANTON, backgroundColor: bg, color: colorFg(p?.color), boxShadow: big ? '3px 3px 0 #000' : '2px 2px 0 #000' }}
     >
       {p?.name || '?'}
     </span>
@@ -438,35 +438,42 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
     const moutons = toArray(r.moutons).map((id) => byId[id]).filter(Boolean);
     const minority = r.minority || null;
     const unanimous = !minority && (yes.length === 0 || no.length === 0);
+    // Chaque camp = une grande carte de SA couleur (plus de panneau sombre
+    // + en-tête : "trop serré"). Prénoms empilés en gros ; la minorité est
+    // inclinée avec l'ombre blanche et ses marques sous chaque prénom.
     const col = (side, list, color) => {
       const isMin = minority === side;
       return (
         <div
-          className="flex-1 border-4 border-black min-w-0"
-          style={{ ...panel, boxShadow: isMin ? `6px 6px 0 ${th.hi}` : `4px 4px 0 ${th.shadow}` }}
+          className="flex-1 border-4 border-black min-w-0 px-3 pt-4 pb-5 flex flex-col items-center"
+          style={{
+            backgroundColor: color,
+            color: '#FFF',
+            minHeight: 200,
+            boxShadow: isMin ? `7px 7px 0 ${th.hi}` : `5px 5px 0 ${th.shadow}`,
+            transform: isMin ? `rotate(${side === 'y' ? -2 : 2}deg)` : 'none',
+          }}
         >
-          <div style={{ ...ANTON, backgroundColor: color, color: '#FFF' }} className="border-b-4 border-black text-center text-3xl uppercase py-2">
+          <div style={ANTON} className="text-4xl uppercase leading-none">
             {side === 'y' ? t('debats.yes') : t('debats.no')}
-            <span className="ml-2 text-xl opacity-90">{list.length}</span>
           </div>
-          <div className="p-3 flex flex-wrap gap-2 justify-center min-h-[64px]">
+          <div style={MONO} className="text-[10px] uppercase tracking-widest opacity-80 mt-1 mb-4">
+            {list.length} {list.length > 1 ? 'votes' : 'vote'}
+          </div>
+          <div className="flex flex-col items-center gap-3 w-full">
             {list.length ? (
-              // Minorité : les marques s'affichent sous le prénom (l'info
-              // utile au moment où on la prend, sans panneau à part).
-              list.map((p) =>
-                isMin ? (
-                  <div key={p.id} className="flex flex-col items-center gap-1">
-                    <NameChip p={p} />
-                    <span className="text-sm leading-none">
+              list.map((p) => (
+                <div key={p.id} className="flex flex-col items-center gap-1.5 max-w-full">
+                  <NameChip p={p} big />
+                  {isMin && (
+                    <span className="text-base leading-none">
                       <Marks n={marks[p.id] || 0} />
                     </span>
-                  </div>
-                ) : (
-                  <NameChip key={p.id} p={p} />
-                )
-              )
+                  )}
+                </div>
+              ))
             ) : (
-              <span style={MONO} className="text-[10px] uppercase tracking-widest opacity-40 self-center">
+              <span style={MONO} className="text-[10px] uppercase tracking-widest opacity-60 mt-4">
                 {t('debats.nobody')}
               </span>
             )}
@@ -482,7 +489,7 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
         <div style={ANTON} className="text-xl uppercase leading-tight text-center opacity-80 mb-5 px-2">
           {nbsp(q.t)}
         </div>
-        <div className="flex gap-3 mb-6">
+        <div className="flex gap-4 mb-7 items-start">
           {col('y', yes, th.yes)}
           {col('n', no, th.no)}
         </div>
