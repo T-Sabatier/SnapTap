@@ -133,14 +133,14 @@ export default function Debats({ room, roomCode, playerId, onLeave }) {
           text: '#FFF',
           panel: '#45102A',
           panelText: '#FFF',
-          // Ombres NOIRES : le rose néon sur fond framboise faisait bizarre
-          // (retour utilisateur) ; le blanc marque la minorité.
-          shadow: '#000',
+          // Ombres OR (champagne) : le rose sur framboise faisait bizarre, le
+          // noir était trop terne (retours utilisateur) ; le blanc marque la minorité.
+          shadow: '#FFC23D',
           hi: '#FFF',
           yes: PINK,
           no: '#5B1A8C',
           bar: '#5A0F30',
-          debate: { bg: PINK, fg: '#FFF', shadow: '#000' },
+          debate: { bg: PINK, fg: '#FFF', shadow: '#FFC23D' },
         }
       : {
           page: bg,
